@@ -1,0 +1,800 @@
+  [1m[35m (10.6ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY) /*application='DevNewsAggregator'*/[0m
+  [1m[35m (7.3ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='DevNewsAggregator'*/[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_try_advisory_lock(3412772191978308285) /*application='DevNewsAggregator'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.9ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='DevNewsAggregator'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (1.1ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Create (0.9ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ('environment', 'development', '2025-09-08 20:56:26.132930', '2025-09-08 20:56:26.132934') RETURNING "key" /*application='DevNewsAggregator'*/[0m
+Migrating to CreateNewsSources (20250908204450)
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  [1m[35m (8.6ms)[0m  [1m[35mCREATE TABLE "news_sources" ("id" bigserial primary key, "name" character varying, "api_url" character varying, "source_type" character varying, "active" boolean, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='DevNewsAggregator'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250908204450') RETURNING "version" /*application='DevNewsAggregator'*/[0m
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+Migrating to CreateArticles (20250908204501)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  [1m[35m (7.4ms)[0m  [1m[35mCREATE TABLE "articles" ("id" bigserial primary key, "title" character varying, "url" character varying, "published_at" timestamp(6), "description" text, "external_id" character varying, "source_type" character varying, "score" integer, "comment_count" integer, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL) /*application='DevNewsAggregator'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.4ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250908204501') RETURNING "version" /*application='DevNewsAggregator'*/[0m
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_advisory_unlock(3412772191978308285) /*application='DevNewsAggregator'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='DevNewsAggregator'*/[0m
+Starting news aggregation from all sources...
+Fetching articles from Hacker News...
+NewsFetchers::HackerNewsFetcher: fetched 0 articles
+Fetching articles from Dev.to...
+NewsFetchers::DevToFetcher: fetched 0 articles
+Fetching articles from Reddit r/programming...
+  [1m[36mArticle Load (0.7ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbqt4d' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.9ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Largest NPM Compromise in History - Supply Chain Attack', 'https://www.aikido.dev/blog/npm-debug-and-chalk-packages-compromised', '2025-09-08 15:28:16', 'Hey Everyone
+
+We just discovered that around 1 hour ago packages with a total of 2 billion weekly downloads on npm were compromised all belonging to one developer [https://www.npmjs.com/\~qix](https://www.npmjs.com/~qix)
+
+ansi-styles (371.41m downloads per week)  
+debug (357.6m downloads per week)  
+backslash (0.26m downloads per week)  
+chalk-template (3.9m downloads per week)  
+supports-hyperlinks (19.2m downloads per week)  
+has-ansi (12.1m downloads per week)  
+simple-swizzle (26.26m downloads per week)  
+color-string (27.48m downloads per week)  
+error-ex (47.17m downloads per week)  
+color-name (191.71m downloads per week)  
+is-arrayish (73.8m downloads per week)  
+slice-ansi (59.8m downloads per week)  
+color-convert (193.5m downloads per week)  
+wrap-ansi (197.99m downloads per week)  
+ansi-regex (243.64m downloads per week)  
+supports-color (287.1m downloads per week)  
+strip-ansi (261.17m downloads per week)  
+chalk (299.99m downloads per week)
+
+The compromises all stem from a core developers NPM account getting taken over from a phishing campaign
+
+The malware itself, luckily, looks like its mostly intrested in crypto at the moment so its impact is smaller than if they had installed a backdoor for example.
+
+# How the Malware Works (Step by Step)
+
+1. **Injects itself into the browser**
+   * Hooks core functions like `fetch`, `XMLHttpRequest`, and wallet APIs (`window.ethereum`, Solana, etc.).
+   * Ensures it can intercept both web traffic and wallet activity.
+2. **Watches for sensitive data**
+   * Scans network responses and transaction payloads for anything that looks like a wallet address or transfer.
+   * Recognizes multiple formats across Ethereum, Bitcoin, Solana, Tron, Litecoin, and Bitcoin Cash.
+3. **Rewrites the targets**
+   * Replaces the legitimate destination with an attacker-controlled address.
+   * Uses “lookalike” addresses (via string-matching) to make swaps less obvious.
+4. **Hijacks transactions before they’re signed**
+   * Alters Ethereum and Solana transaction parameters (e.g., recipients, approvals, allowances).
+   * Even if the UI looks correct, the signed transaction routes funds to the attacker.
+5. **Stays stealthy**
+   * If a crypto wallet is detected, it avoids obvious swaps in the UI to reduce suspicion.
+   * Keeps silent hooks running in the background to capture and alter real transactions
+
+Our blog is being dynamically updated - [https://www.aikido.dev/blog/npm-debug-and-chalk-packages-compromised](https://www.aikido.dev/blog/npm-debug-and-chalk-packages-compromised)', '1nbqt4d', 'reddit', 537, 202, '2025-09-08 21:00:36.066367', '2025-09-08 21:00:36.066367') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (8.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Largest NPM Compromise in History - Supply Chain Attack
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvfcs' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.2ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Writing Code Is Easy. Reading It Isn''t', 'https://idiallo.com/blog/writing-code-is-easy-reading-is-hard', '2025-09-08 18:18:00', '', '1nbvfcs', 'reddit', 66, 21, '2025-09-08 21:00:36.081177', '2025-09-08 21:00:36.081177') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (7.4ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Writing Code Is Easy. Reading It Isn't
+  [1m[36mArticle Load (0.4ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbv9xc' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.5ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Firefox 32-bit Linux Support to End in 2026', 'https://blog.mozilla.org/futurereleases/2025/09/05/firefox-32-bit-linux-support-to-end-in-2026/', '2025-09-08 18:12:28', '', '1nbv9xc', 'reddit', 26, 4, '2025-09-08 21:00:36.093904', '2025-09-08 21:00:36.093904') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Firefox 32-bit Linux Support to End in 2026
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbg6u1' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.3ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('How I solved a distributed queue problem after 15 years', 'https://www.dbos.dev/blog/durable-queues', '2025-09-08 06:19:17', '', '1nbg6u1', 'reddit', 107, 31, '2025-09-08 21:00:36.098942', '2025-09-08 21:00:36.098942') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: How I solved a distributed queue problem after 15 years
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvest' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.2ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Everything is a []u8', 'https://www.openmymind.net/Everything-Is-A-u8-array/', '2025-09-08 18:17:25', '', '1nbvest', 'reddit', 8, 20, '2025-09-08 21:00:36.104784', '2025-09-08 21:00:36.104784') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Everything is a []u8
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvabp' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.2ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('A complete map of the Rust type system', 'https://rustcurious.com/elements/', '2025-09-08 18:12:53', '', '1nbvabp', 'reddit', 6, 0, '2025-09-08 21:00:36.109332', '2025-09-08 21:00:36.109332') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: A complete map of the Rust type system
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbv9w3' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.2ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Color NPM Package Compromised', 'https://fasterthanli.me/articles/color-npm-package-compromised', '2025-09-08 18:12:26', '', '1nbv9w3', 'reddit', 4, 2, '2025-09-08 21:00:36.114933', '2025-09-08 21:00:36.114933') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Color NPM Package Compromised
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbl1dm' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.3ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('The Subtle Art of Taming Flows and Coroutines in Kotlin, or ''How Not to DDoS Yourself with Server-Sent Events''', 'https://cekrem.github.io/posts/the-subtle-art-of-taming-flows-and-coroutines-in-kotlin/', '2025-09-08 11:21:50', '', '1nbl1dm', 'reddit', 12, 2, '2025-09-08 21:00:36.119525', '2025-09-08 21:00:36.119525') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: The Subtle Art of Taming Flows and Coroutines in Kotlin, or 'How Not to DDoS Yourself with Server-Sent Events'
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvji6' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.1ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Emulating Rust''s Result and ? in Jai with Metaprogramming', 'https://jamesoswald.dev/posts/jai-result/', '2025-09-08 18:22:07', '', '1nbvji6', 'reddit', 3, 0, '2025-09-08 21:00:36.125208', '2025-09-08 21:00:36.125208') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Emulating Rust's Result and ? in Jai with Metaprogramming
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvi5u' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.2ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Keeping secrets out of logs', 'https://allan.reyes.sh/posts/keeping-secrets-out-of-logs/', '2025-09-08 18:20:46', '', '1nbvi5u', 'reddit', 3, 0, '2025-09-08 21:00:36.129764', '2025-09-08 21:00:36.129764') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Keeping secrets out of logs
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvh5t' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.2ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('No Silver Bullet: Essence and Accidents of Software Engineering (1986) [pdf]', 'https://www.cs.unc.edu/techreports/86-020.pdf', '2025-09-08 18:19:51', '', '1nbvh5t', 'reddit', 3, 0, '2025-09-08 21:00:36.135285', '2025-09-08 21:00:36.135285') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: No Silver Bullet: Essence and Accidents of Software Engineering (1986) [pdf]
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbyspd' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.2ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Adventures in C++ Game Architecture', 'https://hoboker.substack.com/p/adventures-in-c-game-architecture', '2025-09-08 20:24:35', 'It''s a fairly detailed technical writeup. I hope you find it interesting.', '1nbyspd', 'reddit', 2, 0, '2025-09-08 21:00:36.139814', '2025-09-08 21:00:36.139814') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Adventures in C++ Game Architecture
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbviq4' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.3ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Algebraic Effects in Practice with Flix', 'https://www.relax.software/blog/flix-effects-intro/', '2025-09-08 18:21:20', '', '1nbviq4', 'reddit', 2, 0, '2025-09-08 21:00:36.146019', '2025-09-08 21:00:36.146019') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Algebraic Effects in Practice with Flix
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvifp' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.2ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('The Expression Problem and its solutions', 'https://eli.thegreenplace.net/2016/the-expression-problem-and-its-solutions', '2025-09-08 18:21:02', '', '1nbvifp', 'reddit', 2, 0, '2025-09-08 21:00:36.151393', '2025-09-08 21:00:36.151393') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: The Expression Problem and its solutions
+  [1m[36mArticle Load (0.5ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvhnx' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.4ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Forty-Four Esolangs: The Art of Esoteric Code', 'https://spectrum.ieee.org/esoteric-programming-languages-daniel-temkin', '2025-09-08 18:20:19', '', '1nbvhnx', 'reddit', 2, 0, '2025-09-08 21:00:36.158409', '2025-09-08 21:00:36.158409') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Forty-Four Esolangs: The Art of Esoteric Code
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvfpq' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (3.0ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Analog optical computer for AI inference and combinatorial optimization', 'https://www.nature.com/articles/s41586-025-09430-z', '2025-09-08 18:18:23', '', '1nbvfpq', 'reddit', 2, 0, '2025-09-08 21:00:36.163691', '2025-09-08 21:00:36.163691') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.7ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Analog optical computer for AI inference and combinatorial optimization
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvb12' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.5ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('The Key Points of Working Effectively with Legacy Code', 'https://understandlegacycode.com/blog/key-points-of-working-effectively-with-legacy-code/', '2025-09-08 18:13:38', '', '1nbvb12', 'reddit', 2, 0, '2025-09-08 21:00:36.172739', '2025-09-08 21:00:36.172739') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: The Key Points of Working Effectively with Legacy Code
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbma1u' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.6ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Teams Outlast Projects', 'https://frederickvanbrabant.com/blog/2025-09-05-teams-outlast-projects/', '2025-09-08 12:23:39', '', '1nbma1u', 'reddit', 4, 0, '2025-09-08 21:00:36.178891', '2025-09-08 21:00:36.178891') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Teams Outlast Projects
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nblrjg' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.6ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Beyond package management: How Nix refactored my digital life', 'https://www.jimmyff.co.uk/blog/beyond-package-management-how-nix-refactored-my-digital-life/', '2025-09-08 11:59:35', 'Hey, author here, the blog post takes you through my journey with nix so far: reviving an old Pixelbook with NixOS, wrangling my MacBook with nix-darwin, and super-charging Nix with AI to solve a problem I thought was unsolvable.
+
+Happy to answer any questions!', '1nblrjg', 'reddit', 4, 8, '2025-09-08 21:00:36.186300', '2025-09-08 21:00:36.186300') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Beyond package management: How Nix refactored my digital life
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbx6g9' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.6ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('End-to-End Type Safety in TypeScript', 'https://rowsana.substack.com/p/end-to-end-type-safety-in-typescript', '2025-09-08 19:23:12', '', '1nbx6g9', 'reddit', 0, 0, '2025-09-08 21:00:36.192493', '2025-09-08 21:00:36.192493') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: End-to-End Type Safety in TypeScript
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvjjk' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.6ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Resources, Laziness, and Continuation-Passing Style', 'https://journal.infinitenegativeutility.com/resources-laziness-and-continuation-passing-style', '2025-09-08 18:22:09', '', '1nbvjjk', 'reddit', 1, 0, '2025-09-08 21:00:36.199859', '2025-09-08 21:00:36.199859') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Resources, Laziness, and Continuation-Passing Style
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvjga' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.6ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Hitting Peak File IO Performance with Zig', 'https://steelcake.com/blog/nvme-zig/', '2025-09-08 18:22:04', '', '1nbvjga', 'reddit', 1, 0, '2025-09-08 21:00:36.206105', '2025-09-08 21:00:36.206105') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Hitting Peak File IO Performance with Zig
+  [1m[36mArticle Load (0.6ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvjeq' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.4ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Geometric Deep Learning: Grids, Groups, Graphs, Geodesics, and Gauges', 'https://arxiv.org/abs/2104.13478', '2025-09-08 18:22:01', '', '1nbvjeq', 'reddit', 1, 0, '2025-09-08 21:00:36.220959', '2025-09-08 21:00:36.220959') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Geometric Deep Learning: Grids, Groups, Graphs, Geodesics, and Gauges
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvie3' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.5ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('The “impossibly small” Microdot web framework', 'https://lwn.net/Articles/1034121/', '2025-09-08 18:20:59', '', '1nbvie3', 'reddit', 0, 0, '2025-09-08 21:00:36.226449', '2025-09-08 21:00:36.226449') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.7ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: The “impossibly small” Microdot web framework
+  [1m[36mArticle Load (1.6ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbvguz' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.5ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Exploring Grid-Aware Websites', 'https://www.nicchan.me/blog/exploring-grid-aware-websites/', '2025-09-08 18:19:32', '', '1nbvguz', 'reddit', 1, 0, '2025-09-08 21:00:36.236503', '2025-09-08 21:00:36.236503') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Exploring Grid-Aware Websites
+Fetched 25 articles from Reddit r/programming
+NewsFetchers::RedditFetcher: fetched 25 articles
+Fetching articles from Reddit r/webdev...
+  [1m[36mArticle Load (0.7ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbfhr3' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (2.4ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Is this a decent price I’m being charged?', 'https://www.reddit.com/gallery/1nbfhr3', '2025-09-08 05:37:05', 'Local web developer who has built websites I find nice and aesthetically pleasing has quoted me for a website I need for my business. 
+
+My website basically needs a simple hiring system and SMS text function that sends texts to me when someone makes a booking and a few other pages showing my vehicles for hire. 
+
+Web developer has quoted me $10,000 to create all the pages, the booking system and the SMS feature.
+
+It also includes 3 revisions. I write the text for the pages and they can review it and give guidance, they also sort out all of the SEO for the website.
+
+', '1nbfhr3', 'reddit', 74, 126, '2025-09-08 21:00:36.934689', '2025-09-08 21:00:36.934689') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Is this a decent price I’m being charged?
+  [1m[36mArticle Load (0.4ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbgdtn' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (2.7ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Is this job email real or scam ?', 'https://i.redd.it/isnsckuexvnf1.png', '2025-09-08 06:31:18', 'I received an email this morning that, to be honest, made me a little uncertain and confused.
+
+They telling me that I am a good fit for the 9 engineering positions they have open this month because of my experience as a mid- and full-stack developer.  
+  
+The strange part, though, is that the person asked if I wanted to apply, 
+
+and I was told that it would "help if I star their GitHub repo." 
+
+The hiring procedure, interviews, or even appropriate company information were not mentioned at all.  
+  
+I am confused now !!! 
+
+Are some startups really approaching developers like this? 
+
+Or does it sound more like an email scam or red flag/SCAM ?
+
+Would do you think is this is normal outreach or something I should avoid ??', '1nbgdtn', 'reddit', 51, 15, '2025-09-08 21:00:36.945419', '2025-09-08 21:00:36.945419') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Is this job email real or scam ?
+  [1m[36mArticle Load (0.4ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbty3m' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.8ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('npm debug and chalk packages compromised', 'https://www.aikido.dev/blog/npm-debug-and-chalk-packages-compromised', '2025-09-08 17:24:12', '', '1nbty3m', 'reddit', 5, 0, '2025-09-08 21:00:36.954927', '2025-09-08 21:00:36.954927') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: npm debug and chalk packages compromised
+  [1m[36mArticle Load (0.4ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbxdbw' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.8ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Color Shifting in CSS', 'https://www.joshwcomeau.com/animation/color-shifting/', '2025-09-08 19:30:23', '', '1nbxdbw', 'reddit', 2, 0, '2025-09-08 21:00:36.963586', '2025-09-08 21:00:36.963586') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Color Shifting in CSS
+  [1m[36mArticle Load (0.4ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbm56y' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.9ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('clanker.fm - a music taste judging bot and neighbor finder', 'https://www.reddit.com/gallery/1nbm56y', '2025-09-08 12:17:28', 'hi everyone!! i just finished building clanker-fm, a snarky bot that judges your spotify music taste and also connects you with other users who share your questionable taste. live on [https://clanker-fm.hritish.com](https://clanker-fm.hritish.com)
+
+**tldr;** clanker digs through your listening history, asks you a few pointed questions and responds to your answers, and then delivers a roast you didn’t ask for but probably deserve, with exportable cards for sharing on social media.
+
+some of you might remember pudding.cool''s spotify roast bot that they made back in 2021 (pre-genai which is crazy), which i remember being really fun. so mainly inspired by that (and last.fm''s neighbors feature), i decided to use the gemini api for actual ai roasts and combine both of them into one website. (this is my first proper full stack project btw so forgive me if anything breaks 😭)
+
+**some features:**
+
+* **scanning recents**: clanker looks through and roasts your recent played music, while processing the rest of the data in the background.
+* **interactive q&amp;a**: 6 multiple-choice questions based on your own data 
+* **final roast**: metrics like variety score, basicness index, listening patterns and a paragraph like verdict to make you question your existence.
+* **neighbor search**: weighted jaccard algorithm compares your top artists, tracks, and genres to other users
+* **dashboard:** terminal-style dashboard with your top artists, tracks, and genres, and links to neighbors and roast pages.
+* a light and dark mode toggle and fully responsive design
+
+**tech stack:**
+
+* next.js with nextauth for frontend/backend
+* spotify &amp; gemini/openai api''s for the data and ai roast
+* tailwind and framer-motion for styling &amp; animations
+* supabase for database &amp; deployed on vercel
+
+i''d love any and every feedback on the experience, the ui, and any problems (and also whether the roast feels personal enough). i''m especially curious how it runs for people with more mainstream vs niche listening habits. (cause ive only tested it on myself and a friend, the rest of the users on the site rn are mock users 😭) tysm if you try it and add a user to the database!!
+
+mb for the long read, here is the github that has the source code and full documentation: [https://github.com/hritsh/clanker-fm](https://github.com/hritsh/clanker-fm)', '1nbm56y', 'reddit', 6, 9, '2025-09-08 21:00:36.971044', '2025-09-08 21:00:36.971044') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.7ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: clanker.fm - a music taste judging bot and neighbor finder
+  [1m[36mArticle Load (0.9ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbz0pg' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (2.2ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('I built a responsive serverless React app with an integrated music player', 'https://www.alifeinbinary.com', '2025-09-08 20:33:10', 'I wanted to share this here because I''m proud of it and think it could foster some interesting discussion. I''ve been programming for a couple of decades but love making music for films, so I''ve always made my portfolio website for composing as a bit of a fun passion project where I get to experiment with web technologies. 
+
+Some key points:
+
+* React (Typescript) app
+* Serverless architecture using AWS (Lambda, DynamoDB, SES, S3, CloudFront, Cognito) 
+* It uses Webiny CMS to manage the API, file management, IaC, and page building
+* Tailwind CSS, Embla Carousel
+* Web Audio API for FFT analysis that animates that flat surface background
+* Cloudflare caching and security hardening
+
+The short backstory is that I used to have a very similar website about 10 years ago that I built with PHP and jQuery but it relied on the Soundcloud API for hosting the music. When their API died, so did my portfolio site. It''s taken me this long to restore it to its former glory without relying on any third-party service. I''ve also saved 95% on hosting costs by switching to serverless. 
+
+Happy to hear feedback and respond to questions. ', '1nbz0pg', 'reddit', 1, 0, '2025-09-08 21:00:36.980837', '2025-09-08 21:00:36.980837') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: I built a responsive serverless React app with an integrated music player
+  [1m[36mArticle Load (0.4ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbsgix' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.8ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Reddit Word Map - An interesting way to view the popularity of the top 100 posts of any subreddit - interactivity', 'https://skull-island-app.web.app/wordMap/redditWordMap.html', '2025-09-08 16:29:45', 'It''s still rough, but Ive been having fun with it. It''s for sure interesting to see all the different frequencies of words throughout different communities ', '1nbsgix', 'reddit', 2, 0, '2025-09-08 21:00:36.987567', '2025-09-08 21:00:36.987567') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Reddit Word Map - An interesting way to view the popularity of the top 100 posts of any subreddit - interactivity
+  [1m[36mArticle Load (0.5ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbx5cx' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (2.3ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('This site shows all new website launches on the internet (~10,000 per day)', 'https://websitelaunches.com', '2025-09-08 19:22:00', '', '1nbx5cx', 'reddit', 1, 1, '2025-09-08 21:00:36.995269', '2025-09-08 21:00:36.995269') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: This site shows all new website launches on the internet (~10,000 per day)
+  [1m[36mArticle Load (0.4ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbc4ul' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.4ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Does this look nice?', 'https://i.redd.it/sqhyw0cvrunf1.gif', '2025-09-08 02:35:37', 'Been working on these themes for.. 2 hours?', '1nbc4ul', 'reddit', 20, 14, '2025-09-08 21:00:37.002847', '2025-09-08 21:00:37.002847') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Does this look nice?
+Fetched 9 articles from Reddit r/webdev
+NewsFetchers::RedditFetcher: fetched 9 articles
+Fetching articles from Reddit r/javascript...
+  [1m[36mArticle Load (0.6ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbp3c4' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.8ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('NPM package "error-ex" just got published with malware (47m downloads)', 'https://jdstaerk.substack.com/p/we-just-found-malicious-code-in-the', '2025-09-08 14:23:06', '', '1nbp3c4', 'reddit', 36, 11, '2025-09-08 21:00:37.913026', '2025-09-08 21:00:37.913026') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (8.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: NPM package "error-ex" just got published with malware (47m downloads)
+  [1m[36mArticle Load (0.4ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbt6ef' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.8ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Higher-Order Transform Streams: Sequentially Injecting Streams Within Streams', 'https://www.timetler.com/2025/08/23/parallel-recursive-streaming-ai-swarms/', '2025-09-08 16:56:29', '', '1nbt6ef', 'reddit', 5, 0, '2025-09-08 21:00:37.927991', '2025-09-08 21:00:37.927991') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (6.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Higher-Order Transform Streams: Sequentially Injecting Streams Within Streams
+  [1m[36mArticle Load (0.6ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbnl5w' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.7ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('True End-to-End Type Safety Across Your Entire TypeScript Stack', 'https://rowsana.substack.com/p/end-to-end-type-safety-in-typescript', '2025-09-08 13:21:28', '', '1nbnl5w', 'reddit', 1, 0, '2025-09-08 21:00:37.941859', '2025-09-08 21:00:37.941859') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: True End-to-End Type Safety Across Your Entire TypeScript Stack
+  [1m[36mArticle Load (0.4ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbky1n' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.7ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Runner - javascript framework with powerful observability toolkit', 'https://runner.bluelibs.com/', '2025-09-08 11:16:56', '', '1nbky1n', 'reddit', 1, 0, '2025-09-08 21:00:37.948567', '2025-09-08 21:00:37.948567') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Runner - javascript framework with powerful observability toolkit
+  [1m[36mArticle Load (0.4ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbupnu' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (2.1ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('React AI Agent Chat SDK', 'https://github.com/sourcewizard-ai/react-ai-agent-chat-sdk', '2025-09-08 17:51:55', 'Hey, I''ve wrote an open source library over the past two weekends for creating agentic chats. It''s a full-stack library - it provides React UI components for the chat, tools, and a backend endpoint implementation based on Vercel AI SDK.
+
+The reason I''ve written that library is because I saw that Vercel created Chat SDK, but when I wanted to try it, I realized that it''s not an SDK; it''s just a website template, which is also deeply tied to Next.js. The library I''ve created can be used everywhere. (I hope)
+
+Want to quickly try it out? Install it with SourceWizard:
+npx sourcewizard@latest install react-ai-agent-chat-sdk
+
+Let me know if you have any questions!', '1nbupnu', 'reddit', 0, 0, '2025-09-08 21:00:37.956434', '2025-09-08 21:00:37.956434') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: React AI Agent Chat SDK
+  [1m[36mArticle Load (0.4ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1navf6o' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.7ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('GitHub - beep8/beep8-sdk: SDK for developing games and tools for the BEEP-8 fantasy console.', 'https://github.com/beep8/beep8-sdk', '2025-09-07 15:00:13', 'Hey everyone,
+
+I’ve been working on **BEEP-8**, a Fantasy Console that runs entirely in JavaScript.  
+It’s built on:
+
+* an **ARM v4a emulator** in JS (cycle-accurate, 4 MHz),
+* a Namco C30–style **APU emulation** (JavaScript),
+* and a **WebGL-based PPU** for rendering sprites, BG layers, and polygons.
+
+What makes it interesting:
+
+* 100% browser-based, works on both desktop &amp; mobile
+* Free &amp; open-source SDK on GitHub
+* Designed around **hardware-like constraints** (1 MB RAM, 1 MB ROM, 60 fps)
+
+👉 SDK: [https://github.com/beep8/beep8-sdk](https://github.com/beep8/beep8-sdk)  
+👉 Live demo: [https://beep8.org]()
+
+
+
+I’d love to hear the JavaScript community’s thoughts:
+
+* Is pushing JS this way (CPU emulation + WebGL rendering) useful beyond retro projects?
+* Any ideas on optimization or patterns that could make this more efficient?', '1navf6o', 'reddit', 11, 0, '2025-09-08 21:00:37.963753', '2025-09-08 21:00:37.963753') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: GitHub - beep8/beep8-sdk: SDK for developing games and tools for the BEEP-8 fantasy console.
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1nbg1l7' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.7ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('The problem with JavaScript Dates', 'https://rowsana.substack.com/p/the-problem-with-javascript-dates', '2025-09-08 06:10:28', '', '1nbg1l7', 'reddit', 0, 4, '2025-09-08 21:00:37.972084', '2025-09-08 21:00:37.972084') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: The problem with JavaScript Dates
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1n9wq1z' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.7ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('GitHub - mxxii/peberminta: Simple, transparent parser combinators toolkit that supports any tokens', 'https://github.com/mxxii/peberminta', '2025-09-06 11:01:23', 'I updated my parser combinator toolkit yesterday, including some documentation additions. Would love to hear some feedback - I''m wondering what I can improve further, what I might be overlooking due to close familiarity.
+
+I have sustained attention of a squirrel when it comes to reading other libraries documentation, so I prefer not writing a textbook that I wouldn''t be able to read anyway.
+
+I guess my goal is to identify actual needs/confusion sources so I could decide what''s the right place and form to address them.  
+I have some thoughts, but I prefer to withhold them here to not steer the feedback.
+
+Share your thoughts. TIA', '1n9wq1z', 'reddit', 2, 2, '2025-09-08 21:00:37.978529', '2025-09-08 21:00:37.978529') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: GitHub - mxxii/peberminta: Simple, transparent parser combinators toolkit that supports any tokens
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1na2njb' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.6ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Corsfix - open source and secure CORS proxy', 'https://github.com/corsfix/corsfix', '2025-09-06 15:38:13', 'I built this CORS proxy because I was getting CORS errors when building my static websites. There are several existing proxies already, but I wasn''t satisfied with the features (or lack of).
+
+What is this solving?  
+If you try to access APIs directly from the client JavaScript, you most likely get a CORS error. This solves it by relaying your request and returning it with the proper CORS headers.
+
+How is this secure?  
+I covered this in the repo FAQ, but the gist is: no logging, secure against SSRF and LFI, support handling API keys, and no leaking cookies (credentials).
+
+Code: [https://github.com/corsfix/corsfix](https://github.com/corsfix/corsfix)  
+Website: [https://corsfix.com](https://corsfix.com)', '1na2njb', 'reddit', 0, 6, '2025-09-08 21:00:37.986068', '2025-09-08 21:00:37.986068') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Corsfix - open source and secure CORS proxy
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1na2gpe' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.7ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('ffetch 2.0 released - Enhanced fetch() wrapper with proper AbortSignal handling', 'https://www.npmjs.com/package/@gkoos/ffetch', '2025-09-06 15:30:36', 'Just released v2.0 of ffetch, my fetch wrapper that adds timeouts, retries, and circuit breaking without changing fetch semantics.
+
+Major improvements in 2.0:
+
+* Fixed AbortSignal.any fallback that was ignoring user signals
+* Manual timeout implementation removes AbortSignal.timeout dependency
+* Proper signal composition for complex abort scenarios
+* transformRequest hook now preserves signals correctly
+* Revamped documentation
+
+The signal handling was surprisingly tricky - combining user AbortSignals with timeout signals while maintaining compatibility across environments. Had to implement manual fallbacks for AbortSignal.any since it''s not available everywhere.
+
+Example of the signal composition in action:
+
+    const controller = new AbortController()
+    const client = createClient({ timeout: 5000 })
+    
+    // Both user signal AND timeout signal work together
+    client(''/api/data'', { signal: controller.signal })
+
+Still zero deps, \~2KB, drop-in fetch replacement. The goal was to make fetch() reliable without changing its behavior.
+
+GitHub: [https://github.com/gkoos/ffetch](https://github.com/gkoos/ffetch)', '1na2gpe', 'reddit', 0, 7, '2025-09-08 21:00:37.992379', '2025-09-08 21:00:37.992379') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.6ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: ffetch 2.0 released - Enhanced fetch() wrapper with proper AbortSignal handling
+  [1m[36mArticle Load (0.4ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1n9dmk5' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.3ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Just hit my first 2 stars on GitHub + 100 npm downloads', 'https://github.com/agentailor/slimcontext', '2025-09-05 18:50:42', 'I recently published my first open-source package for managing chat history in AI assistants (built for JS/TS).
+
+It’s not a big number, but seeing those first 2 stars and 100 downloads gave me a huge boost. I’ve got lots of ideas to improve it, but for now I want to see how others use it.', '1n9dmk5', 'reddit', 4, 4, '2025-09-08 21:00:38.002235', '2025-09-08 21:00:38.002235') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Just hit my first 2 stars on GitHub + 100 npm downloads
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1n96ofx' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.3ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Made a VSCode extension to clean up messy fetch requests from DevTools', 'https://www.reddit.com/r/webdev/comments/1n953ze/made_a_vscode_extension_to_clean_up_messy_fetch/', '2025-09-05 14:24:15', '', '1n96ofx', 'reddit', 4, 0, '2025-09-08 21:00:38.007933', '2025-09-08 21:00:38.007933') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Made a VSCode extension to clean up messy fetch requests from DevTools
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1n8ukb3' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (2.1ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Mermaid Editor/Renderer', 'https://mermaid-editor.online', '2025-09-05 03:23:25', 'Hey,
+
+I write a tech blog and I need to create lots of diagrams for it. I like using Mermaid, but I quickly ran into the same frustrating pattern with most of the existing editors and renderers: the free options were either too limited or came with barriers that slowed me down. I wanted something simple: just open the page, paste/type in Mermaid code, preview the diagram, and export it without worrying about limits or accounts.
+
+Here are some concrete problems I ran into with other tools:
+
+\- Mermaid Live Editor (the official one): Great for quick editing, but exporting diagrams is capped by a rate limit on their free tier. After a handful of exports, I’d get the dreaded “free tier limit exceeded” message.
+
+Kroki.io: Supports rendering, but running it online requires trusting a shared service with my diagrams. Hosting it myself means extra setup, Docker, and server resources — not ideal if I just want to save a few diagrams.
+
+\- Excalidraw &amp; Lucidchart: Both have nice UIs, but they’re general diagramming tools, not native Mermaid editors. Lucidchart especially locks useful features (like unlimited diagrams or high-quality export) behind a paid plan.
+
+\- Other browser-based tools Almost all I tried had some kind of paywall, signup requirement, or watermark on exports. For something as text-based and simple as Mermaid, that felt unnecessary.
+
+So I built my own tool with a few core principles:
+
+\- No limits: you can create, edit, and export as many diagrams as you want.
+
+\- No signup: the tool works straight from the browser, nothing to install.
+
+\- No tracking: privacy-friendly, just you and your diagrams.
+
+\- Open source: [https://github.com/gkoos/mermaid-editor](https://github.com/gkoos/mermaid-editor)
+
+Now this is a very simple v0.0.1 and needs a lot of refinement, but hopefully it can be useful to some even in its current state.', '1n8ukb3', 'reddit', 12, 4, '2025-09-08 21:00:38.013922', '2025-09-08 21:00:38.013922') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Mermaid Editor/Renderer
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1n8dmd7' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.2ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('I built nocojs - a built time library to create inline placeholder for images', 'https://github.com/akzhy/nocojs', '2025-09-04 15:39:54', 'nocojs is a built time library that can integrate with Vite / Rollup / Webpack / Parcel / Rspack to generate image previews.
+
+So you can write something like
+
+    const imagePreview = preview(''https://example.com/image.jpg'');
+    
+    // or
+    
+    const Image = (
+      &lt;img
+        src={preview(''https://example.com/image.jpg'')}
+        data-src="https://example.com/image.jpg"
+      /&gt;
+    )
+
+And it gets converted to
+
+    const imagePreview = ''data:image/png;base64,iVBORw0KGgoA...''
+    
+    // or
+    
+    const Image = (
+      &lt;img
+        src={''data:image/png;base64,iVBORw0KGgoA...''}
+        data-src="https://example.com/image.jpg"
+      /&gt;
+    )
+
+Pair it with a lazy loading library to avoid layout shifts as your images load.
+
+On server side (Astro / NextJS, etc.) you won''t need the bundler integration and can directly generate previews by calling the `getPlaceholder` function.
+
+Would love your feedbacks and suggestions.', '1n8dmd7', 'reddit', 15, 5, '2025-09-08 21:00:38.019664', '2025-09-08 21:00:38.019664') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: I built nocojs - a built time library to create inline placeholder for images
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1n83l78' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.4ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('I built USAL.js - a 9KB scroll animation library with text effects and framework support for React, Vue, Svelte, Angular + Web Components', 'https://github.com/italoalmeida0/usal', '2025-09-04 07:24:13', 'I just released USAL.js - a scroll animation library I built because I was frustrated with existing options for text animations.
+
+# The Problem
+
+I needed word-by-word and letter-by-letter animations for a client project. AOS.js and SAL.js are great, but they don''t handle text splitting well, and most libraries don''t support web components.
+
+# What I Built
+
+* **9KB minified** (smaller than most images) (5KB Gzipped)
+* **40+ animations** (fade, zoom, flip with all directions)
+* **Text animations** (split by word/letter, shimmer effects, counters)
+* **Framework packages** for React, Vue, Svelte, Angular, Lit
+* **Web Components support** (rare in animation libs)
+* **Zero dependencies**
+
+# Quick Examples
+
+**Basic usage:**
+
+    &lt;script src="https://cdn.usal.dev/latest"&gt;&lt;/script&gt;
+    &lt;div data-usal="fade-u duration-800"&gt;Fades up smoothly&lt;/div&gt;
+
+**Text animations:**
+
+    &lt;p data-usal="split-word split-fade-r split-delay-200"&gt;
+      Each word appears from right
+    &lt;/p&gt;
+
+**Number counters:**
+
+    &lt;span data-usal="count-[1234] duration-2000"&gt;1234&lt;/span&gt;
+
+**React integration:**
+
+    npm install /react
+    
+    import { USALProvider } from ''@usal/react'';
+    
+    &lt;USALProvider&gt;
+      &lt;h1 data-usal="fade-u"&gt;Animated in React&lt;/h1&gt;
+    &lt;/USALProvider&gt;
+
+# Why Another Animation Library?
+
+* **Tailwind-inspired syntax** (duration-800, delay-200)
+* **Text-first approach** (word/letter splitting built-in)
+* **True framework agnostic** (even supports Web Components)
+* **Performance focused** (60fps with hundreds of elements)
+
+I started with SAL.js as inspiration but ended up rewriting everything from scratch to get the text animations and framework support I wanted.
+
+**Links:**
+
+* [Live Demo](https://usal.dev/)
+* [GitHub](https://github.com/italoalmeida0/usal)
+* [NPM](https://www.npmjs.com/package/usal)
+
+What do you think? Any features you''d want to see? I''m actively working on it and would love feedback from the community!', '1n83l78', 'reddit', 24, 8, '2025-09-08 21:00:38.025730', '2025-09-08 21:00:38.025730') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: I built USAL.js - a 9KB scroll animation library with text effects and framework support for React, Vue, Svelte, Angular + Web Components
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1n7rfqo' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.2ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Creating a JavaScript Debugging Utility to Guard Noisy Production Consoles', 'https://magill.dev/post/javascript-debugging-utility-to-guard-noisy-production-consoles', '2025-09-03 21:23:38', 'I want everyone to know how clever this code is, so I shared it here. ', '1n7rfqo', 'reddit', 1, 3, '2025-09-08 21:00:38.030589', '2025-09-08 21:00:38.030589') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (1.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Creating a JavaScript Debugging Utility to Guard Noisy Production Consoles
+  [1m[36mArticle Load (0.3ms)[0m  [1m[34mSELECT "articles".* FROM "articles" WHERE "articles"."external_id" = '1n7vl04' AND "articles"."source_type" = 'reddit' LIMIT 1 /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:15:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mArticle Create (1.2ms)[0m  [1m[32mINSERT INTO "articles" ("title", "url", "published_at", "description", "external_id", "source_type", "score", "comment_count", "created_at", "updated_at") VALUES ('Integrate Trigger.dev and Anchor Browser for Automatic Browser Automation', 'https://anchorbrowser.io/blog/integrate-trigger-dev-and-anchor-browser', '2025-09-04 00:19:09', 'Learn how to create scheduled agentic browser automation jobs using Trigger.dev and Anchor Browser.  Follow along step-by-step for an example that demonstrates a Trigger.dev task calling on the Anchor Browser APIs to automatically check the TDF website for last minute Broadway tickets. Anchor Browser provides browser sessions for your AI agents. By the end you''ll have a better sense on how to make use of scheduling tools and agentic browser APIs to automate anything on the web.', '1n7vl04', 'reddit', 0, 1, '2025-09-08 21:00:38.036620', '2025-09-08 21:00:38.036620') RETURNING "id" /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+  [1m[36mTRANSACTION (0.5ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  ↳ app/services/news_fetchers/base_fetcher.rb:23:in `create_or_update_article'
+Updated article: Integrate Trigger.dev and Anchor Browser for Automatic Browser Automation
+Fetched 17 articles from Reddit r/javascript
+NewsFetchers::RedditFetcher: fetched 17 articles
+News aggregation completed in 3.81s. Total articles processed: 51
+  [1m[36mArticle Count (29.9ms)[0m  [1m[34mSELECT COUNT(*) FROM "articles" /*application='DevNewsAggregator'*/[0m
+Started GET "/" for ::1 at 2025-09-08 18:00:50 -0300
+  [1m[36mActiveRecord::SchemaMigration Load (0.7ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='DevNewsAggregator'*/[0m
+Processing by ArticlesController#index as */*
+  [1m[36mArticle Load (1.0ms)[0m  [1m[34mSELECT "articles".* FROM "articles" ORDER BY "articles"."published_at" DESC LIMIT 50 /*action='index',application='DevNewsAggregator',controller='articles'*/[0m
+  ↳ app/controllers/articles_controller.rb:5:in `group_by'
+  [1m[36mArticle Count (0.3ms)[0m  [1m[34mSELECT COUNT(*) FROM "articles" /*action='index',application='DevNewsAggregator',controller='articles'*/[0m
+  ↳ app/controllers/articles_controller.rb:6:in `index'
+  [1m[36mArticle Maximum (0.5ms)[0m  [1m[34mSELECT MAX("articles"."updated_at") FROM "articles" /*action='index',application='DevNewsAggregator',controller='articles'*/[0m
+  ↳ app/controllers/articles_controller.rb:7:in `index'
+  Rendering layout layouts/application.html.erb
+  Rendering articles/index.html.erb within layouts/application
+  Rendered articles/index.html.erb within layouts/application (Duration: 7.4ms | GC: 0.6ms)
+  Rendered layout layouts/application.html.erb (Duration: 14.5ms | GC: 0.8ms)
+Completed 200 OK in 170ms (Views: 20.1ms | ActiveRecord: 29.4ms (3 queries, 0 cached) | GC: 49.2ms)
+
+
