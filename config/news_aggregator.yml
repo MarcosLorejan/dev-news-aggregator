@@ -1,0 +1,57 @@
+development: &default
+  # News fetching configuration
+  fetching:
+    # How many articles to fetch per source
+    max_articles_per_source: 30
+    
+    # Timeout for API requests (in seconds)
+    request_timeout: 30
+    
+    # How often to retry failed requests
+    max_retries: 3
+  
+  # Data retention
+  retention:
+    # Keep articles for this many days
+    article_retention_days: 30
+    
+    # Clean old articles automatically
+    auto_cleanup: true
+  
+  # API endpoints
+  apis:
+    hacker_news:
+      base_url: "https://hacker-news.firebaseio.com/v0"
+      topstories_endpoint: "/topstories.json"
+      item_endpoint: "/item"
+    
+    devto:
+      base_url: "https://dev.to/api"
+      articles_endpoint: "/articles"
+      
+    reddit:
+      base_url: "https://www.reddit.com/r"
+      format: ".json"
+      subreddits:
+        - programming
+        - webdev  
+        - javascript
+        - reactjs
+        - nodejs
+
+test:
+  <<: *default
+  fetching:
+    max_articles_per_source: 5
+    request_timeout: 10
+  retention:
+    article_retention_days: 7
+
+production:
+  <<: *default
+  fetching:
+    max_articles_per_source: 50
+    request_timeout: 60
+    max_retries: 5
+  retention:
+    article_retention_days: 60
