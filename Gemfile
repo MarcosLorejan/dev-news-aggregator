@@ -43,6 +43,9 @@ gem "thruster", require: false
 # HTTP client for API requests
 gem "httparty", "~> 0.21"
 
+# Cron job scheduling
+gem "whenever", "~> 1.0"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
