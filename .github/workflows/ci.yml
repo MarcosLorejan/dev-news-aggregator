@@ -16,7 +16,13 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
-          bundler-cache: true
+          bundler-cache: false
+
+      - name: Install dependencies
+        run: |
+          bundle config set --local deployment false
+          bundle config set --local path ''
+          bundle install --jobs 4 --retry 3
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bundle exec brakeman --no-pager
@@ -31,7 +37,13 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
-          bundler-cache: true
+          bundler-cache: false
+
+      - name: Install dependencies
+        run: |
+          bundle config set --local deployment false
+          bundle config set --local path ''
+          bundle install --jobs 4 --retry 3
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
         run: bundle exec importmap audit
@@ -46,7 +58,13 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
-          bundler-cache: true
+          bundler-cache: false
+
+      - name: Install dependencies
+        run: |
+          bundle config set --local deployment false
+          bundle config set --local path ''
+          bundle install --jobs 4 --retry 3
 
       - name: Lint code for consistent style
         run: bundle exec rubocop -f github
@@ -75,7 +93,13 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
-          bundler-cache: true
+          bundler-cache: false
+
+      - name: Install dependencies
+        run: |
+          bundle config set --local deployment false
+          bundle config set --local path ''
+          bundle install --jobs 4 --retry 3
 
       - name: Prepare test database
         env:
@@ -129,7 +153,13 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
-          bundler-cache: true
+          bundler-cache: false
+
+      - name: Install dependencies
+        run: |
+          bundle config set --local deployment false
+          bundle config set --local path ''
+          bundle install --jobs 4 --retry 3
 
       - name: Prepare test database
         env:
