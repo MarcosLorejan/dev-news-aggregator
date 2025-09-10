@@ -80,20 +80,17 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
     assert_selector "article.article-card", minimum: 1
   end
 
-  test "should filter by specific source" do
+  test "should filter by specific category" do
     visit articles_path
 
-    # Open the details dropdown for source filtering
-    find("details summary").click
-
-    # Click the first available source filter
-    first_source_btn = first("button.source-filter-btn")
-    if first_source_btn
-      source_value = first_source_btn["data-filter-value"]
-      first_source_btn.click
-      assert_selector "article.article-card[data-source='#{source_value}']", visible: true
+    # Click the first available category filter (which filters by category, not source)
+    first_category_btn = first("button.filter-btn[data-filter-type='category']")
+    if first_category_btn
+      category_value = first_category_btn["data-filter-value"]
+      first_category_btn.click
+      assert_selector "article.article-card[data-category='#{category_value}']", visible: true
     else
-      skip "No source filter buttons found"
+      skip "No category filter buttons found"
     end
   end
 
