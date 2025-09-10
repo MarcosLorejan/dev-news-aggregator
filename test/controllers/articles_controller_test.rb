@@ -32,6 +32,39 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{bookmarks_path}']", "Reading List"
   end
 
+  test "index should show already read link" do
+    get articles_url
+    assert_response :success
+
+    assert_select "a[href='#{read_articles_path}']", "Already Read"
+  end
+
+  test "index should exclude read articles by default" do
+    # Mark one article as read
+    @article.mark_read!
+    
+    get articles_url
+    assert_response :success
+    
+    # Should not show the read article
+    assert_select "h3", text: @article.title, count: 0
+    # Should still show unread articles
+    assert_select "h3", text: @dev_to_article.title, count: 1
+  end
+
+  test "index should include read articles when show_read param is true" do
+    # Mark one article as read
+    @article.mark_read!
+    
+    get articles_url(show_read: true)
+    assert_response :success
+    
+    # Should show the read article when explicitly requested
+    assert_select "h3", text: @article.title, count: 1
+    # Should also show unread articles
+    assert_select "h3", text: @dev_to_article.title, count: 1
+  end
+
   test "should get show" do
     get article_url(@article)
     assert_response :success
