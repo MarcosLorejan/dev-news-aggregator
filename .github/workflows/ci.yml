@@ -8,7 +8,6 @@ on:
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,17 +17,12 @@ jobs:
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-
-      - name: Scan for common Rails security vulnerabilities using static analysis
-        run: bundle exec brakeman --no-pager
-          bundle install --jobs 4 --retry 3
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bundle exec brakeman --no-pager
 
   scan_js:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -38,10 +32,6 @@ jobs:
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-
-      - name: Scan for security vulnerabilities in JavaScript dependencies
-        run: bundle exec importmap audit
-          bundle install --jobs 4 --retry 3
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
         run: bundle exec importmap audit
@@ -60,14 +50,9 @@ jobs:
 
       - name: Lint code for consistent style
         run: bundle exec rubocop -f github
-          bundle install --jobs 4 --retry 3
-
-      - name: Lint code for consistent style
-        run: bundle exec rubocop -f github
 
   test:
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:15
@@ -91,10 +76,6 @@ jobs:
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-        run: |
-          bundle config path vendor/bundle
-          bundle config set --local without 'development production'
-          bundle install --jobs 4 --retry 3
 
       - name: Prepare test database
         env:
@@ -126,7 +107,6 @@ jobs:
 
   coverage:
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:15
@@ -150,10 +130,6 @@ jobs:
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-        run: |
-          bundle config path vendor/bundle
-          bundle config set --local without 'development production'
-          bundle install --jobs 4 --retry 3
 
       - name: Prepare test database
         env:
