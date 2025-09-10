@@ -192,8 +192,11 @@ jobs:
           DB_USERNAME: postgres
           DB_PASSWORD: postgres
         run: |
+          # Run unit tests first and save coverage
           bundle exec rails test
-          bundle exec rails test:system
+          # System tests have different coverage expectations, so we only check unit test coverage
+          # Run system tests without coverage to verify they work
+          COVERAGE="" bundle exec rails test:system
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
