@@ -11,7 +11,6 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get articles_url
     assert_response :success
 
-    # Check that articles are displayed
     assert_select "article.article-card", minimum: 1
     assert_select "h1", "Developer News Aggregator"
   end
@@ -20,7 +19,6 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get articles_url
     assert_response :success
 
-    # Should have filter buttons for different sources
     assert_select "button[data-filter-type='all']", text: /All Articles/
     assert_select "button[data-filter-type='category']", minimum: 1
   end
@@ -30,6 +28,33 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     assert_select "a[href='#{bookmarks_path}']", "Reading List"
+  end
+
+  test "index should show already read link" do
+    get articles_url
+    assert_response :success
+
+    assert_select "a[href='#{read_articles_path}']", "Already Read"
+  end
+
+  test "index should exclude read articles by default" do
+    @article.mark_as_read!
+
+    get articles_url
+    assert_response :success
+
+    assert_select "h2", text: @article.title, count: 0
+    assert_select "h2", text: @dev_to_article.title, count: 1
+  end
+
+  test "index should include read articles when show_read param is true" do
+    @article.mark_as_read!
+
+    get articles_url(show_read: true)
+    assert_response :success
+
+    assert_select "h2", text: @article.title, count: 1
+    assert_select "h2", text: @dev_to_article.title, count: 1
   end
 
   test "should get show" do

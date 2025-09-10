@@ -199,6 +199,8 @@ Uses Docker Compose for PostgreSQL with environment variables:
 - Use scopes for reusable queries
 
 ### Testing Standards
+- **FOR EVERY CHANGE CREATE TESTS** - This is mandatory, no exceptions
+- **PREFER TDD APPROACH** - Write tests first when possible, then implement functionality
 - All tests start with 'should' (e.g., `test "should create bookmark when valid"`) 
 - Do not use `send` in tests - test public interface only
 - Always prefer fixtures over `create` methods for consistency
@@ -211,6 +213,8 @@ Uses Docker Compose for PostgreSQL with environment variables:
 - Prefer integration tests over unit tests when testing user workflows
 - Use `parallelize(workers: :number_of_processors)` in test_helper.rb for faster test runs
 - Disable Spring for testing to avoid caching issues
+- When adding new models, controllers, or features, create comprehensive test coverage immediately
+- Test both happy path and edge cases (error conditions, boundary values, invalid inputs)
 
 ### Git Commit Guidelines
 - Use conventional commit format (e.g., `feat:`, `fix:`, `test:`, `refactor:`)

@@ -92,4 +92,92 @@ class ArticleTest < ActiveSupport::TestCase
     assert_includes not_bookmarked_articles, @article
     assert_not_includes not_bookmarked_articles, bookmarked_article
   end
+
+  test "should have one read_article" do
+    assert_respond_to @article, :read_article
+  end
+
+  test "should return false for read? when no read_article exists" do
+    assert_not @article.read?
+  end
+
+  test "should return true for read? when read_article exists" do
+    @article.create_read_article
+    assert @article.read?
+  end
+
+  test "should create read_article when mark_as_read! is called and none exists" do
+    assert_not @article.read?
+
+    read_article = @article.mark_as_read!
+
+    assert @article.read?
+    assert_kind_of ReadArticle, read_article
+    assert_equal @article, read_article.article
+  end
+
+  test "should return existing read_article when mark_as_read! is called and already read" do
+    existing_read = @article.create_read_article
+
+    read_article = @article.mark_as_read!
+
+    assert_equal existing_read, read_article
+    assert_equal 1, @article.reload.read_article ? 1 : 0 # Ensure only one read_article
+  end
+
+  test "should destroy existing read_article when unmark_as_read! is called" do
+    @article.create_read_article
+    assert @article.read?
+
+    @article.unmark_as_read!
+
+    assert_not @article.reload.read?
+  end
+
+  test "should do nothing when unmark_as_read! is called and no read_article exists" do
+    assert_not @article.read?
+
+    assert_nothing_raised do
+      @article.unmark_as_read!
+    end
+
+    assert_not @article.read?
+  end
+
+  test "should create read_article when toggle_read! is called and none exists" do
+    assert_not @article.read?
+
+    @article.toggle_read!
+
+    assert @article.reload.read?
+  end
+
+  test "should remove read_article when toggle_read! is called and one exists" do
+    @article.create_read_article
+    assert @article.read?
+
+    @article.toggle_read!
+
+    assert_not @article.reload.read?
+  end
+
+  test "should return only read articles in read scope" do
+    read_article = articles(:dev_to_article)
+    read_article.create_read_article
+
+    read_articles = Article.read
+
+    assert_includes read_articles, read_article
+    assert_not_includes read_articles, @article
+  end
+
+  test "should return only unread articles in not_read scope" do
+    read_article = articles(:dev_to_article)
+    read_article.create_read_article
+
+    unread_articles = Article.not_read
+
+    assert_includes unread_articles, @article
+    assert_not_includes unread_articles, read_article
+  end
 end

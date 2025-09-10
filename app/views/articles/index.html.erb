@@ -8,12 +8,18 @@
         </h1>
         <p class="text-gray-400 text-lg">Stay updated with the latest in tech and development</p>
       </div>
-      <div class="flex items-center space-x-6">
-        <%= link_to bookmarks_path, class: "group flex items-center px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25" do %>
-          <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="flex items-center space-x-4">
+        <%= link_to bookmarks_path, class: "group flex items-center px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25" do %>
+          <svg class="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
           </svg>
           Reading List
+        <% end %>
+        <%= link_to read_articles_path, class: "group flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-lg hover:shadow-green-500/25" do %>
+          <svg class="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Already Read
         <% end %>
         <div class="text-sm text-gray-400">
           <div class="flex items-center space-x-2">
@@ -137,6 +143,29 @@
                       title: "Add to reading list" do %>
                     <svg class="w-4 h-4 transition-transform group-hover/bookmark:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                    </svg>
+                  <% end %>
+                <% end %>
+              <% end %>
+              
+              <!-- Already Read Button -->
+              <% if article.read? %>
+                <%= form_with url: unmark_article_as_read_path(article), method: :delete, local: true, class: "inline" do |form| %>
+                  <%= form.button type: "submit", 
+                      class: "group/read p-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg transition-all duration-200 hover:from-orange-600 hover:to-orange-700 hover:scale-110 hover:shadow-lg hover:shadow-orange-500/25", 
+                      title: "Mark as unread" do %>
+                    <svg class="w-4 h-4 transition-transform group-hover/read:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  <% end %>
+                <% end %>
+              <% else %>
+                <%= form_with url: mark_article_as_read_path(article), method: :post, local: true, class: "inline" do |form| %>
+                  <%= form.button type: "submit", 
+                      class: "group/read p-2 bg-dark-700 border border-dark-600 text-gray-400 rounded-lg transition-all duration-200 hover:bg-green-600 hover:border-green-500 hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-green-500/25", 
+                      title: "Mark as read" do %>
+                    <svg class="w-4 h-4 transition-transform group-hover/read:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                   <% end %>
                 <% end %>

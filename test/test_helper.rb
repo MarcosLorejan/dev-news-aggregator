@@ -2,7 +2,7 @@ ENV["RAILS_ENV"] ||= "test"
 ENV["DISABLE_SPRING"] = "1"
 
 # Configure SimpleCov for coverage reporting
-if ENV["COVERAGE"]
+if ENV["COVERAGE"] && ENV["COVERAGE"] != ""
   require "simplecov"
   require "simplecov-lcov"
 

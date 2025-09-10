@@ -54,3 +54,9 @@ yarn-debug.log*
 
 # Ignore coverage reports
 /coverage/
+
+# Ignore tmp restart file
+/tmp/restart.txt
+
+# Ignore test screenshots
+/tmp/screenshots/
