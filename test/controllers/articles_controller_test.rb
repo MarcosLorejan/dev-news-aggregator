@@ -42,7 +42,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "show should display bookmark button when not bookmarked" do
     get article_path(@article)
-    
+
     assert_response :success
     assert_select "button", text: "Add to Reading List"
   end
@@ -50,7 +50,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
   test "show should display unbookmark button when bookmarked" do
     @article.bookmark!
     get article_path(@article)
-    
+
     assert_response :success
     assert_select "button", text: "Remove from Reading List"
   end

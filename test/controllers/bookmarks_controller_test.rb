@@ -57,7 +57,7 @@ class BookmarksControllerTest < ActionDispatch::IntegrationTest
 
   test "should show unbookmark buttons" do
     get bookmarks_path
-    
+
     assert_response :success
     assert_select "button[title='Remove from reading list']", minimum: 1
   end

@@ -10,24 +10,24 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
 
   test "should bookmark article from index page" do
     visit articles_path
-    
+
     within("[data-source='#{@article.source_type}']") do
       bookmark_button = find("button[title='Add to reading list']")
       bookmark_button.click
     end
-    
+
     sleep 0.5
     assert @article.reload.bookmarked?
   end
 
   test "should unbookmark article from index page" do
     visit articles_path
-    
+
     within("[data-source='#{@bookmarked_article.source_type}']") do
       unbookmark_button = find("button[title='Remove from reading list']")
       unbookmark_button.click
     end
-    
+
     sleep 0.5
     assert_not @bookmarked_article.reload.bookmarked?
   end
@@ -54,7 +54,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
 
   test "should filter articles by category" do
     visit articles_path
-    
+
     # Look for a category button (they contain emojis and text)
     if page.has_button?("🔨 Programming Languages", wait: 1)
       click_button "🔨 Programming Languages"
@@ -67,25 +67,25 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
 
   test "should show all articles when clicking All Articles filter" do
     visit articles_path
-    
+
     # First click a category filter if it exists
     if page.has_button?("🔨 Programming Languages", wait: 1)
       click_button "🔨 Programming Languages"
     end
-    
+
     # Then click All Articles - the button text includes count
     all_articles_btn = find("button[data-filter-value='all']")
     all_articles_btn.click
-    
+
     assert_selector "article.article-card", minimum: 1
   end
 
   test "should filter by specific source" do
     visit articles_path
-    
+
     # Open the details dropdown for source filtering
     find("details summary").click
-    
+
     # Click the first available source filter
     first_source_btn = first("button.source-filter-btn")
     if first_source_btn
@@ -99,7 +99,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
 
   test "should bookmark article from detail page" do
     visit article_path(@article)
-    
+
     if page.has_button?("Add to Reading List")
       click_button "Add to Reading List"
       sleep 0.5
@@ -111,7 +111,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
 
   test "should unbookmark article from detail page" do
     visit article_path(@bookmarked_article)
-    
+
     if page.has_button?("Remove from Reading List")
       click_button "Remove from Reading List"
       sleep 0.5
@@ -123,7 +123,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
 
   test "should remove bookmark from reading list" do
     visit bookmarks_path
-    
+
     if page.has_selector?("article.article-card[data-source='reddit_rust']")
       within("article.article-card[data-source='reddit_rust']") do
         page.execute_script("window.confirm = function() { return true; }")
