@@ -1,16 +1,20 @@
 class ArticlesController < ApplicationController
   def index
-    @show_read = params[:show_read] == 'true'
-    
+    @show_read = params[:show_read] == "true"
+
     @articles = if @show_read
                   Article.order(published_at: :desc)
-                else
+    else
                   Article.not_read.order(published_at: :desc)
-                end.limit(50)
-                
+    end.limit(50)
+
     @articles_by_source = @articles.group_by(&:source_type)
     @articles_by_category = view_context.group_sources_by_category(@articles_by_source)
-    @total_count = @show_read ? Article.count : Article.not_read.count
+    @total_count = if @show_read
+                     Article.count
+    else
+                     Article.not_read.count
+    end
     @last_updated = Article.maximum(:updated_at)
   end
 

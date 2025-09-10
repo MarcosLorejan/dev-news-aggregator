@@ -24,7 +24,8 @@ class Article < ApplicationRecord
   end
 
   def toggle_bookmark!
-    bookmarked? ? unbookmark! : bookmark!
+    return unbookmark! if bookmarked?
+    bookmark!
   end
 
   def read?
@@ -44,6 +45,7 @@ class Article < ApplicationRecord
   end
 
   def toggle_read!
-    read? ? unmark_as_read! : mark_as_read!
+    return unmark_as_read! if read?
+    mark_as_read!
   end
 end

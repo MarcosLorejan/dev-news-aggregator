@@ -11,7 +11,6 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get articles_url
     assert_response :success
 
-    # Check that articles are displayed
     assert_select "article.article-card", minimum: 1
     assert_select "h1", "Developer News Aggregator"
   end
@@ -20,7 +19,6 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get articles_url
     assert_response :success
 
-    # Should have filter buttons for different sources
     assert_select "button[data-filter-type='all']", text: /All Articles/
     assert_select "button[data-filter-type='category']", minimum: 1
   end
@@ -40,28 +38,22 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index should exclude read articles by default" do
-    # Mark one article as read
     @article.mark_as_read!
-    
+
     get articles_url
     assert_response :success
-    
-    # Should not show the read article
+
     assert_select "h3", text: @article.title, count: 0
-    # Should still show unread articles
     assert_select "h3", text: @dev_to_article.title, count: 1
   end
 
   test "index should include read articles when show_read param is true" do
-    # Mark one article as read
     @article.mark_as_read!
-    
+
     get articles_url(show_read: true)
     assert_response :success
-    
-    # Should show the read article when explicitly requested
+
     assert_select "h3", text: @article.title, count: 1
-    # Should also show unread articles
     assert_select "h3", text: @dev_to_article.title, count: 1
   end
 

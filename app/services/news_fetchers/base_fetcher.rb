@@ -20,8 +20,13 @@ class NewsFetchers::BaseFetcher
     article.assign_attributes(attributes)
 
     if article.new_record? || article.changed?
+      is_new_record = article.new_record?
       article.save!
-      Rails.logger.info "#{article.new_record? ? 'Created' : 'Updated'} article: #{article.title}"
+      if is_new_record
+        Rails.logger.info "Created article: #{article.title}"
+      else
+        Rails.logger.info "Updated article: #{article.title}"
+      end
     end
 
     article
