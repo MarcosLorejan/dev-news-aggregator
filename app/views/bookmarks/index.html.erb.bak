@@ -62,9 +62,9 @@
           <div class="flex justify-between items-start mb-4">
             <div class="flex-1">
               <h2 class="text-xl font-bold text-gray-100 mb-2 leading-tight group-hover:text-primary-300 transition-colors duration-200">
-                <%= link_to article.url, target: "_blank", 
+                <%= link_to article.title, article.url, target: "_blank", 
                     class: "hover:text-primary-400 transition-colors duration-200 flex items-start group/link", 
-                    rel: "noopener noreferrer" do %>
+                    rel: "noopener noreferrer" %>
                   <span class="flex-1"><%= article.title %></span>
                   <svg class="w-4 h-4 ml-2 mt-1 opacity-60 group-hover/link:opacity-100 transition-all duration-200 group-hover/link:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
@@ -109,7 +109,7 @@
                 <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
                 </svg>
-                🔖 Bookmarked <%= article.bookmark.bookmarked_at.strftime("%b %d") %>
+                Saved <%= article.bookmark.bookmarked_at.strftime("%b %d") %>
               </span>
             </div>
             
@@ -152,7 +152,7 @@
       </div>
       <h2 class="text-2xl font-bold text-gray-200 mb-4">No bookmarked articles yet</h2>
       <p class="text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">
-        Articles you bookmark will appear here in your reading list.
+        Start building your reading list by bookmarking interesting articles. They'll appear here for easy access later.
       </p>
       <%= link_to articles_path, 
           class: "group inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25" do %>
@@ -166,31 +166,109 @@
 </div>
 
 <script>
+// Modern bookmark filtering functionality with animations
 document.addEventListener('DOMContentLoaded', function() {
   const filterBtns = document.querySelectorAll('.filter-btn');
   const articles = document.querySelectorAll('.article-card');
   
+  // Initialize animations
+  initializeAnimations();
+  
   filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const source = btn.dataset.source;
       
-      // Update active button
-      filterBtns.forEach(b => {
-        b.classList.remove('active', 'bg-gradient-to-r', 'from-primary-600', 'to-primary-700', 'text-white', 'shadow-lg', 'shadow-primary-500/25');
-        b.classList.add('bg-dark-800', 'border', 'border-dark-700', 'text-gray-300');
-      });
-      btn.classList.add('active', 'bg-gradient-to-r', 'from-primary-600', 'to-primary-700', 'text-white', 'shadow-lg', 'shadow-primary-500/25');
-      btn.classList.remove('bg-dark-800', 'border', 'border-dark-700', 'text-gray-300');
+      // Add click animation
+      btn.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        btn.style.transform = '';
+      }, 150);
       
-      // Filter articles
-      articles.forEach(article => {
-        if (source === 'all' || article.dataset.source === source) {
-          article.style.display = 'block';
-        } else {
+      // Update active button with new dark theme classes
+      updateFilterButtons(btn);
+      
+      // Filter articles with smooth animation
+      filterArticlesWithAnimation(source);
+    });
+  });
+  
+  function updateFilterButtons(activeBtn) {
+    filterBtns.forEach(b => {
+      b.classList.remove('active');
+      // Remove active gradient classes
+      b.classList.remove('bg-gradient-to-r', 'from-primary-600', 'to-primary-700', 'text-white', 'shadow-lg', 'shadow-primary-500/25');
+      // Add inactive classes
+      b.classList.add('bg-dark-800', 'border', 'border-dark-700', 'text-gray-300');
+    });
+    
+    // Set active button
+    activeBtn.classList.add('active');
+    activeBtn.classList.remove('bg-dark-800', 'border', 'border-dark-700', 'text-gray-300');
+    activeBtn.classList.add('bg-gradient-to-r', 'from-primary-600', 'to-primary-700', 'text-white', 'shadow-lg', 'shadow-primary-500/25');
+  }
+  
+  function filterArticlesWithAnimation(source) {
+    articles.forEach((article, index) => {
+      const showArticle = (source === 'all' || article.dataset.source === source);
+      
+      // Smooth fade animation
+      if (showArticle) {
+        article.style.display = 'block';
+        article.style.opacity = '0';
+        article.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+          article.style.transition = 'all 0.3s ease-out';
+          article.style.opacity = '1';
+          article.style.transform = 'translateY(0)';
+        }, index * 50); // Staggered animation
+      } else {
+        article.style.transition = 'all 0.2s ease-in';
+        article.style.opacity = '0';
+        article.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
           article.style.display = 'none';
-        }
+        }, 200);
+      }
+    });
+  }
+  
+  function initializeAnimations() {
+    // Add hover effects to cards
+    articles.forEach(article => {
+      article.addEventListener('mouseenter', () => {
+        article.style.transition = 'all 0.3s ease-out';
+      });
+      
+      article.addEventListener('mouseleave', () => {
+        article.style.transition = 'all 0.3s ease-out';
       });
     });
+    
+    // Smooth scroll for better UX
+    document.documentElement.style.scrollBehavior = 'smooth';
+  }
+  
+  // Add intersection observer for scroll animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, observerOptions);
+  
+  // Observe all article cards
+  articles.forEach(article => {
+    observer.observe(article);
   });
 });
 </script>

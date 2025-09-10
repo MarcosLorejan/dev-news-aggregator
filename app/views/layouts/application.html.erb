@@ -23,17 +23,102 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'primary': {
+                50: '#faf5ff',
+                100: '#f3e8ff',
+                200: '#e9d5ff',
+                300: '#d8b4fe',
+                400: '#c084fc',
+                500: '#a855f7',
+                600: '#9333ea',
+                700: '#7c3aed',
+                800: '#6b21a8',
+                900: '#581c87',
+                950: '#3b0764',
+              },
+              'dark': {
+                50: '#f8fafc',
+                100: '#f1f5f9',
+                200: '#e2e8f0',
+                300: '#cbd5e1',
+                400: '#94a3b8',
+                500: '#64748b',
+                600: '#475569',
+                700: '#334155',
+                800: '#1e293b',
+                850: '#172033',
+                900: '#0f172a',
+                950: '#020617',
+              },
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-in-out',
+              'slide-up': 'slideUp 0.3s ease-out',
+              'scale-in': 'scaleIn 0.2s ease-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              slideUp: {
+                '0%': { transform: 'translateY(10px)', opacity: '0' },
+                '100%': { transform: 'translateY(0)', opacity: '1' },
+              },
+              scaleIn: {
+                '0%': { transform: 'scale(0.95)', opacity: '0' },
+                '100%': { transform: 'scale(1)', opacity: '1' },
+              },
+            },
+          },
+        },
+      }
+    </script>
     <style>
+      :root {
+        --primary-50: 250 245 255;
+        --primary-500: 168 85 247;
+        --primary-600: 147 51 234;
+        --primary-700: 124 58 237;
+        --dark-800: 30 41 59;
+        --dark-850: 23 32 51;
+        --dark-900: 15 23 42;
+        --dark-950: 2 6 23;
+      }
+      
       .line-clamp-3 {
         display: -webkit-box;
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
+      
+      .gradient-border {
+        background: linear-gradient(135deg, rgb(168 85 247 / 0.2), rgb(147 51 234 / 0.1));
+        border: 1px solid rgb(168 85 247 / 0.3);
+      }
+      
+      .glass-effect {
+        backdrop-filter: blur(10px);
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+      }
+      
+      .scroll-smooth {
+        scroll-behavior: smooth;
+      }
     </style>
   </head>
 
-  <body class="bg-gray-100 min-h-screen">
-    <%= yield %>
+  <body class="bg-dark-900 min-h-screen text-gray-100 antialiased scroll-smooth">
+    <div class="min-h-screen bg-gradient-to-br from-dark-900 via-dark-850 to-dark-900">
+      <%= yield %>
+    </div>
   </body>
 </html>

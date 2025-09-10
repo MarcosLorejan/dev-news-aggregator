@@ -1,41 +1,95 @@
-<div class="container mx-auto px-4 py-8">
-  <div class="mb-6">
-    <%= link_to "← Back to Articles", articles_path, class: "text-blue-600 hover:text-blue-800 font-medium" %>
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <!-- Navigation -->
+  <div class="mb-8 animate-fade-in">
+    <%= link_to articles_path, 
+        class: "group inline-flex items-center px-4 py-2 bg-gradient-to-r from-dark-700 to-dark-600 border border-dark-500 text-gray-300 rounded-xl font-medium transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:border-primary-500 hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25" do %>
+      <svg class="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back to Articles
+    <% end %>
   </div>
   
-  <article class="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
-    <div class="mb-4">
-      <span class="inline-block px-3 py-1 text-sm font-medium bg-gray-100 text-gray-800 rounded-full mb-4">
-        <%= @article.source_type.humanize %>
-      </span>
+  <!-- Article Container -->
+  <article class="glass-effect rounded-2xl p-8 md:p-12 animate-slide-up">
+    <!-- Article Header -->
+    <div class="mb-8">
+      <div class="flex flex-wrap items-center gap-4 mb-6">
+        <span class="inline-block px-4 py-2 text-sm font-semibold bg-gradient-to-r from-primary-600/20 to-primary-700/20 text-primary-300 border border-primary-500/30 rounded-full">
+          <%= @article.source_type.humanize %>
+        </span>
+        <% if @article.bookmarked? %>
+          <span class="inline-flex items-center px-3 py-1 text-xs font-medium bg-primary-600/20 text-primary-400 border border-primary-500/30 rounded-full">
+            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+            </svg>
+            Bookmarked
+          </span>
+        <% end %>
+      </div>
       
-      <h1 class="text-3xl font-bold text-gray-900 mb-4"><%= @article.title %></h1>
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-100 mb-6 leading-tight"><%= @article.title %></h1>
       
-      <div class="flex items-center space-x-6 text-sm text-gray-600 mb-6">
-        <span>📅 <%= @article.published_at.strftime("%B %d, %Y at %I:%M %p") %></span>
-        <span>👍 <%= @article.score %> points</span>
-        <span>💬 <%= @article.comment_count %> comments</span>
+      <!-- Article Meta -->
+      <div class="flex flex-wrap items-center gap-6 text-sm text-gray-400 mb-6">
+        <span class="flex items-center">
+          <svg class="w-4 h-4 mr-2 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <%= @article.published_at.strftime("%B %d, %Y at %I:%M %p") %>
+        </span>
+        <span class="flex items-center">
+          <svg class="w-4 h-4 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
+          </svg>
+          <%= @article.score %> points
+        </span>
+        <span class="flex items-center">
+          <svg class="w-4 h-4 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+          <%= @article.comment_count %> comments
+        </span>
       </div>
     </div>
     
+    <!-- Article Description -->
     <% if @article.description.present? %>
-      <div class="prose prose-lg max-w-none mb-8">
-        <p class="text-gray-700 leading-relaxed"><%= simple_format(@article.description) %></p>
+      <div class="mb-8">
+        <div class="prose prose-lg max-w-none">
+          <div class="text-gray-300 leading-relaxed text-lg"><%= simple_format(@article.description) %></div>
+        </div>
       </div>
     <% end %>
     
-    <div class="border-t border-gray-200 pt-6">
-      <div class="flex justify-between items-center">
-        <div class="text-sm text-gray-500">
-          <p>External ID: <%= @article.external_id %></p>
-          <p>Last updated: <%= @article.updated_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+    <!-- Article Footer -->
+    <div class="border-t border-dark-700 pt-8">
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <!-- Article Metadata -->
+        <div class="text-sm text-gray-500 space-y-1">
+          <p class="flex items-center">
+            <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+            </svg>
+            External ID: <span class="text-gray-400 ml-1 font-mono"><%= @article.external_id %></span>
+          </p>
+          <p class="flex items-center">
+            <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Last updated: <%= @article.updated_at.strftime("%B %d, %Y at %I:%M %p") %>
+          </p>
         </div>
         
-        <div class="flex space-x-4">
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap gap-4">
+          <!-- Bookmark Button -->
           <% if @article.bookmarked? %>
             <%= form_with url: unbookmark_article_path(@article), method: :delete, local: true, class: "inline" do |form| %>
-              <%= form.button type: "submit", class: "inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors" do %>
-                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <%= form.button type: "submit", 
+                  class: "group inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-red-700 hover:to-red-800 hover:scale-105 hover:shadow-lg hover:shadow-red-500/25", 
+                  data: { confirm: "Remove this article from your reading list?" } do %>
+                <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
                 </svg>
                 Remove from Reading List
@@ -43,20 +97,23 @@
             <% end %>
           <% else %>
             <%= form_with url: bookmark_article_path(@article), method: :post, local: true, class: "inline" do |form| %>
-              <%= form.button type: "submit", class: "inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-yellow-600 transition-colors" do %>
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <%= form.button type: "submit", 
+                  class: "group inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25" do %>
+                <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
                 </svg>
                 Add to Reading List
               <% end %>
             <% end %>
           <% end %>
+          
+          <!-- Visit Source Button -->
           <% if safe_external_url(@article.url) %>
             <%= link_to safe_external_url(@article.url), target: "_blank", 
-                class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors", 
+                class: "group inline-flex items-center px-6 py-3 bg-gradient-to-r from-dark-700 to-dark-600 border border-dark-500 text-gray-300 rounded-xl font-medium transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:border-primary-500 hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25", 
                 rel: "noopener noreferrer" do %>
               Visit Source
-              <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
               </svg>
             <% end %>
