@@ -32,7 +32,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_10_182154) do
     t.datetime "bookmarked_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["article_id"], name: "index_bookmarks_on_article_id"
+    t.index [ "article_id" ], name: "index_bookmarks_on_article_id"
   end
 
   create_table "news_sources", force: :cascade do |t|
@@ -49,7 +49,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_10_182154) do
     t.datetime "read_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["article_id"], name: "index_read_articles_on_article_id"
+    t.index [ "article_id" ], name: "index_read_articles_on_article_id"
   end
 
   add_foreign_key "bookmarks", "articles"

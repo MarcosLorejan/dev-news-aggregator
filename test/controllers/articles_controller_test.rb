@@ -43,8 +43,8 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get articles_url
     assert_response :success
 
-    assert_select "h3", text: @article.title, count: 0
-    assert_select "h3", text: @dev_to_article.title, count: 1
+    assert_select "h2", text: @article.title, count: 0
+    assert_select "h2", text: @dev_to_article.title, count: 1
   end
 
   test "index should include read articles when show_read param is true" do
@@ -53,8 +53,8 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get articles_url(show_read: true)
     assert_response :success
 
-    assert_select "h3", text: @article.title, count: 1
-    assert_select "h3", text: @dev_to_article.title, count: 1
+    assert_select "h2", text: @article.title, count: 1
+    assert_select "h2", text: @dev_to_article.title, count: 1
   end
 
   test "should get show" do

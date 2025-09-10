@@ -6,8 +6,6 @@ Rails.application.routes.draw do
     member do
       post :bookmark
       delete :unbookmark
-      post :mark_as_read
-      delete :unmark_as_read
     end
   end
 
@@ -15,9 +13,9 @@ Rails.application.routes.draw do
   resources :bookmarks, only: [ :index ]
 
   # Read articles routes
-  resources :read_articles, only: [ :index ], path: 'read'
-  post 'articles/:article_id/mark_as_read', to: 'read_articles#create', as: 'mark_article_as_read'
-  delete 'articles/:article_id/unmark_as_read', to: 'read_articles#destroy', as: 'unmark_article_as_read'
+  resources :read_articles, only: [ :index ], path: "read"
+  post "articles/:article_id/mark_as_read", to: "read_articles#create", as: "mark_article_as_read"
+  delete "articles/:article_id/unmark_as_read", to: "read_articles#destroy", as: "unmark_article_as_read"
 
   root "articles#index"
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

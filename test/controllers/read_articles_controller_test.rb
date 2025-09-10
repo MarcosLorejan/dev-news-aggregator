@@ -15,7 +15,7 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
   test "should display read articles" do
     get read_articles_path
     assert_select ".article-card", count: 1
-    assert_select "h3", @article.title
+    assert_select "h2", text: @article.title
   end
 
   test "should show empty state when no read articles exist" do
@@ -29,7 +29,7 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
   test "should group read articles by source" do
     dev_article = articles(:dev_to_article)
     ReadArticle.create!(article: dev_article)
-    
+
     get read_articles_path
     assert_response :success
     assert_select "button[data-source]", minimum: 2 # Should have filter buttons for different sources

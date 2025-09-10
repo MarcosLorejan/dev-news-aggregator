@@ -51,7 +51,7 @@ class ReadArticleTest < ActiveSupport::TestCase
   test "should order recent scope by read_at desc" do
     older_read = ReadArticle.create!(article: articles(:dev_to_article), read_at: 2.days.ago)
     newer_read = ReadArticle.create!(article: articles(:reddit_rust_article), read_at: 1.day.ago)
-    
+
     recent_reads = ReadArticle.recent
     assert_equal newer_read, recent_reads.first
     assert_equal older_read, recent_reads.last
