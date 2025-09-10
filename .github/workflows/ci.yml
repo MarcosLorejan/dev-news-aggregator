@@ -21,16 +21,15 @@ jobs:
 
       - name: Cache bundler gems
         id: cache-bundler
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/.ruby-version') }}
+          key: ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ github.run_id }}
           restore-keys: |
-            ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-
-            ${{ runner.os }}-gems-
+            ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-${{ hashFiles('**/Gemfile.lock') }}-
+            ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-
 
       - name: Install bundler dependencies
-        if: steps.cache-bundler.outputs.cache-hit != 'true'
         run: |
           bundle config path vendor/bundle
           bundle config set --local without 'development production'
@@ -50,15 +49,19 @@ jobs:
           ruby-version: .ruby-version
 
       - name: Restore bundler cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/.ruby-version') }}
+          key: ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-${{ hashFiles('**/Gemfile.lock') }}-
+            ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-
 
       - name: Configure bundle
         run: |
           bundle config path vendor/bundle
           bundle config set --local without 'development production'
+          bundle install --jobs 4 --retry 3
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bundle exec brakeman --no-pager
@@ -77,15 +80,19 @@ jobs:
           ruby-version: .ruby-version
 
       - name: Restore bundler cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/.ruby-version') }}
+          key: ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-${{ hashFiles('**/Gemfile.lock') }}-
+            ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-
 
       - name: Configure bundle
         run: |
           bundle config path vendor/bundle
           bundle config set --local without 'development production'
+          bundle install --jobs 4 --retry 3
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
         run: bundle exec importmap audit
@@ -103,15 +110,19 @@ jobs:
           ruby-version: .ruby-version
 
       - name: Restore bundler cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/.ruby-version') }}
+          key: ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-${{ hashFiles('**/Gemfile.lock') }}-
+            ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-
 
       - name: Configure bundle
         run: |
           bundle config path vendor/bundle
           bundle config set --local without 'development production'
+          bundle install --jobs 4 --retry 3
 
       - name: Lint code for consistent style
         run: bundle exec rubocop -f github
@@ -144,15 +155,19 @@ jobs:
           ruby-version: .ruby-version
 
       - name: Restore bundler cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/.ruby-version') }}
+          key: ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-${{ hashFiles('**/Gemfile.lock') }}-
+            ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-
 
       - name: Configure bundle
         run: |
           bundle config path vendor/bundle
           bundle config set --local without 'development production'
+          bundle install --jobs 4 --retry 3
 
       - name: Prepare test database
         env:
@@ -210,15 +225,19 @@ jobs:
           ruby-version: .ruby-version
 
       - name: Restore bundler cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/.ruby-version') }}
+          key: ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-${{ hashFiles('**/Gemfile.lock') }}-
+            ${{ runner.os }}-ruby-${{ hashFiles('**/.ruby-version') }}-gems-
 
       - name: Configure bundle
         run: |
           bundle config path vendor/bundle
           bundle config set --local without 'development production'
+          bundle install --jobs 4 --retry 3
 
       - name: Prepare test database
         env:
