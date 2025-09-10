@@ -7,9 +7,20 @@ class NewsAggregatorService
     @fetchers = [
       NewsFetchers::HackerNewsFetcher.new,
       NewsFetchers::DevToFetcher.new,
-      NewsFetchers::RedditFetcher.new(subreddit: 'programming'),
-      NewsFetchers::RedditFetcher.new(subreddit: 'webdev'),
-      NewsFetchers::RedditFetcher.new(subreddit: 'javascript')
+      # Programming languages
+      NewsFetchers::RedditFetcher.new(subreddit: "programming"),
+      NewsFetchers::RedditFetcher.new(subreddit: "webdev"),
+      NewsFetchers::RedditFetcher.new(subreddit: "javascript"),
+      NewsFetchers::RedditFetcher.new(subreddit: "ruby"),
+      NewsFetchers::RedditFetcher.new(subreddit: "rust"),
+      # Security and tech
+      NewsFetchers::RedditFetcher.new(subreddit: "netsec"),
+      NewsFetchers::RedditFetcher.new(subreddit: "cybersecurity"),
+      NewsFetchers::RedditFetcher.new(subreddit: "technology"),
+      # AI and LLM
+      NewsFetchers::RedditFetcher.new(subreddit: "MachineLearning"),
+      NewsFetchers::RedditFetcher.new(subreddit: "artificial"),
+      NewsFetchers::RedditFetcher.new(subreddit: "LocalLLaMA")
     ]
     @all_articles = []
   end
@@ -33,7 +44,7 @@ class NewsAggregatorService
     duration = (end_time - start_time).round(2)
 
     Rails.logger.info "News aggregation completed in #{duration}s. Total articles processed: #{@all_articles.count}"
-    
+
     {
       articles_count: @all_articles.count,
       duration: duration,

@@ -1,21 +1,41 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  title: MyString
-  url: MyString
-  published_at: 2025-09-08 17:45:01
-  description: MyText
-  external_id: MyString
-  source_type: MyString
-  score: 1
-  comment_count: 1
+hacker_news_article:
+  title: "Show HN: My new startup"
+  url: "https://example.com/startup"
+  published_at: <%= 1.day.ago %>
+  description: "We built an amazing product that will change the world"
+  external_id: "12345"
+  source_type: "hacker_news"
+  score: 150
+  comment_count: 45
 
-two:
-  title: MyString
-  url: MyString
-  published_at: 2025-09-08 17:45:01
-  description: MyText
-  external_id: MyString
-  source_type: MyString
-  score: 1
-  comment_count: 1
+dev_to_article:
+  title: "10 Tips for Better Ruby Code"
+  url: "https://dev.to/user/ruby-tips"
+  published_at: <%= 2.days.ago %>
+  description: "Learn how to write cleaner, more maintainable Ruby code"
+  external_id: "67890"
+  source_type: "dev_to"
+  score: 75
+  comment_count: 12
+
+reddit_rust_article:
+  title: "Learning Rust: A Beginner's Journey"
+  url: "https://reddit.com/r/rust/comments/abc123"
+  published_at: <%= 3.days.ago %>
+  description: "My experience learning Rust as a JavaScript developer"
+  external_id: "abc123"
+  source_type: "reddit_rust"
+  score: 200
+  comment_count: 58
+
+reddit_ruby_article:
+  title: "Rails 8.0 New Features"
+  url: "https://reddit.com/r/ruby/comments/def456"
+  published_at: <%= 4.days.ago %>
+  description: "Exploring the latest features in Rails 8.0"
+  external_id: "def456"
+  source_type: "reddit_ruby"
+  score: 89
+  comment_count: 23

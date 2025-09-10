@@ -1,6 +1,9 @@
 ENV["RAILS_ENV"] ||= "test"
+ENV["DISABLE_SPRING"] = "1"
 require_relative "../config/environment"
 require "rails/test_help"
+require "timecop"
+require "ostruct"
 
 module ActiveSupport
   class TestCase

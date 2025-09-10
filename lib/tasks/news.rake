@@ -2,9 +2,9 @@ namespace :news do
   desc "Fetch news from all sources"
   task fetch: :environment do
     puts "Starting news aggregation..."
-    
+
     result = NewsAggregatorService.fetch_all_news
-    
+
     puts "News aggregation completed!"
     puts "Articles processed: #{result[:articles_count]}"
     puts "Duration: #{result[:duration]}s"
@@ -15,7 +15,7 @@ namespace :news do
   desc "Show latest articles"
   task latest: :environment do
     articles = Article.order(published_at: :desc).limit(10)
-    
+
     if articles.any?
       puts "Latest 10 articles:"
       articles.each_with_index do |article, index|
@@ -31,7 +31,7 @@ namespace :news do
 
   desc "Clean old articles (older than 7 days)"
   task clean: :environment do
-    old_articles = Article.where('published_at < ?', 7.days.ago)
+    old_articles = Article.where("published_at < ?", 7.days.ago)
     count = old_articles.count
     old_articles.delete_all
     puts "Removed #{count} old articles"

@@ -32,7 +32,26 @@
         </div>
         
         <div class="flex space-x-4">
-          <%= link_to "View Original Article", @article.url, target: "_blank", 
+          <% if @article.bookmarked? %>
+            <%= form_with url: unbookmark_article_path(@article), method: :delete, local: true, class: "inline" do |form| %>
+              <%= form.button type: "submit", class: "inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors" do %>
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                </svg>
+                Remove from Reading List
+              <% end %>
+            <% end %>
+          <% else %>
+            <%= form_with url: bookmark_article_path(@article), method: :post, local: true, class: "inline" do |form| %>
+              <%= form.button type: "submit", class: "inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-yellow-600 transition-colors" do %>
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                </svg>
+                Add to Reading List
+              <% end %>
+            <% end %>
+          <% end %>
+          <%= link_to @article.url, target: "_blank", 
               class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" do %>
             Visit Source
             <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

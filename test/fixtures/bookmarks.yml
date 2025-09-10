@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+rust_article_bookmark:
+  article: reddit_rust_article
+  bookmarked_at: <%= 1.hour.ago %>
+
+ruby_article_bookmark:
+  article: reddit_ruby_article
+  bookmarked_at: <%= 2.hours.ago %>

@@ -1,29 +1,58 @@
 <div class="container mx-auto px-4 py-8">
   <div class="flex justify-between items-center mb-8">
     <h1 class="text-3xl font-bold text-gray-800">Developer News Aggregator</h1>
-    <div class="text-sm text-gray-600">
-      <div>Total articles: <%= @total_count %></div>
-      <% if @last_updated %>
-        <div>Last updated: <%= @last_updated.strftime("%B %d, %Y at %I:%M %p") %></div>
+    <div class="flex items-center space-x-6">
+      <%= link_to bookmarks_path, class: "text-blue-600 hover:text-blue-800 font-medium flex items-center" do %>
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+        </svg>
+        Reading List
       <% end %>
+      <div class="text-sm text-gray-600">
+        <div>Total articles: <%= @total_count %></div>
+        <% if @last_updated %>
+          <div>Last updated: <%= @last_updated.strftime("%B %d, %Y at %I:%M %p") %></div>
+        <% end %>
+      </div>
     </div>
   </div>
 
   <% if @articles.any? %>
-    <!-- Filter buttons -->
-    <div class="mb-6 flex flex-wrap gap-2">
-      <button class="filter-btn active px-4 py-2 bg-blue-500 text-white rounded-md" data-source="all">All Sources</button>
-      <% @articles_by_source.keys.each do |source| %>
-        <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" data-source="<%= source %>">
-          <%= source.humanize %> (<%= @articles_by_source[source].count %>)
+    <!-- Category Filter buttons -->
+    <div class="mb-6">
+      <div class="flex flex-wrap gap-2 mb-4">
+        <button class="filter-btn active px-4 py-2 bg-blue-500 text-white rounded-md" data-filter-type="all" data-filter-value="all">
+          All Articles (<%= @articles.count %>)
         </button>
-      <% end %>
+        <% @articles_by_category.each do |category, articles| %>
+          <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" 
+                  data-filter-type="category" data-filter-value="<%= category.parameterize %>">
+            <%= category_icon(category) %> <%= category %> (<%= articles.count %>)
+          </button>
+        <% end %>
+      </div>
+      
+      <!-- Source filter buttons (secondary) -->
+      <details class="text-sm">
+        <summary class="cursor-pointer text-gray-600 hover:text-gray-800">Filter by specific source</summary>
+        <div class="flex flex-wrap gap-1 mt-2 pl-4">
+          <% @articles_by_source.keys.each do |source| %>
+            <button class="source-filter-btn px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs hover:bg-gray-200" 
+                    data-filter-type="source" data-filter-value="<%= source %>">
+              <%= source.humanize %> (<%= @articles_by_source[source].count %>)
+            </button>
+          <% end %>
+        </div>
+      </details>
     </div>
 
     <!-- Articles list -->
     <div class="space-y-4">
       <% @articles.each do |article| %>
-        <article class="article-card bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow" data-source="<%= article.source_type %>">
+        <% article_category = @articles_by_category.find { |category, articles| articles.include?(article) }&.first || 'Other' %>
+        <article class="article-card bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow" 
+                 data-source="<%= article.source_type %>" 
+                 data-category="<%= article_category.parameterize %>">
           <div class="flex justify-between items-start mb-3">
             <h2 class="text-xl font-semibold text-gray-900 mb-2">
               <%= link_to article.title, article.url, target: "_blank", class: "hover:text-blue-600 transition-colors" %>
@@ -46,7 +75,28 @@
               <span>👍 <%= article.score %></span>
               <span>💬 <%= article.comment_count %></span>
             </div>
-            <%= link_to "View Details", article_path(article), class: "text-blue-600 hover:text-blue-800 font-medium" %>
+            <div class="flex items-center space-x-3">
+              <% if article.bookmarked? %>
+                <%= form_with url: unbookmark_article_path(article), method: :delete, local: true, class: "inline" do |form| %>
+                  <%= form.button type: "submit", class: "text-yellow-600 hover:text-yellow-800 transition-colors", 
+                      title: "Remove from reading list" do %>
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                    </svg>
+                  <% end %>
+                <% end %>
+              <% else %>
+                <%= form_with url: bookmark_article_path(article), method: :post, local: true, class: "inline" do |form| %>
+                  <%= form.button type: "submit", class: "text-gray-400 hover:text-yellow-600 transition-colors", 
+                      title: "Add to reading list" do %>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                    </svg>
+                  <% end %>
+                <% end %>
+              <% end %>
+              <%= link_to "View Details", article_path(article), class: "text-blue-600 hover:text-blue-800 font-medium" %>
+            </div>
           </div>
         </article>
       <% end %>
@@ -61,28 +111,59 @@
 </div>
 
 <script>
-// Simple filtering functionality
+// Advanced filtering functionality
 document.addEventListener('DOMContentLoaded', function() {
-  const filterBtns = document.querySelectorAll('.filter-btn');
+  const filterBtns = document.querySelectorAll('.filter-btn, .source-filter-btn');
   const articles = document.querySelectorAll('.article-card');
   
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      // Update active button
-      filterBtns.forEach(b => b.classList.remove('active', 'bg-blue-500', 'text-white'));
-      filterBtns.forEach(b => b.classList.add('bg-gray-200', 'text-gray-700'));
-      btn.classList.add('active', 'bg-blue-500', 'text-white');
-      btn.classList.remove('bg-gray-200', 'text-gray-700');
+      const filterType = btn.dataset.filterType;
+      const filterValue = btn.dataset.filterValue;
       
-      const source = btn.dataset.source;
+      // Update active button (only for main filter buttons, not source buttons)
+      if (btn.classList.contains('filter-btn')) {
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          b.classList.remove('active', 'bg-blue-500', 'text-white');
+          b.classList.add('bg-gray-200', 'text-gray-700');
+        });
+        btn.classList.add('active', 'bg-blue-500', 'text-white');
+        btn.classList.remove('bg-gray-200', 'text-gray-700');
+        
+        // Reset source filter buttons
+        document.querySelectorAll('.source-filter-btn').forEach(b => {
+          b.classList.remove('bg-blue-200');
+          b.classList.add('bg-gray-100');
+        });
+      } else {
+        // Handle source filter button click
+        document.querySelectorAll('.source-filter-btn').forEach(b => {
+          b.classList.remove('bg-blue-200');
+          b.classList.add('bg-gray-100');
+        });
+        btn.classList.add('bg-blue-200');
+        btn.classList.remove('bg-gray-100');
+        
+        // Reset main filter buttons
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          b.classList.remove('active', 'bg-blue-500', 'text-white');
+          b.classList.add('bg-gray-200', 'text-gray-700');
+        });
+      }
       
       // Filter articles
       articles.forEach(article => {
-        if (source === 'all' || article.dataset.source === source) {
-          article.style.display = 'block';
-        } else {
-          article.style.display = 'none';
+        let showArticle = false;
+        
+        if (filterType === 'all' && filterValue === 'all') {
+          showArticle = true;
+        } else if (filterType === 'category') {
+          showArticle = article.dataset.category === filterValue;
+        } else if (filterType === 'source') {
+          showArticle = article.dataset.source === filterValue;
         }
+        
+        article.style.display = showArticle ? 'block' : 'none';
       });
     });
   });

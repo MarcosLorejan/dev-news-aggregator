@@ -313,6 +313,7 @@ GEM
     stringio (3.1.7)
     thor (1.4.0)
     thruster (0.1.15-x86_64-linux)
+    timecop (0.9.10)
     timeout (0.4.3)
     turbo-rails (2.0.16)
       actionpack (>= 7.1.0)
@@ -364,6 +365,7 @@ DEPENDENCIES
   solid_queue
   stimulus-rails
   thruster
+  timecop
   turbo-rails
   tzinfo-data
   web-console

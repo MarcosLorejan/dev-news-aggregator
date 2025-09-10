@@ -16,14 +16,14 @@ class NewsFetchers::BaseFetcher
       external_id: attributes[:external_id],
       source_type: attributes[:source_type]
     )
-    
+
     article.assign_attributes(attributes)
-    
+
     if article.new_record? || article.changed?
       article.save!
       Rails.logger.info "#{article.new_record? ? 'Created' : 'Updated'} article: #{article.title}"
     end
-    
+
     article
   end
 end
