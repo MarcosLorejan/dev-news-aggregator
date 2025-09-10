@@ -48,7 +48,7 @@ jobs:
           bundle install --jobs 4 --retry 3
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
-        run: bundle exec importmap audit
+        run: bundle exec rails importmap:audit
 
   lint:
     runs-on: ubuntu-latest
