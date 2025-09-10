@@ -220,3 +220,9 @@ Uses Docker Compose for PostgreSQL with environment variables:
 - Keep commit messages concise and descriptive
 - Commit frequently to save changes - don't wait until everything is perfect
 - Push commits regularly to avoid losing work
+
+### GitHub Issue and Branch Workflow
+- When creating issues, use `gh` CLI and conventional commits format
+- Use available issue templates when creating new issues
+- When working on an issue, create a new branch based on the issue name
+- Branch naming convention: use descriptive names related to the issue (e.g., `fix-ci-bundler-cache`, `feat-deployment-automation`)
