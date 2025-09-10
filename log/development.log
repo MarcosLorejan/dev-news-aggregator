@@ -9638,3 +9638,17 @@ Processing by ArticlesController#index as HTML
 Completed 200 OK in 196ms (Views: 151.5ms | ActiveRecord: 18.2ms (54 queries, 0 cached) | GC: 52.1ms)
 
 
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT pg_try_advisory_lock(3412772191978308285) /*application='DevNewsAggregator'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.9ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='DevNewsAggregator'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.8ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='DevNewsAggregator'*/[0m
+Migrating to CreateReadArticles (20250910182154)
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN /*application='DevNewsAggregator'*/[0m
+  [1m[35m (36.8ms)[0m  [1m[35mCREATE TABLE "read_articles" ("id" bigserial primary key, "article_id" bigint NOT NULL, "read_at" timestamp(6), "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL, CONSTRAINT "fk_rails_4d9210fce7"
+FOREIGN KEY ("article_id")
+  REFERENCES "articles" ("id")
+) /*application='DevNewsAggregator'*/[0m
+  [1m[35m (2.5ms)[0m  [1m[35mCREATE INDEX "index_read_articles_on_article_id" ON "read_articles" ("article_id") /*application='DevNewsAggregator'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20250910182154') RETURNING "version" /*application='DevNewsAggregator'*/[0m
+  [1m[36mTRANSACTION (2.1ms)[0m  [1m[35mCOMMIT /*application='DevNewsAggregator'*/[0m
+  [1m[35m (0.3ms)[0m  [1m[34mSELECT pg_advisory_unlock(3412772191978308285) /*application='DevNewsAggregator'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.3ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='DevNewsAggregator'*/[0m

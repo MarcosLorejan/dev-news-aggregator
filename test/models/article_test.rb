@@ -106,39 +106,39 @@ class ArticleTest < ActiveSupport::TestCase
     assert @article.read?
   end
 
-  test "should create read_article when mark_read! is called and none exists" do
+  test "should create read_article when mark_as_read! is called and none exists" do
     assert_not @article.read?
 
-    read_article = @article.mark_read!
+    read_article = @article.mark_as_read!
 
     assert @article.read?
     assert_kind_of ReadArticle, read_article
     assert_equal @article, read_article.article
   end
 
-  test "should return existing read_article when mark_read! is called and already read" do
+  test "should return existing read_article when mark_as_read! is called and already read" do
     existing_read = @article.create_read_article
 
-    read_article = @article.mark_read!
+    read_article = @article.mark_as_read!
 
     assert_equal existing_read, read_article
     assert_equal 1, @article.reload.read_article ? 1 : 0 # Ensure only one read_article
   end
 
-  test "should destroy existing read_article when unmark_read! is called" do
+  test "should destroy existing read_article when unmark_as_read! is called" do
     @article.create_read_article
     assert @article.read?
 
-    @article.unmark_read!
+    @article.unmark_as_read!
 
     assert_not @article.reload.read?
   end
 
-  test "should do nothing when unmark_read! is called and no read_article exists" do
+  test "should do nothing when unmark_as_read! is called and no read_article exists" do
     assert_not @article.read?
 
     assert_nothing_raised do
-      @article.unmark_read!
+      @article.unmark_as_read!
     end
 
     assert_not @article.read?
@@ -171,11 +171,11 @@ class ArticleTest < ActiveSupport::TestCase
     assert_not_includes read_articles, @article
   end
 
-  test "should return only unread articles in unread scope" do
+  test "should return only unread articles in not_read scope" do
     read_article = articles(:dev_to_article)
     read_article.create_read_article
 
-    unread_articles = Article.unread
+    unread_articles = Article.not_read
 
     assert_includes unread_articles, @article
     assert_not_includes unread_articles, read_article

@@ -41,7 +41,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "index should exclude read articles by default" do
     # Mark one article as read
-    @article.mark_read!
+    @article.mark_as_read!
     
     get articles_url
     assert_response :success
@@ -54,7 +54,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "index should include read articles when show_read param is true" do
     # Mark one article as read
-    @article.mark_read!
+    @article.mark_as_read!
     
     get articles_url(show_read: true)
     assert_response :success

@@ -22,8 +22,8 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
     ReadArticle.destroy_all
     get read_articles_path
     assert_response :success
-    assert_select ".empty-state"
-    assert_select "p", text: /You haven't marked any articles as read yet/
+    assert_select "h2", text: "No read articles yet"
+    assert_select "p", text: /Articles you mark as read will appear here/
   end
 
   test "should group read articles by source" do
@@ -32,29 +32,29 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
     
     get read_articles_path
     assert_response :success
-    assert_select ".source-section", count: 2
+    assert_select "button[data-source]", minimum: 2 # Should have filter buttons for different sources
   end
 
   test "should display read timestamps" do
     get read_articles_path
-    assert_select ".text-purple-300", text: /Read/
-  end
-
-  test "should show unmark read buttons" do
-    get read_articles_path
-    assert_select "form[action='#{mark_unread_article_path(@article)}']"
-    assert_select "button", text: "Mark as Unread"
+    assert_select "span", text: /Read/
   end
 
   test "should show back to articles link" do
     get read_articles_path
-    assert_select "a[href='#{articles_path}']", text: "Back to Articles"
+    assert_select "a[href='#{articles_path}']", text: "Back to All Articles"
+  end
+
+  test "should show unmark read buttons" do
+    get read_articles_path
+    assert_select "form[action='#{unmark_article_as_read_path(@article)}']"
+    assert_select "button[type='submit']", count: 1 # Should have unmark button
   end
 
   test "should mark article as read" do
     unread_article = articles(:dev_to_article)
     assert_difference "ReadArticle.count", 1 do
-      post mark_read_article_path(unread_article)
+      post mark_article_as_read_path(unread_article)
     end
     assert_redirected_to articles_path
     assert unread_article.reload.read?
@@ -63,7 +63,7 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
   test "should mark article as read and respond to JSON" do
     unread_article = articles(:dev_to_article)
     assert_difference "ReadArticle.count", 1 do
-      post mark_read_article_path(unread_article), as: :json
+      post mark_article_as_read_path(unread_article), as: :json
     end
     assert_response :ok
     json_response = JSON.parse(response.body)
@@ -73,7 +73,7 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "should handle mark read of non-existent article" do
     assert_no_difference "ReadArticle.count" do
-      post mark_read_article_path(id: 99999)
+      post mark_article_as_read_path(article_id: 99999)
     end
     assert_redirected_to articles_path
     assert_equal "Article not found", flash[:alert]
@@ -81,7 +81,7 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "should mark article as unread" do
     assert_difference "ReadArticle.count", -1 do
-      delete mark_unread_article_path(@article)
+      delete unmark_article_as_read_path(@article)
     end
     assert_redirected_to read_articles_path
     assert_not @article.reload.read?
@@ -89,7 +89,7 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "should mark article as unread and respond to JSON" do
     assert_difference "ReadArticle.count", -1 do
-      delete mark_unread_article_path(@article), as: :json
+      delete unmark_article_as_read_path(@article), as: :json
     end
     assert_response :ok
     json_response = JSON.parse(response.body)
@@ -99,7 +99,7 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "should handle unmark read of non-existent article" do
     assert_no_difference "ReadArticle.count" do
-      delete mark_unread_article_path(id: 99999)
+      delete unmark_article_as_read_path(article_id: 99999)
     end
     assert_redirected_to read_articles_path
     assert_equal "Article not found", flash[:alert]
@@ -108,7 +108,7 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
   test "should handle unmark read of article that is not read" do
     unread_article = articles(:dev_to_article)
     assert_no_difference "ReadArticle.count" do
-      delete mark_unread_article_path(unread_article)
+      delete unmark_article_as_read_path(unread_article)
     end
     assert_redirected_to read_articles_path
     assert_equal "Article is not marked as read", flash[:alert]
