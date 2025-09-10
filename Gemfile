@@ -69,4 +69,8 @@ group :test do
 
   # Time manipulation for tests
   gem "timecop"
+
+  # Test coverage reporting
+  gem "simplecov", require: false
+  gem "simplecov-lcov", require: false
 end
