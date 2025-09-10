@@ -6,40 +6,8 @@ on:
     branches: [ main ]
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      cache-hit: ${{ steps.cache-bundler.outputs.cache-hit }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
-
-      - name: Cache bundler gems
-        id: cache-bundler
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/.ruby-version') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-
-            ${{ runner.os }}-gems-
-
-      - name: Install bundler dependencies
-        if: steps.cache-bundler.outputs.cache-hit != 'true'
-        run: |
-          bundle config path vendor/bundle
-          bundle config set --local without 'development production'
-          bundle install --jobs 4 --retry 3
-
   scan_ruby:
     runs-on: ubuntu-latest
-    needs: setup
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -48,25 +16,20 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
+          bundler-cache: false
 
-      - name: Restore bundler cache
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/.ruby-version') }}
-
-      - name: Configure bundle
+      - name: Clean and install dependencies
         run: |
-          bundle config path vendor/bundle
-          bundle config set --local without 'development production'
+          rm -rf vendor/bundle
+          bundle config set --local path 'vendor/bundle'
+          bundle config set --local deployment false
+          bundle install --jobs 4 --retry 3
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bundle exec brakeman --no-pager
 
   scan_js:
     runs-on: ubuntu-latest
-    needs: setup
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -75,17 +38,14 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
+          bundler-cache: false
 
-      - name: Restore bundler cache
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/.ruby-version') }}
-
-      - name: Configure bundle
+      - name: Clean and install dependencies
         run: |
-          bundle config path vendor/bundle
-          bundle config set --local without 'development production'
+          rm -rf vendor/bundle
+          bundle config set --local path 'vendor/bundle'
+          bundle config set --local deployment false
+          bundle install --jobs 4 --retry 3
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
         run: |
@@ -100,7 +60,6 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
-    needs: setup
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -109,25 +68,20 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
+          bundler-cache: false
 
-      - name: Restore bundler cache
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/.ruby-version') }}
-
-      - name: Configure bundle
+      - name: Clean and install dependencies
         run: |
-          bundle config path vendor/bundle
-          bundle config set --local without 'development production'
+          rm -rf vendor/bundle
+          bundle config set --local path 'vendor/bundle'
+          bundle config set --local deployment false
+          bundle install --jobs 4 --retry 3
 
       - name: Lint code for consistent style
         run: bundle exec rubocop -f github
 
   test:
     runs-on: ubuntu-latest
-    needs: setup
-
     services:
       postgres:
         image: postgres:15
@@ -150,17 +104,14 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
+          bundler-cache: false
 
-      - name: Restore bundler cache
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/.ruby-version') }}
-
-      - name: Configure bundle
+      - name: Clean and install dependencies
         run: |
-          bundle config path vendor/bundle
-          bundle config set --local without 'development production'
+          rm -rf vendor/bundle
+          bundle config set --local path 'vendor/bundle'
+          bundle config set --local deployment false
+          bundle install --jobs 4 --retry 3
 
       - name: Prepare test database
         env:
@@ -192,8 +143,6 @@ jobs:
 
   coverage:
     runs-on: ubuntu-latest
-    needs: setup
-
     services:
       postgres:
         image: postgres:15
@@ -216,17 +165,14 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
+          bundler-cache: false
 
-      - name: Restore bundler cache
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/.ruby-version') }}
-
-      - name: Configure bundle
+      - name: Clean and install dependencies
         run: |
-          bundle config path vendor/bundle
-          bundle config set --local without 'development production'
+          rm -rf vendor/bundle
+          bundle config set --local path 'vendor/bundle'
+          bundle config set --local deployment false
+          bundle install --jobs 4 --retry 3
 
       - name: Prepare test database
         env:
