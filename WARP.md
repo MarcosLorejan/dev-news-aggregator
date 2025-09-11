@@ -234,5 +234,19 @@ Uses Docker Compose for PostgreSQL with environment variables:
   - Status: `todo`, `in-progress`, `review-needed`, etc.
 - Example issue creation: `gh issue create --title "feat: new feature" --body "Description" --label "feature,medium,todo"`
 - Use available issue templates when creating new issues
-- When working on an issue, create a new branch based on the issue name
+- **When working on an issue, ALWAYS follow this workflow:**
+  1. Create a new branch based on the issue name
+  2. Make changes and commit following conventional commits format
+  3. Push branch to origin
+  4. **Create Pull Request using `gh` CLI - NEVER commit directly to master**
+  5. Wait for review/approval before merging
 - Branch naming convention: use descriptive names related to the issue (e.g., `fix-ci-bundler-cache`, `feat-deployment-automation`)
+- **Example PR workflow:**
+  ```bash
+  git checkout -b feat-new-feature
+  # Make changes...
+  git add .
+  git commit -m "feat: implement new feature"
+  git push origin feat-new-feature
+  gh pr create --title "feat: implement new feature" --body "Closes #123"
+  ```
