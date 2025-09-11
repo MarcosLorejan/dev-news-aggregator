@@ -60,3 +60,6 @@ yarn-debug.log*
 
 # Ignore test screenshots
 /tmp/screenshots/
+
+# Ignore local server log files
+rails_server.log
