@@ -227,6 +227,12 @@ Uses Docker Compose for PostgreSQL with environment variables:
 
 ### GitHub Issue and Branch Workflow
 - When creating issues, use `gh` CLI and conventional commits format
+- **Always add appropriate labels to issues** using `--label` option with `gh` CLI
+- Required issue labels:
+  - Type: `feature`, `bug`, `enhancement`, `documentation`, `test`, etc.
+  - Priority: `high`, `medium`, `low`
+  - Status: `todo`, `in-progress`, `review-needed`, etc.
+- Example issue creation: `gh issue create --title "feat: new feature" --body "Description" --label "feature,medium,todo"`
 - Use available issue templates when creating new issues
 - When working on an issue, create a new branch based on the issue name
 - Branch naming convention: use descriptive names related to the issue (e.g., `fix-ci-bundler-cache`, `feat-deployment-automation`)
