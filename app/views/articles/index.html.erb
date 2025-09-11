@@ -209,24 +209,29 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+function initializeCategoryFilter() {
   const filterBtns = document.querySelectorAll('.filter-btn');
   const articles = document.querySelectorAll('.article-card');
   
   filterBtns.forEach(btn => {
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+  });
+  
+  const freshFilterBtns = document.querySelectorAll('.filter-btn');
+  
+  freshFilterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const filterType = btn.dataset.filterType;
       const filterValue = btn.dataset.filterValue;
       
-      // Update active button
-      filterBtns.forEach(b => {
+      freshFilterBtns.forEach(b => {
         b.classList.remove('active', 'bg-gradient-to-r', 'from-primary-600', 'to-primary-700', 'text-white', 'shadow-lg', 'shadow-primary-500/25');
         b.classList.add('bg-dark-800', 'border', 'border-dark-700', 'text-gray-300');
       });
       btn.classList.add('active', 'bg-gradient-to-r', 'from-primary-600', 'to-primary-700', 'text-white', 'shadow-lg', 'shadow-primary-500/25');
       btn.classList.remove('bg-dark-800', 'border', 'border-dark-700', 'text-gray-300');
       
-      // Filter articles
       articles.forEach(article => {
         let showArticle = false;
         
@@ -240,5 +245,9 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   });
-});
+}
+
+document.addEventListener('DOMContentLoaded', initializeCategoryFilter);
+document.addEventListener('turbo:load', initializeCategoryFilter);
+document.addEventListener('turbo:render', initializeCategoryFilter);
 </script>
