@@ -26,6 +26,14 @@
             Bookmarked
           </span>
         <% end %>
+        <% if @article.read? %>
+          <span class="inline-flex items-center px-3 py-1 text-xs font-medium bg-green-600/20 text-green-400 border border-green-500/30 rounded-full">
+            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Already Read
+          </span>
+        <% end %>
       </div>
       
       <h1 class="text-3xl md:text-4xl font-bold text-gray-100 mb-6 leading-tight"><%= @article.title %></h1>
@@ -83,6 +91,29 @@
         
         <!-- Action Buttons -->
         <div class="flex flex-wrap gap-4">
+          <!-- Already Read Button -->
+          <% if @article.read? %>
+            <%= form_with url: unmark_article_as_read_path(@article), method: :delete, local: true, class: "inline" do |form| %>
+              <%= form.button type: "submit", 
+                  class: "group inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-orange-600 hover:to-orange-700 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25" do %>
+                <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Mark as Unread
+              <% end %>
+            <% end %>
+          <% else %>
+            <%= form_with url: mark_article_as_read_path(@article), method: :post, local: true, class: "inline" do |form| %>
+              <%= form.button type: "submit", 
+                  class: "group inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-lg hover:shadow-green-500/25" do %>
+                <svg class="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Mark as Read
+              <% end %>
+            <% end %>
+          <% end %>
+          
           <!-- Bookmark Button -->
           <% if @article.bookmarked? %>
             <%= form_with url: unbookmark_article_path(@article), method: :delete, local: true, class: "inline" do |form| %>
