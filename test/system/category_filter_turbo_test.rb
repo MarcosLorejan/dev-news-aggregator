@@ -12,19 +12,19 @@ class CategoryFilterTurboTest < ApplicationSystemTestCase
 
     if has_button?("All Articles", wait: 2)
       first_category_btn = first("button.filter-btn[data-filter-type='category']")
-      
+
       if first_category_btn
         category_value = first_category_btn["data-filter-value"]
-        
+
         first_category_btn.click
         assert_selector "article.article-card[data-category='#{category_value}']", visible: true
-        
+
         click_link "Reading List"
         assert_current_path bookmarks_path
-        
+
         click_link "Back to All Articles"
         assert_current_path articles_path
-        
+
         fresh_category_btn = first("button.filter-btn[data-filter-type='category']")
         if fresh_category_btn
           fresh_category_value = fresh_category_btn["data-filter-value"]
@@ -55,7 +55,7 @@ class CategoryFilterTurboTest < ApplicationSystemTestCase
 
         visit articles_path
         assert_current_path articles_path
-        
+
         first_category_btn = first("button.filter-btn[data-filter-type='category']")
         if first_category_btn
           category_value = first_category_btn["data-filter-value"]
@@ -74,19 +74,19 @@ class CategoryFilterTurboTest < ApplicationSystemTestCase
 
     if has_button?("All Articles", wait: 2)
       first_category_btn = first("button.filter-btn[data-filter-type='category']")
-      
+
       if first_category_btn
         category_value = first_category_btn["data-filter-value"]
         first_category_btn.click
-        
+
         visible_articles_before = all("article.article-card[data-category='#{category_value}']", visible: true).count
         assert visible_articles_before > 0, "Expected visible articles after filtering"
-        
+
         page.evaluate_script("initializeCategoryFilter();")
-        
+
         visible_articles_after = all("article.article-card[data-category='#{category_value}']", visible: true).count
         assert_equal visible_articles_before, visible_articles_after
-        
+
         fresh_category_btn = first("button.filter-btn[data-filter-type='category']")
         fresh_category_btn.click if fresh_category_btn
         assert_selector "article.article-card[data-category='#{category_value}']", visible: true
