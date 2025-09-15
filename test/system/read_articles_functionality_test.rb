@@ -5,14 +5,14 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
     @article = articles(:hacker_news_article)
     @bookmarked_article = articles(:reddit_rust_article)
     @read_article = articles(:dev_to_article)
-    
+
     # Set up initial states
     @article.unbookmark! if @article.bookmarked?
     @article.unmark_as_read! if @article.read?
-    
+
     @bookmarked_article.bookmark! unless @bookmarked_article.bookmarked?
     @bookmarked_article.unmark_as_read! if @bookmarked_article.read?
-    
+
     @read_article.mark_as_read! unless @read_article.read?
   end
 
@@ -163,7 +163,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
 
     # Refresh page to see updated status
     visit article_path(@article)
-    
+
     # Should show both statuses
     assert_selector "span", text: "Bookmarked"
     assert_selector "span", text: "Already Read"
