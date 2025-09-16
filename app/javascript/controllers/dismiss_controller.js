@@ -1,6 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="dismiss"
 export default class extends Controller {
   static values = {
     articleId: Number,
@@ -29,11 +28,9 @@ export default class extends Controller {
     
     this.lastDismissedId = articleId
     
-    // Make article semi-transparent immediately
     articleCard.style.opacity = '0.5'
     articleCard.style.pointerEvents = 'none'
     
-    // Add click handler to undo via clicking the faded article
     const undoClickHandler = (e) => {
       e.preventDefault()
       e.stopPropagation()
@@ -42,7 +39,6 @@ export default class extends Controller {
     articleCard.addEventListener('click', undoClickHandler)
     articleCard.dataset.undoHandler = 'true'
     
-    // Send dismiss request
     fetch(`/articles/${articleId}/dismiss`, {
       method: 'POST',
       headers: {
@@ -59,7 +55,6 @@ export default class extends Controller {
       this.showUndoToast(articleId, articleTitle, articleCard, undoClickHandler)
     }).catch(error => {
       console.error('Error dismissing article:', error)
-      // Restore article if dismiss failed
       articleCard.style.opacity = '1'
       articleCard.style.pointerEvents = 'auto'
       articleCard.removeEventListener('click', undoClickHandler)
@@ -105,13 +100,11 @@ export default class extends Controller {
     updateToastContent()
     document.body.appendChild(toast)
     
-    // Store reference for global access
     window.dismissController = this
     this.currentToast = toast
     this.currentArticleCard = articleCard
     this.currentUndoHandler = undoClickHandler
     
-    // Countdown timer
     const countdownInterval = setInterval(() => {
       timeLeft--
       updateToastContent()
@@ -132,24 +125,20 @@ export default class extends Controller {
   }
   
   undoDismiss(articleId, articleCard, undoClickHandler) {
-    // Clear countdown
     if (this.currentCountdown) {
       clearInterval(this.currentCountdown)
     }
     
-    // Remove toast
     if (this.currentToast) {
       this.currentToast.remove()
       this.currentToast = null
     }
     
-    // Restore article appearance
     articleCard.style.opacity = '1'
     articleCard.style.pointerEvents = 'auto'
     articleCard.removeEventListener('click', undoClickHandler)
     delete articleCard.dataset.undoHandler
     
-    // Send undismiss request
     fetch(`/articles/${articleId}/undismiss`, {
       method: 'DELETE',
       headers: {
@@ -170,7 +159,6 @@ export default class extends Controller {
   }
   
   finalizeDismiss(articleCard, undoClickHandler) {
-    // Remove the article from view completely
     articleCard.style.transition = 'all 0.5s ease-out'
     articleCard.style.transform = 'translateX(-100%)'
     articleCard.style.opacity = '0'
@@ -179,7 +167,6 @@ export default class extends Controller {
       articleCard.remove()
     }, 500)
     
-    // Clean up
     articleCard.removeEventListener('click', undoClickHandler)
   }
   
