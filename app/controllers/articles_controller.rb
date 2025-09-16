@@ -52,7 +52,7 @@ class ArticlesController < ApplicationController
     @article = Article.find(params[:id])
     dismissed = @article.dismiss!
 
-    MakeDismissalPermanentJob.perform_in(15.seconds, dismissed.id)
+    MakeDismissalPermanentJob.set(wait: 15.seconds).perform_later(dismissed.id)
 
     respond_to do |format|
       format.turbo_stream

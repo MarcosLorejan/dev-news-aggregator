@@ -177,7 +177,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get articles_path
     
     assert_response :success
-    assert_not assigns(:articles).include?(@article)
+    assert_select "h2", text: @article.title, count: 0
   end
 
   test "should include temporarily dismissed articles in index" do
@@ -186,6 +186,6 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get articles_path
     
     assert_response :success
-    assert assigns(:articles).include?(@article)
+    assert_select "h2", text: @article.title, count: 1
   end
 end

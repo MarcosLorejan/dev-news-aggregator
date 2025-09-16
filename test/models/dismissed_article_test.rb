@@ -3,7 +3,8 @@ require "test_helper"
 class DismissedArticleTest < ActiveSupport::TestCase
   def setup
     @article = articles(:hacker_news_article)
-    @dismissed_article = dismissed_articles(:dismissed_hacker_news)
+    @dismissed_article = @article.dismiss!
+    @dismissed_article.update!(permanent: true)
   end
 
   test "should belong to article" do
