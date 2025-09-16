@@ -41,14 +41,14 @@ class DismissedArticleTest < ActiveSupport::TestCase
       dismissed_at: Time.current,
       permanent: false
     )
-    
+
     assert_includes DismissedArticle.temporary, temporary_dismissed
     assert_not_includes DismissedArticle.temporary, @dismissed_article
   end
 
   test "should scope permanent dismissed articles" do
     @dismissed_article.update!(permanent: true)
-    
+
     assert_includes DismissedArticle.permanent, @dismissed_article
     assert_not_includes DismissedArticle.permanent, DismissedArticle.temporary.first
   end
@@ -58,7 +58,7 @@ class DismissedArticleTest < ActiveSupport::TestCase
       article: articles(:dev_to_article),
       dismissed_at: Time.current
     )
-    
+
     assert dismissed.persisted?
     assert_not dismissed.permanent?
     assert dismissed.dismissed_at.present?
@@ -70,7 +70,7 @@ class DismissedArticleTest < ActiveSupport::TestCase
       dismissed_at: Time.current,
       permanent: false
     )
-    
+
     dismissed.update!(permanent: true)
     assert dismissed.permanent?
   end

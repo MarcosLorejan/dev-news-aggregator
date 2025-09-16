@@ -206,7 +206,7 @@ class ArticleTest < ActiveSupport::TestCase
   test "should undismiss article" do
     @article.dismiss!
     assert @article.reload.pending_dismissal?
-    
+
     @article.undismiss!
     assert_not @article.reload.pending_dismissal?
     assert_not @article.dismissed?
@@ -223,7 +223,7 @@ class ArticleTest < ActiveSupport::TestCase
     dismissed_article = articles(:reddit_rust_article)
     dismissed_article.dismiss!
     dismissed_article.dismissed_article.update!(permanent: true)
-    
+
     not_dismissed = Article.not_dismissed
     assert_includes not_dismissed, @article
     assert_not_includes not_dismissed, dismissed_article
@@ -233,7 +233,7 @@ class ArticleTest < ActiveSupport::TestCase
     dismissed_article = articles(:reddit_rust_article)
     dismissed_article.dismiss!
     dismissed_article.dismissed_article.update!(permanent: true)
-    
+
     dismissed = Article.dismissed
     assert_includes dismissed, dismissed_article
     assert_not_includes dismissed, @article
@@ -242,11 +242,11 @@ class ArticleTest < ActiveSupport::TestCase
   test "should scope pending_dismissal articles" do
     pending_article = articles(:reddit_rust_article)
     pending_article.dismiss!
-    
+
     permanently_dismissed = articles(:dev_to_article)
     permanently_dismissed.dismiss!
     permanently_dismissed.dismissed_article.update!(permanent: true)
-    
+
     pending = Article.pending_dismissal
     assert_includes pending, pending_article
     assert_not_includes pending, permanently_dismissed
@@ -256,7 +256,7 @@ class ArticleTest < ActiveSupport::TestCase
   test "should include temporary dismissals in not_dismissed scope" do
     temporary_dismissed = articles(:reddit_rust_article)
     temporary_dismissed.dismiss!
-    
+
     not_dismissed = Article.not_dismissed
     assert_includes not_dismissed, temporary_dismissed
   end

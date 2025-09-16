@@ -7,7 +7,7 @@ class Article < ApplicationRecord
   scope :not_bookmarked, -> { left_joins(:bookmark).where(bookmarks: { id: nil }) }
   scope :read, -> { joins(:read_article) }
   scope :not_read, -> { left_joins(:read_article).where(read_articles: { id: nil }) }
-  scope :not_dismissed, -> { left_joins(:dismissed_article).where('dismissed_articles.id IS NULL OR dismissed_articles.permanent = false') }
+  scope :not_dismissed, -> { left_joins(:dismissed_article).where("dismissed_articles.id IS NULL OR dismissed_articles.permanent = false") }
   scope :dismissed, -> { joins(:dismissed_article).where(dismissed_articles: { permanent: true }) }
   scope :pending_dismissal, -> { joins(:dismissed_article).where(dismissed_articles: { permanent: false }) }
 
