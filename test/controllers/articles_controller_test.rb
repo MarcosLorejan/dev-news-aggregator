@@ -132,4 +132,60 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to articles_path
   end
+
+  test "should dismiss article" do
+    post dismiss_article_path(@article), headers: { 'Accept' => 'application/json' }
+    
+    assert_response :success
+    assert @article.reload.pending_dismissal?
+    
+    response_data = JSON.parse(response.body)
+    assert_equal 'dismissed', response_data['status']
+    assert_equal 15, response_data['timeout']
+  end
+
+  test "should undismiss article" do
+    @article.dismiss!
+    
+    delete undismiss_article_path(@article), headers: { 'Accept' => 'application/json' }
+    
+    assert_response :success
+    assert_not @article.reload.pending_dismissal?
+    
+    response_data = JSON.parse(response.body)
+    assert_equal 'restored', response_data['status']
+  end
+
+  test "should handle dismiss with missing article" do
+    post dismiss_article_path(99999), headers: { 'Accept' => 'application/json' }
+    
+    assert_redirected_to articles_path
+    assert_equal 'Article not found.', flash[:alert]
+  end
+
+  test "should handle undismiss with missing article" do
+    delete undismiss_article_path(99999), headers: { 'Accept' => 'application/json' }
+    
+    assert_redirected_to articles_path
+    assert_equal 'Article not found.', flash[:alert]
+  end
+
+  test "should exclude permanently dismissed articles from index" do
+    @article.dismiss!
+    @article.dismissed_article.update!(permanent: true)
+    
+    get articles_path
+    
+    assert_response :success
+    assert_not assigns(:articles).include?(@article)
+  end
+
+  test "should include temporarily dismissed articles in index" do
+    @article.dismiss!
+    
+    get articles_path
+    
+    assert_response :success
+    assert assigns(:articles).include?(@article)
+  end
 end
