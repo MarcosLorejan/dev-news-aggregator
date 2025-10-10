@@ -72,9 +72,6 @@ class ArticlesController < ApplicationController
       format.html { redirect_back(fallback_location: articles_path) }
     end
   rescue ActiveRecord::RecordNotFound
-    respond_to do |format|
-      format.json { render json: { error: "Article not found" }, status: :not_found }
-      format.html { redirect_to articles_path, alert: "Article not found." }
-    end
+    redirect_to articles_path, alert: "Article not found."
   end
 end
