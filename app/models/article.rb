@@ -62,7 +62,7 @@ class Article < ApplicationRecord
   end
 
   def dismiss!
-    return dismissed_article if dismissed?
+    return dismissed_article if dismissed_article.present?
     create_dismissed_article(dismissed_at: Time.current, permanent: false)
   end
 

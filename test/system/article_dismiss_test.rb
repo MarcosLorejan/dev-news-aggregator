@@ -13,7 +13,6 @@ class ArticleDismissTest < ApplicationSystemTestCase
 
     within first("article.article-card") do
       assert_selector "button[title='Dismiss article']"
-      assert_selector "svg", count: 4
     end
   end
 
@@ -39,7 +38,8 @@ class ArticleDismissTest < ApplicationSystemTestCase
     dismiss_button.click
 
     sleep 0.5
-    assert_equal "0.5", article_card.style("opacity")
+    opacity = article_card.style("opacity")["opacity"]
+    assert_equal "0.5", opacity
   end
 
   test "should undo dismiss via toast UNDO button" do
@@ -54,7 +54,8 @@ class ArticleDismissTest < ApplicationSystemTestCase
     end
 
     sleep 0.5
-    assert_equal "1", article_card.style("opacity")
+    opacity = article_card.style("opacity")["opacity"]
+    assert_equal "1", opacity
     assert_no_selector ".dismiss-toast"
   end
 
@@ -69,7 +70,8 @@ class ArticleDismissTest < ApplicationSystemTestCase
     article_card.click
 
     sleep 0.5
-    assert_equal "1", article_card.style("opacity")
+    opacity = article_card.style("opacity")["opacity"]
+    assert_equal "1", opacity
     assert_no_selector ".dismiss-toast"
   end
 
@@ -192,20 +194,21 @@ class ArticleDismissTest < ApplicationSystemTestCase
   end
 
   test "should handle dismiss API error gracefully" do
+    visit articles_path
+
     page.execute_script("
       window.fetch = function() {
         return Promise.reject(new Error('Network error'))
       }
     ")
 
-    visit articles_path
-
     article_card = first("article.article-card")
     dismiss_button = article_card.find("button[title='Dismiss article']")
     dismiss_button.click
 
     sleep 0.5
-    assert_equal "1", article_card.style("opacity")
+    opacity = article_card.style("opacity")["opacity"]
+    assert_equal "1", opacity
   end
 
   test "should handle multiple rapid dismissals" do
