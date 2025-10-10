@@ -69,6 +69,22 @@ bin/rubocop
 bin/brakeman
 ```
 
+## Automated Dependency Management
+
+This project uses **Dependabot** with automated merge capabilities:
+
+- **Patch & Minor Updates**: Automatically merged after all CI checks pass
+- **Major Updates**: Require manual review and approval
+- **CI Integration**: Auto-merge only triggers when all tests, linting, and security scans succeed
+- **Safety First**: Major version updates are flagged with warnings for manual review
+
+The automation runs on all Dependabot PRs for:
+- Ruby dependencies (Bundler)
+- GitHub Actions
+- Docker images
+
+No manual intervention needed for routine security patches and minor updates!
+
 ## Development
 
 See [WARP.md](WARP.md) for detailed development guidelines, architecture overview, and project-specific conventions.
