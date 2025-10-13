@@ -116,7 +116,7 @@ GEM
       raabro (~> 1.4)
     globalid (1.2.1)
       activesupport (>= 6.1)
-    httparty (0.23.1)
+    httparty (0.23.2)
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
@@ -363,7 +363,7 @@ DEPENDENCIES
   brakeman
   capybara
   debug
-  httparty (~> 0.21)
+  httparty (~> 0.23)
   importmap-rails
   jbuilder
   kamal
