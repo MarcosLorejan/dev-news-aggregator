@@ -180,4 +180,84 @@ class ArticleTest < ActiveSupport::TestCase
     assert_includes unread_articles, @article
     assert_not_includes unread_articles, read_article
   end
+
+  test "should have one dismissed_article" do
+    assert_respond_to @article, :dismissed_article
+  end
+
+  test "should not be dismissed initially" do
+    assert_not @article.dismissed?
+    assert_not @article.pending_dismissal?
+  end
+
+  test "should dismiss article" do
+    dismissed = @article.dismiss!
+    assert dismissed.is_a?(DismissedArticle)
+    assert @article.reload.pending_dismissal?
+    assert_not @article.dismissed?
+  end
+
+  test "should return existing dismissed_article when already dismissed" do
+    first_dismiss = @article.dismiss!
+    second_dismiss = @article.dismiss!
+    assert_equal first_dismiss, second_dismiss
+  end
+
+  test "should undismiss article" do
+    @article.dismiss!
+    assert @article.reload.pending_dismissal?
+
+    @article.undismiss!
+    assert_not @article.reload.pending_dismissal?
+    assert_not @article.dismissed?
+  end
+
+  test "should be permanently dismissed when permanent flag is true" do
+    dismissed = @article.dismiss!
+    dismissed.update!(permanent: true)
+    assert @article.reload.dismissed?
+    assert_not @article.pending_dismissal?
+  end
+
+  test "should scope not_dismissed articles" do
+    dismissed_article = articles(:reddit_rust_article)
+    dismissed_article.dismiss!
+    dismissed_article.dismissed_article.update!(permanent: true)
+
+    not_dismissed = Article.not_dismissed
+    assert_includes not_dismissed, @article
+    assert_not_includes not_dismissed, dismissed_article
+  end
+
+  test "should scope dismissed articles" do
+    dismissed_article = articles(:reddit_rust_article)
+    dismissed_article.dismiss!
+    dismissed_article.dismissed_article.update!(permanent: true)
+
+    dismissed = Article.dismissed
+    assert_includes dismissed, dismissed_article
+    assert_not_includes dismissed, @article
+  end
+
+  test "should scope pending_dismissal articles" do
+    pending_article = articles(:reddit_rust_article)
+    pending_article.dismiss!
+
+    permanently_dismissed = articles(:dev_to_article)
+    permanently_dismissed.dismiss!
+    permanently_dismissed.dismissed_article.update!(permanent: true)
+
+    pending = Article.pending_dismissal
+    assert_includes pending, pending_article
+    assert_not_includes pending, permanently_dismissed
+    assert_not_includes pending, @article
+  end
+
+  test "should include temporary dismissals in not_dismissed scope" do
+    temporary_dismissed = articles(:reddit_rust_article)
+    temporary_dismissed.dismiss!
+
+    not_dismissed = Article.not_dismissed
+    assert_includes not_dismissed, temporary_dismissed
+  end
 end
