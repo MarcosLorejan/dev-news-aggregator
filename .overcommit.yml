@@ -1,0 +1,63 @@
+# Use this file to configure the Overcommit hooks you wish to use in your
+# repository. Uncomment the hooks you want to enable.
+#
+# For more information, see: https://github.com/sds/overcommit
+
+# Verify signatures for overcommit gem
+verify_signatures: false
+
+# Loads Bundler context from a Gemfile
+gemfile: Gemfile
+
+PreCommit:
+  ALL:
+    required: false
+    quiet: false
+    exclude:
+      - 'vendor/**/*'
+
+  BundleAudit:
+    enabled: true
+    description: 'Check for vulnerable versions of gems'
+    required: true
+    command: ['bundle', 'exec', 'bundle-audit', 'check', '--update']
+
+  RuboCop:
+    enabled: true
+    description: 'Analyze with RuboCop'
+    required: true
+    command: ['bundle', 'exec', 'rubocop']
+    on_warn: fail
+
+  BundleCheck:
+    enabled: true
+    description: 'Check Gemfile dependencies'
+
+  YamlSyntax:
+    enabled: true
+    description: 'Check YAML syntax'
+    exclude:
+      - 'vendor/**/*'
+
+CommitMsg:
+  ALL:
+    requires_files: false
+    quiet: false
+
+  CapitalizedSubject:
+    enabled: true
+    description: 'Check subject capitalization'
+
+  EmptyMessage:
+    enabled: true
+    description: 'Check for empty commit message'
+
+  TextWidth:
+    enabled: true
+    description: 'Check text width'
+    max_subject_width: 72
+    max_body_width: 80
+
+  TrailingPeriod:
+    enabled: true
+    description: 'Check for trailing periods in subject'

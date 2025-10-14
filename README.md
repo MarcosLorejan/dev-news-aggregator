@@ -89,6 +89,16 @@ No manual intervention needed for routine security patches and minor updates!
 
 See [WARP.md](WARP.md) for detailed development guidelines, architecture overview, and project-specific conventions.
 
+### Pre-commit Hooks
+
+This project uses Overcommit for automated code quality checks before commits. See [docs/PRE_COMMIT_HOOKS.md](docs/PRE_COMMIT_HOOKS.md) for setup instructions.
+
+```bash
+# One-time setup
+bundle exec overcommit --install
+bundle exec overcommit --sign
+```
+
 ## License
 
 MIT License
