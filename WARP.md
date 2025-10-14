@@ -187,6 +187,7 @@ Uses Docker Compose for PostgreSQL with environment variables:
 - Keep methods small and focused on a single responsibility
 - Prefer composition over inheritance
 - Prefer early returns over ternary operators for better readability
+- **Do not add comments to code** - code should be self-documenting through clear naming and structure
 
 ### Ruby/Rails Conventions
 - Follow RuboCop conventions (run `bin/rubocop` to check)
