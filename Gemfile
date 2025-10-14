@@ -41,7 +41,7 @@ gem "thruster", require: false
 # gem "image_processing", "~> 1.2"
 
 # HTTP client for API requests
-gem "httparty", "~> 0.21"
+gem "httparty", "~> 0.23"
 
 # Cron job scheduling
 gem "whenever", "~> 1.0"
