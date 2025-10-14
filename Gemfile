@@ -55,11 +55,17 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Security vulnerability scanner for Gemfile.lock
+  gem "bundler-audit", require: false
 end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Git hook manager for pre-commit checks
+  gem "overcommit", require: false
 end
 
 group :test do
