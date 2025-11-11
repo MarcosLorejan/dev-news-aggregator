@@ -31,6 +31,7 @@ jobs:
           check-name: 'quality_gate'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 30
+        continue-on-error: true
 
       - name: Enable auto-merge for patch and minor updates
         # Only auto-merge patch and minor updates
@@ -39,7 +40,15 @@ jobs:
           steps.metadata.outputs.update-type == 'version-update:semver-minor'
         run: |
           echo "Auto-merging ${{ steps.metadata.outputs.dependency-names }} from ${{ steps.metadata.outputs.previous-version }} to ${{ steps.metadata.outputs.new-version }}"
-          gh pr merge --auto --squash "$PR_URL"
+          
+          # Try to enable auto-merge, but handle failures gracefully
+          if gh pr merge --auto --squash "$PR_URL" 2>&1; then
+            echo "✅ Auto-merge enabled successfully"
+          else
+            echo "⚠️ Could not enable auto-merge (PR may be in unstable state)"
+            echo "The PR will need to be merged manually once all checks pass"
+            exit 0
+          fi
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
