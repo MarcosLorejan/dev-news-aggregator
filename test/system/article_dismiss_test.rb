@@ -213,7 +213,8 @@ class ArticleDismissTest < ApplicationSystemTestCase
     dismiss_button.click
 
     sleep 0.5
-    opacity = article_card.style("opacity")["opacity"]
+    refreshed_article_card = first("article.article-card")
+    opacity = refreshed_article_card.style("opacity")["opacity"]
     assert_equal "1", opacity
   end
 
