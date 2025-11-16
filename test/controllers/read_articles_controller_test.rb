@@ -113,4 +113,28 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to read_articles_path
     assert_equal "Article is not marked as read", flash[:alert]
   end
+
+  test "index should return JSON with read articles" do
+    get read_articles_path, as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    
+    assert json_response.key?("articles")
+    assert json_response.key?("pagination")
+    assert json_response.key?("articles_by_source")
+    
+    assert json_response["articles"].is_a?(Array)
+    assert json_response["pagination"]["current_page"] == 1
+  end
+
+  test "index JSON should support pagination" do
+    get read_articles_path(page: 1, per_page: 10), as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    
+    assert_equal 1, json_response["pagination"]["current_page"]
+    assert_equal 10, json_response["pagination"]["per_page"]
+  end
 end
