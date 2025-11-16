@@ -19,8 +19,10 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= vite_client_tag %>
-    <%= vite_typescript_tag 'application' %>
+    <% unless Rails.env.test? %>
+      <%= vite_client_tag %>
+      <%= vite_typescript_tag 'application' %>
+    <% end %>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
