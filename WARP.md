@@ -223,6 +223,7 @@ Uses Docker Compose for PostgreSQL with environment variables:
 - Test both happy path and edge cases (error conditions, boundary values, invalid inputs)
 
 ### Git Commit Guidelines
+- **ALWAYS run tests and RuboCop before committing** - Run `bin/rails test` and `bin/rubocop` to ensure all tests pass and code follows style guidelines
 - Use conventional commit format (e.g., `feat:`, `fix:`, `test:`, `refactor:`)
 - One line commit messages only - no body or additional description
 - One commit per file (exceptions allowed for large PRs with same context)
