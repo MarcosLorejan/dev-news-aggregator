@@ -10,6 +10,7 @@ gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
 # Use Vite for frontend assets [https://github.com/ElMassimo/vite_ruby]
 gem "vite_rails"
+gem "turbo-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
