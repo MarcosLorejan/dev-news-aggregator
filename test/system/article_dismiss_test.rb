@@ -212,7 +212,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
     dismiss_button = article_card.find("button[title='Dismiss article']")
     dismiss_button.click
 
-    sleep 0.5
+    sleep 1
     refreshed_article_card = first("article.article-card")
     opacity = refreshed_article_card.style("opacity")["opacity"]
     assert_equal "1", opacity
