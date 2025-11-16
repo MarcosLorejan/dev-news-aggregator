@@ -19,7 +19,10 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
+    <% unless Rails.env.test? %>
+      <%= vite_client_tag %>
+      <%= vite_typescript_tag 'application' %>
+    <% end %>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -123,6 +126,7 @@
 
   <body class="bg-dark-900 min-h-screen text-gray-100 antialiased scroll-smooth">
     <div class="min-h-screen bg-gradient-to-br from-dark-900 via-dark-850 to-dark-900">
+      <div id="root"></div>
       <%= yield %>
     </div>
   </body>
