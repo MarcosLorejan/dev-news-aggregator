@@ -2,6 +2,11 @@
 
 This file provides guidance to WARP (warp.dev) when working with code in this repository.
 
+## Warp AI Behavior
+
+- **At the start of every new chat session**: Read this WARP.md file and confirm you've read it and will follow the guidelines
+- **When user makes suggestions**: Ask if they want the suggestion added to WARP.md for future reference
+
 ## Development Commands
 
 ### Setup & Database
