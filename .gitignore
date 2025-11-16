@@ -42,6 +42,11 @@
 yarn-debug.log*
 .yarn-integrity
 
+# Vite
+/public/vite*
+/public/builds
+node_modules
+
 # Ignore .env files
 .env
 .env.local
