@@ -82,7 +82,7 @@ GEM
     bcrypt_pbkdf (1.1.1)
     bigdecimal (3.3.1)
     bindex (0.8.1)
-    bootsnap (1.18.6)
+    bootsnap (1.19.0)
       msgpack (~> 1.2)
     brakeman (7.1.1)
       racc
@@ -113,6 +113,7 @@ GEM
     docile (1.4.1)
     dotenv (3.1.8)
     drb (2.2.3)
+    dry-cli (1.3.0)
     ed25519 (1.4.0)
     erb (5.1.3)
     erubi (1.13.1)
@@ -129,10 +130,6 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    importmap-rails (2.2.2)
-      actionpack (>= 6.0.0)
-      activesupport (>= 6.0.0)
-      railties (>= 6.0.0)
     iniparse (1.5.0)
     io-console (0.8.1)
     irb (1.15.3)
@@ -173,6 +170,7 @@ GEM
     msgpack (1.8.0)
     multi_xml (0.7.2)
       bigdecimal (~> 3.1)
+    mutex_m (0.3.0)
     net-imap (0.5.12)
       date
       net-protocol
@@ -217,6 +215,8 @@ GEM
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.2.4)
+    rack-proxy (0.7.7)
+      rack
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -331,8 +331,6 @@ GEM
       net-sftp (>= 2.1.2)
       net-ssh (>= 2.8.0)
       ostruct
-    stimulus-rails (1.3.4)
-      railties (>= 6.0.0)
     stringio (3.1.8)
     thor (1.4.0)
     thruster (0.1.16-x86_64-linux)
@@ -349,6 +347,15 @@ GEM
     unicode-emoji (4.0.4)
     uri (1.1.1)
     useragent (0.16.11)
+    vite_rails (3.0.19)
+      railties (>= 5.1, < 9)
+      vite_ruby (~> 3.0, >= 3.2.2)
+    vite_ruby (3.9.2)
+      dry-cli (>= 0.7, < 2)
+      logger (~> 1.6)
+      mutex_m
+      rack-proxy (~> 0.6, >= 0.6.1)
+      zeitwerk (~> 2.2)
     web-console (4.2.1)
       actionview (>= 6.0.0)
       activemodel (>= 6.0.0)
@@ -376,7 +383,6 @@ DEPENDENCIES
   capybara
   debug
   httparty (~> 0.23)
-  importmap-rails
   jbuilder
   kamal
   overcommit
@@ -391,11 +397,11 @@ DEPENDENCIES
   solid_cable
   solid_cache
   solid_queue
-  stimulus-rails
   thruster
   timecop
   turbo-rails
   tzinfo-data
+  vite_rails
   web-console
   whenever (~> 1.0)
 
