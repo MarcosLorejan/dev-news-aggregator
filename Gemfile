@@ -41,7 +41,7 @@ gem "thruster", require: false
 gem "httparty", "~> 0.23"
 
 # Cron job scheduling
-gem "whenever", "~> 1.0"
+gem "whenever", "~> 1.1"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
