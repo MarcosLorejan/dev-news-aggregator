@@ -180,6 +180,14 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to articles_path
   end
 
+  test "should handle bookmark of non-existent article as JSON" do
+    post bookmark_article_path(id: 999999), as: :json
+
+    assert_response :not_found
+    json_response = JSON.parse(response.body)
+    assert_equal "Article not found", json_response["error"]
+  end
+
   test "should handle bookmark of non-existent article" do
     post bookmark_article_path(id: 999999)
 
@@ -212,8 +220,9 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
   test "should handle dismiss with missing article" do
     post dismiss_article_path(99999), headers: { "Accept" => "application/json" }
 
-    assert_redirected_to articles_path
-    assert_equal "Article not found.", flash[:alert]
+    assert_response :not_found
+    json_response = JSON.parse(response.body)
+    assert_equal "Article not found", json_response["error"]
   end
 
   test "should handle undismiss with missing article" do

@@ -56,11 +56,6 @@ class ArticlesController < ApplicationController
       format.html
       format.json { render json: article_json(@article) }
     end
-  rescue ActiveRecord::RecordNotFound
-    respond_to do |format|
-      format.html { redirect_to articles_path, alert: "Article not found." }
-      format.json { render json: { error: "Article not found" }, status: :not_found }
-    end
   end
 
   def bookmark
@@ -71,8 +66,6 @@ class ArticlesController < ApplicationController
       format.html { redirect_back(fallback_location: articles_path) }
       format.json { render json: { bookmarked: @article.bookmarked? } }
     end
-  rescue ActiveRecord::RecordNotFound
-    redirect_to articles_path, alert: "Article not found."
   end
 
   def unbookmark
@@ -83,8 +76,6 @@ class ArticlesController < ApplicationController
       format.html { redirect_back(fallback_location: articles_path) }
       format.json { render json: { bookmarked: @article.bookmarked? } }
     end
-  rescue ActiveRecord::RecordNotFound
-    redirect_to articles_path, alert: "Article not found."
   end
 
   def dismiss
@@ -98,8 +89,6 @@ class ArticlesController < ApplicationController
       format.json { render json: { status: "dismissed", timeout: 15 } }
       format.html { redirect_back(fallback_location: articles_path) }
     end
-  rescue ActiveRecord::RecordNotFound
-    redirect_to articles_path, alert: "Article not found."
   end
 
   def undismiss
@@ -109,11 +98,6 @@ class ArticlesController < ApplicationController
     respond_to do |format|
       format.json { render json: { status: "restored" } }
       format.html { redirect_back(fallback_location: articles_path) }
-    end
-  rescue ActiveRecord::RecordNotFound
-    respond_to do |format|
-      format.html { redirect_to articles_path, alert: "Article not found." }
-      format.json { render json: { error: "Article not found" }, status: :not_found }
     end
   end
 
