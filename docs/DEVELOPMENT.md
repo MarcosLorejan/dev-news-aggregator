@@ -1,15 +1,13 @@
-# WARP.md
+# Development Guide
 
-This file provides guidance to WARP (warp.dev) when working with code in this repository.
+Project-specific commands, architecture, and conventions for dev-news-aggregator.
 
-## Warp AI Behavior
+For the directory map, see [REPO_STRUCTURE.md](REPO_STRUCTURE.md). **Update that file whenever you change project structure** (new folders, models, routes, migrations, etc.).
 
-- **At the start of every new chat session**: Read this WARP.md file and confirm you've read it and will follow the guidelines
-- **When user makes suggestions**: Ask if they want the suggestion added to WARP.md for future reference
+## Development commands
 
-## Development Commands
+### Setup & database
 
-### Setup & Database
 ```bash
 # Install dependencies
 bundle install
@@ -25,7 +23,8 @@ bin/rails db:seed
 bin/rails runner "NewsAggregatorService.fetch_all_news"
 ```
 
-### Running the Application
+### Running the application
+
 ```bash
 # Start Rails server
 bin/rails server
@@ -36,7 +35,8 @@ bin/dev
 # Access application at http://localhost:3000
 ```
 
-### News Operations
+### News operations
+
 ```bash
 # Fetch news from all sources
 bin/rails news:fetch
@@ -52,6 +52,7 @@ bin/rails runner "NewsAggregatorService.fetch_all_news"
 ```
 
 ### Testing
+
 ```bash
 # Run all tests
 bin/rails test
@@ -63,7 +64,8 @@ bin/rails test test/models/article_test.rb
 bin/rails test test/controllers/articles_controller_test.rb -n test_index
 ```
 
-### Code Quality
+### Code quality
+
 ```bash
 # Run RuboCop linter
 bin/rubocop
@@ -75,44 +77,45 @@ bin/rubocop -a
 bin/brakeman
 ```
 
-### Cron Jobs
+### Cron jobs
+
 ```bash
 # Update crontab with scheduled jobs
 whenever --update-crontab
 
-# View current cron schedule  
+# View current cron schedule
 crontab -l
 
 # Clear crontab
 whenever --clear-crontab
 ```
 
-## Architecture Overview
+## Architecture overview
 
-### Core Components
+### Core components
 
 **NewsAggregatorService**: Central orchestrator that coordinates all news fetchers. Initializes fetchers for Hacker News, Dev.to, and multiple Reddit subreddits covering programming languages (Ruby, Rust, JavaScript), web development, cybersecurity, AI/ML, and general tech. Handles error logging and aggregates results.
 
-**Fetcher Architecture**: Modular fetcher system with `NewsFetchers::BaseFetcher` as the abstract base class. Each fetcher (HackerNews, DevTo, Reddit) inherits and implements `fetch_articles`. Common pattern: fetch from API, transform data, call `create_or_update_article`.
+**Fetcher architecture**: Modular fetcher system with `NewsFetchers::BaseFetcher` as the abstract base class. Each fetcher (HackerNews, DevTo, Reddit) inherits and implements `fetch_articles`. Common pattern: fetch from API, transform data, call `create_or_update_article`.
 
-**Data Models**:
+**Data models**:
 - `Article`: Stores aggregated news with unified schema (title, url, published_at, description, external_id, source_type, score, comment_count)
 - `Bookmark`: Tracks bookmarked articles for personal reading list functionality
 - `NewsSource`: Configuration table for news sources (currently unused in favor of hard-coded fetchers)
 
-**Scheduled Jobs**: Uses `whenever` gem to run `news:fetch` hourly during business hours (9 AM - 6 PM) and `news:clean` daily at 2 AM. Logs to `log/cron.log`.
+**Scheduled jobs**: Uses `whenever` gem to run `news:fetch` hourly during business hours (9 AM - 6 PM) and `news:clean` daily at 2 AM. Logs to `log/cron.log`.
 
-### Key Design Patterns
+### Key design patterns
 
-**Service-Oriented Architecture**: Business logic separated into service classes rather than fat models. Each news source has its own fetcher service.
+**Service-oriented architecture**: Business logic separated into service classes rather than fat models. Each news source has its own fetcher service.
 
-**Fail-Safe Aggregation**: If one news source fails, others continue processing. Errors are logged but don't stop the entire aggregation process.
+**Fail-safe aggregation**: If one news source fails, others continue processing. Errors are logged but don't stop the entire aggregation process.
 
-**Idempotent Updates**: Articles use `find_or_initialize_by(external_id, source_type)` to prevent duplicates while allowing updates to existing articles.
+**Idempotent updates**: Articles use `find_or_initialize_by(external_id, source_type)` to prevent duplicates while allowing updates to existing articles.
 
-**Rate Limiting Awareness**: Limits API calls (e.g., first 30 HN stories) and includes proper error handling for API failures.
+**Rate limiting awareness**: Limits API calls (e.g., first 30 HN stories) and includes proper error handling for API failures.
 
-### File Structure
+### File structure
 
 ```
 app/
@@ -123,13 +126,13 @@ app/
     news_fetchers/
       base_fetcher.rb                   # Abstract fetcher base class
       hacker_news_fetcher.rb            # HN API integration
-      dev_to_fetcher.rb                 # Dev.to API integration  
+      dev_to_fetcher.rb                 # Dev.to API integration
       reddit_fetcher.rb                 # Reddit API integration
 lib/tasks/news.rake                     # Rake tasks for news operations
 config/schedule.rb                      # Cron job definitions
 ```
 
-### API Integration Details
+### API integration details
 
 **Hacker News**: Uses Firebase API (`hacker-news.firebaseio.com/v0`). Fetches top stories, then individual story details. Filters out Ask HN posts without URLs.
 
@@ -137,44 +140,33 @@ config/schedule.rb                      # Cron job definitions
 
 **Reddit**: Multiple instances for different subreddits. Each subreddit is treated as a separate source type in the database.
 
-### Database Schema
+### Database schema
 
 Articles table uses generic fields to accommodate all news sources:
 - `source_type`: String identifier (hacker_news, dev_to, reddit_programming, etc.)
-- `external_id`: Source-specific unique identifier 
+- `external_id`: Source-specific unique identifier
 - `score`: Votes/reactions from source (HN score, Dev.to reactions, Reddit upvotes)
 - `comment_count`: Source-specific comment counts
 
-### Environment Configuration
+### Environment configuration
 
 Uses Docker Compose for PostgreSQL with environment variables:
 - `POSTGRES_USER`: devnews
-- `POSTGRES_PASSWORD`: password  
+- `POSTGRES_PASSWORD`: password
 - `POSTGRES_DB`: dev_news_aggregator
 
-### Key Features
+### Key features
 
-**Article Bookmarking**: Users can bookmark articles for later reading. Bookmarks are displayed in a dedicated reading list with category filtering.
+**Article bookmarking**: Users can bookmark articles for later reading. Bookmarks are displayed in a dedicated reading list with category filtering.
 
-**Category Filtering**: Articles are grouped into logical categories (Programming Languages, Web Development, Security, AI & Machine Learning, General Tech) for easier browsing.
+**Category filtering**: Articles are grouped into logical categories (Programming Languages, Web Development, Security, AI & Machine Learning, General Tech) for easier browsing.
 
-**Multi-Source Aggregation**: Fetches from 12+ different sources including:
+**Multi-source aggregation**: Fetches from 12+ different sources including:
 - Hacker News (hacker_news)
-- Dev.to (dev_to) 
+- Dev.to (dev_to)
 - Reddit subreddits: ruby, rust, javascript, programming, webdev, netsec, cybersecurity, technology, MachineLearning, artificial, LocalLLaMA
 
-### Key Features
-
-**Article Bookmarking**: Users can bookmark articles for later reading. Bookmarks are displayed in a dedicated reading list with category filtering.
-
-**Category Filtering**: Articles are grouped into logical categories (Programming Languages, Web Development, Security, AI & Machine Learning, General Tech) for easier browsing.
-
-**Multi-Source Aggregation**: Fetches from 12+ different sources including:
-- Hacker News (hacker_news)
-- Dev.to (dev_to) 
-- Reddit subreddits: ruby, rust, javascript, programming, webdev, netsec, cybersecurity, technology, MachineLearning, artificial, LocalLLaMA
-
-### Adding New News Sources
+### Adding new news sources
 
 1. Create fetcher in `app/services/news_fetchers/` inheriting from `BaseFetcher`
 2. Implement `fetch_articles` method
@@ -182,19 +174,19 @@ Uses Docker Compose for PostgreSQL with environment variables:
 4. Use consistent `source_type` naming pattern
 5. Update category grouping in `articles_helper.rb` if needed
 
-## Coding Guidelines
+## Coding guidelines
 
-### General Principles
-- Follow SOLID principles (Single responsibility, Open/closed, Liskov substitution, Interface segregation, Dependency inversion)
-- Follow KISS convention (Keep It Simple, Stupid)
-- Follow DRY principle (Don't Repeat Yourself)
+### General principles
+
+- Follow **SOLID**, **KISS**, and **DRY**
 - Use descriptive method and variable names
 - Keep methods small and focused on a single responsibility
 - Prefer composition over inheritance
 - Prefer early returns over ternary operators for better readability
-- **Do not add comments to code** - code should be self-documenting through clear naming and structure
+- **Do not add comments to code** — code should be self-documenting through clear naming and structure
 
-### Ruby/Rails Conventions
+### Ruby/Rails conventions
+
 - Follow RuboCop conventions (run `bin/rubocop` to check)
 - Use consistent indentation (2 spaces)
 - Follow Rails naming conventions
@@ -204,17 +196,18 @@ Uses Docker Compose for PostgreSQL with environment variables:
 - Prefer `find_by` over `where.first`
 - Use scopes for reusable queries
 
-### Testing Standards
-- **FOR EVERY CHANGE CREATE TESTS** - This is mandatory, no exceptions
-- **PREFER TDD APPROACH** - Write tests first when possible, then implement functionality
-- All tests start with 'should' (e.g., `test "should create bookmark when valid"`) 
-- Do not use `send` in tests - test public interface only
+### Testing standards
+
+- **For every change, create tests** — mandatory, no exceptions
+- **Prefer TDD** — write tests first when possible, then implement functionality
+- All tests start with `should` (e.g., `test "should create bookmark when valid"`)
+- Do not use `send` in tests — test public interface only
 - Always prefer fixtures over `create` methods for consistency
 - Mock only when necessary (external APIs, slow operations) and use mocha gem for mocking
-- Do not use comments in tests - test names should be self-descriptive
+- Do not use comments in tests — test names should be self-descriptive
 - Follow RuboCop conventions in test files
 - Apply SOLID and KISS principles to test code
-- One assertion per concept, multiple assertions per test are acceptable if related
+- One assertion per concept; multiple assertions per test are acceptable if related
 - Use `setup` method for common test data initialization
 - Prefer integration tests over unit tests when testing user workflows
 - Use `parallelize(workers: :number_of_processors)` in test_helper.rb for faster test runs
@@ -222,17 +215,19 @@ Uses Docker Compose for PostgreSQL with environment variables:
 - When adding new models, controllers, or features, create comprehensive test coverage immediately
 - Test both happy path and edge cases (error conditions, boundary values, invalid inputs)
 
-### Git Commit Guidelines
-- **ALWAYS run tests and RuboCop before committing** - Run `bin/rails test` and `bin/rubocop` to ensure all tests pass and code follows style guidelines
+### Git commit guidelines
+
+- **Always run tests and RuboCop before committing** — run `bin/rails test` and `bin/rubocop`
 - Use conventional commit format (e.g., `feat:`, `fix:`, `test:`, `refactor:`)
-- One line commit messages only - no body or additional description
+- One line commit messages only — no body or additional description
 - One commit per file (exceptions allowed for large PRs with same context)
 - No co-authored comments
 - Keep commit messages concise and descriptive
-- Commit frequently to save changes - don't wait until everything is perfect
+- Commit frequently to save changes — don't wait until everything is perfect
 - Push commits regularly to avoid losing work
 
-### GitHub Issue and Branch Workflow
+### GitHub issue and branch workflow
+
 - When creating issues, use `gh` CLI and conventional commits format
 - **Always add appropriate labels to issues** using `--label` option with `gh` CLI
 - Required issue labels:
@@ -241,11 +236,11 @@ Uses Docker Compose for PostgreSQL with environment variables:
   - Status: `todo`, `in-progress`, `review-needed`, etc.
 - Example issue creation: `gh issue create --title "feat: new feature" --body "Description" --label "feature,medium,todo"`
 - Use available issue templates when creating new issues
-- **When working on an issue, ALWAYS follow this workflow:**
+- **When working on an issue, always follow this workflow:**
   1. Create a new branch based on the issue name
   2. Make changes and commit following conventional commits format
   3. Push branch to origin
-  4. **Create Pull Request using `gh` CLI - NEVER commit directly to master**
+  4. **Create Pull Request using `gh` CLI — never commit directly to master**
   5. Wait for review/approval before merging
 - Branch naming convention: use descriptive names related to the issue (e.g., `fix-ci-bundler-cache`, `feat-deployment-automation`)
 - **Example PR workflow:**
