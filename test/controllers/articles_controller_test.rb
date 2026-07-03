@@ -50,23 +50,29 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get article_url(@article)
     assert_response :success
 
-    assert_select "h1", @article.title
-    assert_select "a[href='#{@article.url}'][target='_blank']", "Visit Source"
+    assert_select "#root"
+    assert_select "script[type='module'][src*='application']"
   end
 
-  test "show should display bookmark button when not bookmarked" do
-    get article_path(@article)
+  test "show JSON should return article details" do
+    get article_path(@article), as: :json
 
     assert_response :success
-    assert_select "button", text: "Add to Reading List"
+    json_response = JSON.parse(response.body)
+    assert_equal @article.id, json_response["id"]
+    assert_equal @article.title, json_response["title"]
+    assert json_response.key?("bookmarked")
+    assert json_response.key?("read")
   end
 
-  test "show should display unbookmark button when bookmarked" do
+  test "show JSON should include bookmark state" do
+    get article_path(@article), as: :json
+    assert_response :success
+    refute JSON.parse(response.body)["bookmarked"]
+
     @article.bookmark!
-    get article_path(@article)
-
-    assert_response :success
-    assert_select "button", text: "Remove from Reading List"
+    get article_path(@article), as: :json
+    assert JSON.parse(response.body)["bookmarked"]
   end
 
   test "should bookmark article" do

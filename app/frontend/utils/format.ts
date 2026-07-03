@@ -41,6 +41,34 @@ export function formatLastUpdated(isoDate: string): string {
   })
 }
 
+export function formatDetailDate(isoDate: string): string {
+  const date = new Date(isoDate)
+  const datePart = date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
+  const timePart = date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  })
+  return `${datePart} at ${timePart}`
+}
+
+export function safeExternalUrl(url: string | null | undefined): string | null {
+  if (!url) return null
+  try {
+    const parsed = new URL(url)
+    if ((parsed.protocol === 'http:' || parsed.protocol === 'https:') && parsed.host) {
+      return url
+    }
+  } catch {
+    return null
+  }
+  return null
+}
+
 export function truncate(text: string, length: number): string {
   if (text.length <= length) return text
   return `${text.slice(0, length)}...`

@@ -49,4 +49,12 @@ class ReactShellTest < ActionDispatch::IntegrationTest
     assert_select "#root"
     assert_select "script[type='module'][src*='application']"
   end
+
+  test "article show renders react mount point" do
+    get article_path(articles(:hacker_news_article))
+
+    assert_response :success
+    assert_select "#root"
+    assert_select "script[type='module'][src*='application']"
+  end
 end
