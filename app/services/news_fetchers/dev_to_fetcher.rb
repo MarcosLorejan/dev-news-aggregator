@@ -6,7 +6,10 @@ class NewsFetchers::DevToFetcher < NewsFetchers::BaseFetcher
     Rails.logger.info "Fetching articles from Dev.to..."
 
     # Get latest articles
-    articles_data = self.class.get("/articles", query: { per_page: 30, top: 7 })
+    articles_data = self.class.get(
+      "/articles",
+      query: { per_page: NewsAggregatorConfig.max_articles_per_source, top: 7 }
+    )
     return [] unless articles_data.is_a?(Array)
 
     articles_data.each do |article_data|

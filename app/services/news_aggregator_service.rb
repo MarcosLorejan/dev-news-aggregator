@@ -17,21 +17,16 @@ class NewsAggregatorService
   end
 
   def self.default_fetchers
-    [
+    fetchers = [
       NewsFetchers::HackerNewsFetcher.new,
-      NewsFetchers::DevToFetcher.new,
-      NewsFetchers::RedditFetcher.new(subreddit: "programming"),
-      NewsFetchers::RedditFetcher.new(subreddit: "webdev"),
-      NewsFetchers::RedditFetcher.new(subreddit: "javascript"),
-      NewsFetchers::RedditFetcher.new(subreddit: "ruby"),
-      NewsFetchers::RedditFetcher.new(subreddit: "rust"),
-      NewsFetchers::RedditFetcher.new(subreddit: "netsec"),
-      NewsFetchers::RedditFetcher.new(subreddit: "cybersecurity"),
-      NewsFetchers::RedditFetcher.new(subreddit: "technology"),
-      NewsFetchers::RedditFetcher.new(subreddit: "MachineLearning"),
-      NewsFetchers::RedditFetcher.new(subreddit: "artificial"),
-      NewsFetchers::RedditFetcher.new(subreddit: "LocalLLaMA")
+      NewsFetchers::DevToFetcher.new
     ]
+
+    NewsAggregatorConfig.reddit_subreddits.each do |subreddit|
+      fetchers << NewsFetchers::RedditFetcher.new(subreddit: subreddit)
+    end
+
+    fetchers
   end
 
   def fetch_all_news

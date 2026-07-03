@@ -7,7 +7,7 @@ class NewsFetchers::RedditFetcherTest < ActiveSupport::TestCase
 
   test "fetch_articles creates articles from link posts" do
     stub_request(:get, "https://www.reddit.com/r/programming.json")
-      .with(query: { limit: 25 })
+      .with(query: { limit: NewsAggregatorConfig.max_articles_per_source })
       .to_return(
         status: 200,
         body: {
@@ -41,7 +41,7 @@ class NewsFetchers::RedditFetcherTest < ActiveSupport::TestCase
 
   test "fetch_articles skips self posts without external URL" do
     stub_request(:get, "https://www.reddit.com/r/programming.json")
-      .with(query: { limit: 25 })
+      .with(query: { limit: NewsAggregatorConfig.max_articles_per_source })
       .to_return(
         status: 200,
         body: {
@@ -71,7 +71,7 @@ class NewsFetchers::RedditFetcherTest < ActiveSupport::TestCase
 
   test "fetch_articles uses overridden URL for self posts with external link" do
     stub_request(:get, "https://www.reddit.com/r/programming.json")
-      .with(query: { limit: 25 })
+      .with(query: { limit: NewsAggregatorConfig.max_articles_per_source })
       .to_return(
         status: 200,
         body: {
@@ -103,7 +103,7 @@ class NewsFetchers::RedditFetcherTest < ActiveSupport::TestCase
 
   test "fetch_articles returns empty array when API response is invalid" do
     stub_request(:get, "https://www.reddit.com/r/programming.json")
-      .with(query: { limit: 25 })
+      .with(query: { limit: NewsAggregatorConfig.max_articles_per_source })
       .to_return(status: 200, body: {}.to_json, headers: { "Content-Type" => "application/json" })
 
     assert_no_difference "Article.count" do

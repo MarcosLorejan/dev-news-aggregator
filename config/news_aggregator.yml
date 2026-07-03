@@ -34,10 +34,16 @@ development: &default
       format: ".json"
       subreddits:
         - programming
-        - webdev  
+        - webdev
         - javascript
-        - reactjs
-        - nodejs
+        - ruby
+        - rust
+        - netsec
+        - cybersecurity
+        - technology
+        - MachineLearning
+        - artificial
+        - LocalLLaMA
 
 test:
   <<: *default

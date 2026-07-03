@@ -12,7 +12,10 @@ class NewsFetchers::RedditFetcher < NewsFetchers::BaseFetcher
     Rails.logger.info "Fetching articles from Reddit r/#{@subreddit}..."
 
     # Get hot posts from subreddit
-    response = self.class.get("/r/#{@subreddit}.json", query: { limit: 25 })
+    response = self.class.get(
+      "/r/#{@subreddit}.json",
+      query: { limit: NewsAggregatorConfig.max_articles_per_source }
+    )
     return [] unless response.is_a?(Hash) && response["data"]
 
     posts_data = response.dig("data", "children")

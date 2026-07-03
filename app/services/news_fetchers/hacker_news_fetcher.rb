@@ -9,8 +9,7 @@ class NewsFetchers::HackerNewsFetcher < NewsFetchers::BaseFetcher
     top_story_ids = self.class.get("/topstories.json")
     return [] unless top_story_ids.is_a?(Array)
 
-    # Limit to first 30 stories to avoid rate limits
-    top_story_ids.first(30).each do |story_id|
+    top_story_ids.first(NewsAggregatorConfig.max_articles_per_source).each do |story_id|
       fetch_story(story_id)
     end
 
