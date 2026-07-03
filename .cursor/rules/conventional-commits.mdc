@@ -1,0 +1,31 @@
+---
+description: Use Conventional Commits for all git commit messages
+alwaysApply: true
+---
+
+# Conventional Commits
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) for every commit message.
+
+## Format
+
+```
+<type>(<optional scope>): <short description>
+```
+
+- **type**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `ci`, `build`, `perf`
+- **scope**: optional area (e.g. `frontend`, `api`, `deps`)
+- **description**: imperative mood, lowercase, no trailing period
+
+## Examples
+
+- `feat(frontend): add ArticlesIndexPage component`
+- `fix(views): load application.tsx vite entrypoint`
+- `test(system): update dismiss tests for React articles index`
+- `ci: build Vite test assets before test jobs`
+- `chore(deps): add react-router-dom`
+
+## When committing
+
+- One logical change per commit; split by file when each file is a distinct concern.
+- Prefer `feat` for user-facing behavior, `fix` for bugs, `test` for test-only changes.
