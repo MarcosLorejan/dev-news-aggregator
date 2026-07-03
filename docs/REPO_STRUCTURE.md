@@ -32,7 +32,7 @@ Rails 8 news aggregator with a React (Vite) frontend, PostgreSQL, and scheduled 
 ```
 dev-news-aggregator/
 ├── app/                    # Application code (MVC, services, jobs, frontend)
-├── bin/                    # Executables (rails, dev, rubocop, brakeman, …)
+├── bin/                    # Executables (rails, dev, jobs, rubocop, brakeman, …)
 ├── config/                 # Rails and app configuration
 ├── db/                     # Migrations, schema, seeds
 ├── docs/                   # Project documentation
@@ -111,9 +111,11 @@ dev-news-aggregator/
 | File | Purpose |
 |------|---------|
 | `routes.rb` | URL routing |
-| `database.yml` | PostgreSQL connection |
+| `database.yml` | PostgreSQL connection (primary + queue DB in dev/production) |
 | `schedule.rb` | Cron definitions (`whenever` gem) |
 | `news_aggregator.yml` | Fetch limits, retention, subreddit list, API endpoints |
+| `queue.yml` | Solid Queue worker and dispatcher settings |
+| `recurring.yml` | Solid Queue recurring task schedule |
 | `deploy.yml` | Kamal deployment |
 | `vite.json` | Vite-Rails integration |
 | `environments/` | Per-env Rails settings (development, test, production) |
@@ -124,7 +126,9 @@ dev-news-aggregator/
 | Path | Purpose |
 |------|---------|
 | `migrate/` | Schema migrations |
-| `schema.rb` | Current DB schema (generated) |
+| `schema.rb` | Primary database schema (generated) |
+| `queue_schema.rb` | Solid Queue database schema (loaded into queue DB) |
+| `queue_migrate/` | Queue DB migrations path (schema loaded via `db:prepare`) |
 | `seeds.rb` | Seed data |
 
 ### Migrations (in order)
