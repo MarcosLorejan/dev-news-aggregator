@@ -17,7 +17,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should mark article as read from bookmark page" do
-    visit bookmarks_path
+    visit_bookmarks_index
 
     within("article.article-card[data-source='#{@bookmarked_article.source_type}']") do
       read_button = find("button[title='Mark as read']")
@@ -30,7 +30,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
 
   test "should mark article as unread from bookmark page" do
     @bookmarked_article.mark_as_read!
-    visit bookmarks_path
+    visit_bookmarks_index
 
     within("article.article-card[data-source='#{@bookmarked_article.source_type}']") do
       unread_button = find("button[title='Mark as unread']")
@@ -87,7 +87,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
 
   test "should show correct button state on bookmark page for read article" do
     @bookmarked_article.mark_as_read!
-    visit bookmarks_path
+    visit_bookmarks_index
 
     within("article.article-card[data-source='#{@bookmarked_article.source_type}']") do
       assert_selector "button[title='Mark as unread']"
@@ -96,7 +96,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should show correct button state on bookmark page for unread article" do
-    visit bookmarks_path
+    visit_bookmarks_index
 
     within("article.article-card[data-source='#{@bookmarked_article.source_type}']") do
       assert_selector "button[title='Mark as read']"
@@ -105,7 +105,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should maintain bookmark status when marking as read from bookmark page" do
-    visit bookmarks_path
+    visit_bookmarks_index
 
     within("article.article-card[data-source='#{@bookmarked_article.source_type}']") do
       find("button[title='Mark as read']").click
