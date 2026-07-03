@@ -111,7 +111,10 @@ export default function ArticleCard({
                 : 'group/bookmark p-2 bg-dark-700 border border-dark-600 text-gray-400 rounded-lg transition-all duration-200 hover:bg-primary-600 hover:border-primary-500 hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-primary-500/25'
             }
             title={article.bookmarked ? 'Remove from reading list' : 'Add to reading list'}
-            onClick={() => onBookmarkToggle(article)}
+            onClick={(event) => {
+              event.stopPropagation()
+              onBookmarkToggle(article)
+            }}
           >
             <svg className="w-4 h-4 transition-transform group-hover/bookmark:scale-110" fill={article.bookmarked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
@@ -126,7 +129,10 @@ export default function ArticleCard({
                 : 'group/read p-2 bg-dark-700 border border-dark-600 text-gray-400 rounded-lg transition-all duration-200 hover:bg-green-600 hover:border-green-500 hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-green-500/25'
             }
             title={article.read ? 'Mark as unread' : 'Mark as read'}
-            onClick={() => onReadToggle(article)}
+            onClick={(event) => {
+              event.stopPropagation()
+              onReadToggle(article)
+            }}
           >
             <svg className="w-4 h-4 transition-transform group-hover/read:scale-110" fill={article.read ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -136,6 +142,7 @@ export default function ArticleCard({
           <a
             href={`/articles/${article.id}`}
             className="group/detail px-4 py-2 bg-gradient-to-r from-dark-700 to-dark-600 border border-dark-500 text-gray-300 rounded-lg font-medium transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:border-primary-500 hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-primary-500/20"
+            onClick={(event) => event.stopPropagation()}
           >
             <span className="flex items-center">
               Details
