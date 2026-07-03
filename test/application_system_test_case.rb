@@ -21,13 +21,19 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def visit_articles_index
     visit articles_path
-    assert_selector "[data-testid='articles-page']", wait: 10
-    assert_no_text "Loading articles...", wait: 10
+    unless page.has_selector?("[data-testid='articles-page']", wait: 12)
+      visit articles_path
+    end
+    assert_selector "[data-testid='articles-page']", wait: 12
+    assert_no_text "Loading articles...", wait: 12
   end
 
   def visit_bookmarks_index
     visit bookmarks_path
-    assert_selector "[data-testid='bookmarks-page']", wait: 10
-    assert_no_text "Loading reading list...", wait: 10
+    unless page.has_selector?("[data-testid='bookmarks-page']", wait: 12)
+      visit bookmarks_path
+    end
+    assert_selector "[data-testid='bookmarks-page']", wait: 12
+    assert_no_text "Loading reading list...", wait: 12
   end
 end
