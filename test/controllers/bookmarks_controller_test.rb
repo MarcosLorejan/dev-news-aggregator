@@ -61,4 +61,28 @@ class BookmarksControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "button[title='Remove from reading list']", minimum: 1
   end
+
+  test "index should return JSON with bookmarked articles" do
+    get bookmarks_url, as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+
+    assert json_response.key?("articles")
+    assert json_response.key?("pagination")
+    assert json_response.key?("articles_by_source")
+
+    assert json_response["articles"].is_a?(Array)
+    assert json_response["pagination"]["current_page"] == 1
+  end
+
+  test "index JSON should support pagination" do
+    get bookmarks_url(page: 1, per_page: 5), as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+
+    assert_equal 1, json_response["pagination"]["current_page"]
+    assert_equal 5, json_response["pagination"]["per_page"]
+  end
 end

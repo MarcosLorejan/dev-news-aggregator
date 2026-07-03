@@ -93,4 +93,37 @@ class DismissedArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "article.article-card", minimum: 1
   end
+
+  test "index should return JSON with dismissed articles" do
+    get dismissed_articles_path, as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+
+    assert json_response.key?("articles")
+    assert json_response.key?("pagination")
+
+    assert json_response["articles"].is_a?(Array)
+    assert json_response["pagination"]["current_page"] == 1
+  end
+
+  test "index JSON should support pagination" do
+    get dismissed_articles_path(page: 1, per_page: 20), as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+
+    assert_equal 1, json_response["pagination"]["current_page"]
+    assert_equal 20, json_response["pagination"]["per_page"]
+  end
+
+  test "recently_dismissed should return JSON" do
+    get recently_dismissed_path, as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+
+    assert json_response.key?("articles")
+    assert json_response["articles"].is_a?(Array)
+  end
 end
