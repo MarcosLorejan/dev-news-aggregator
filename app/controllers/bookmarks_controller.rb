@@ -16,7 +16,7 @@ class BookmarksController < ApplicationController
       format.html
       format.json do
         render json: {
-          articles: @bookmarked_articles.map { |article| article_json(article) },
+          articles: @bookmarked_articles.map { |article| ArticleSerializer.as_bookmark_json(article) },
           articles_by_source: @bookmarks_by_source.transform_keys(&:to_s).transform_values { |articles| articles.map(&:id) },
           pagination: {
             current_page: page,
@@ -27,23 +27,5 @@ class BookmarksController < ApplicationController
         }
       end
     end
-  end
-
-  private
-
-  def article_json(article)
-    {
-      id: article.id,
-      title: article.title,
-      url: article.url,
-      description: article.description,
-      source_type: article.source_type,
-      score: article.score,
-      comment_count: article.comment_count,
-      external_id: article.external_id,
-      published_at: article.published_at,
-      bookmarked_at: article.bookmark&.bookmarked_at,
-      read: article.read?
-    }
   end
 end
