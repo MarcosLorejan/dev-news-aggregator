@@ -15,7 +15,7 @@ class DismissedArticlesController < ApplicationController
       format.html
       format.json do
         render json: {
-          articles: @dismissed_articles.map { |article| article_json(article) },
+          articles: @dismissed_articles.map { |article| ArticleSerializer.as_dismissed_json(article) },
           pagination: {
             current_page: page,
             per_page: per_page,
@@ -38,27 +38,9 @@ class DismissedArticlesController < ApplicationController
       format.html
       format.json do
         render json: {
-          articles: @articles.map { |article| article_json(article) }
+          articles: @articles.map { |article| ArticleSerializer.as_dismissed_json(article) }
         }
       end
     end
-  end
-
-  private
-
-  def article_json(article)
-    {
-      id: article.id,
-      title: article.title,
-      url: article.url,
-      description: article.description,
-      source_type: article.source_type,
-      score: article.score,
-      comment_count: article.comment_count,
-      external_id: article.external_id,
-      published_at: article.published_at,
-      dismissed_at: article.dismissed_article&.dismissed_at,
-      permanent: article.dismissed_article&.permanent
-    }
   end
 end

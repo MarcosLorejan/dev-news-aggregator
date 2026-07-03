@@ -19,7 +19,7 @@ class ArticlesController < ApplicationController
       format.html
       format.json do
         render json: {
-          articles: @articles.map { |article| article_json(article) },
+          articles: @articles.map { |article| ArticleSerializer.as_json(article) },
           articles_by_category: @articles_by_category.transform_values { |articles| articles.map(&:id) },
           categories: @articles_by_category.keys.map { |name| { name: name, icon: helpers.category_icon(name) } },
           pagination: {
@@ -54,7 +54,7 @@ class ArticlesController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render json: article_json(@article) }
+      format.json { render json: ArticleSerializer.as_json(@article) }
     end
   rescue ActiveRecord::RecordNotFound
     respond_to do |format|
@@ -152,25 +152,5 @@ class ArticlesController < ApplicationController
 
     Rails.cache.write(key, Time.current, expires_in: FETCH_RATE_LIMIT)
     false
-  end
-
-  def article_json(article)
-    {
-      id: article.id,
-      title: article.title,
-      url: article.url,
-      description: article.description,
-      source_type: article.source_type,
-      score: article.score,
-      comment_count: article.comment_count,
-      external_id: article.external_id,
-      published_at: article.published_at,
-      created_at: article.created_at,
-      updated_at: article.updated_at,
-      bookmarked: article.bookmarked?,
-      read: article.read?,
-      dismissed: article.dismissed?,
-      pending_dismissal: article.pending_dismissal?
-    }
   end
 end
