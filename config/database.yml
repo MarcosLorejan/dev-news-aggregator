@@ -24,8 +24,13 @@ default: &default
   password: <%= ENV.fetch("DB_PASSWORD") { "dev_password" } %>
 
 development:
-  <<: *default
-  database: dev_news_aggregator_development
+  primary:
+    <<: *default
+    database: dev_news_aggregator_development
+  queue:
+    <<: *default
+    database: dev_news_aggregator_development_queue
+    migrations_paths: db/queue_migrate
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

@@ -15,8 +15,8 @@ bundle install
 # Start PostgreSQL container
 sudo docker-compose up -d
 
-# Setup database
-bin/rails db:migrate
+# Setup primary and queue databases
+bin/rails db:prepare
 bin/rails db:seed
 
 # Initial news fetch
@@ -26,8 +26,11 @@ bin/rails runner "NewsAggregatorService.fetch_all_news"
 ### Running the application
 
 ```bash
-# Start Rails server
-bin/rails server
+# Start Rails server (with Solid Queue supervisor in Puma for background jobs)
+SOLID_QUEUE_IN_PUMA=1 bin/rails server
+
+# Or run job workers in a separate process
+bin/jobs
 
 # Run in development mode
 bin/dev
@@ -106,6 +109,8 @@ whenever --clear-crontab
 - `NewsSource`: Optional database-backed source registry; when enabled records exist, they override the YAML default fetcher list
 
 **Scheduled jobs**: Uses `whenever` gem to run `news:fetch` hourly during business hours (9 AM - 6 PM) and `news:clean` daily at 2 AM. Logs to `log/cron.log`.
+
+**Background jobs (Solid Queue)**: Active Job uses Solid Queue in development and production. `MakeDismissalPermanentJob` runs 15 seconds after an article is dismissed. In development, start the app with `SOLID_QUEUE_IN_PUMA=1 bin/rails server` (or run `bin/jobs` in a separate terminal). Production uses a dedicated queue database and `SOLID_QUEUE_IN_PUMA=true` in Kamal deploy config.
 
 ### Key design patterns
 
