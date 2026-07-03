@@ -9,46 +9,41 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
     get read_articles_path
     assert_response :success
-    assert_select "h1", "Already Read"
+    assert_select "#root"
+    assert_select "script[type='module'][src*='application']"
   end
 
-  test "should display read articles" do
-    get read_articles_path
-    assert_select ".article-card", count: 1
-    assert_select "h2", text: @article.title
+  test "index JSON should include read articles" do
+    get read_articles_path, as: :json
+    assert_response :success
+
+    json_response = JSON.parse(response.body)
+    assert json_response["articles"].is_a?(Array)
+    assert json_response["articles"].any? { |article| article["id"] == @article.id }
+    assert json_response["articles"].all? { |article| article.key?("read_at") }
   end
 
   test "should show empty state when no read articles exist" do
     ReadArticle.destroy_all
-    get read_articles_path
+
+    get read_articles_path, as: :json
     assert_response :success
-    assert_select "h2", text: "No read articles yet"
-    assert_select "p", text: /Articles you mark as read will appear here/
+
+    json_response = JSON.parse(response.body)
+    assert_equal 0, json_response["pagination"]["total_count"]
+    assert_empty json_response["articles"]
   end
 
-  test "should group read articles by source" do
+  test "index JSON should group articles by source" do
     dev_article = articles(:dev_to_article)
     ReadArticle.create!(article: dev_article)
 
-    get read_articles_path
+    get read_articles_path, as: :json
     assert_response :success
-    assert_select "button[data-source]", minimum: 2 # Should have filter buttons for different sources
-  end
 
-  test "should display read timestamps" do
-    get read_articles_path
-    assert_select "span", text: /Read/
-  end
-
-  test "should show back to articles link" do
-    get read_articles_path
-    assert_select "a[href='#{articles_path}']", text: "Back to All Articles"
-  end
-
-  test "should show unmark read buttons" do
-    get read_articles_path
-    assert_select "form[action='#{unmark_article_as_read_path(@article)}']"
-    assert_select "button[type='submit']", count: 1 # Should have unmark button
+    json_response = JSON.parse(response.body)
+    assert json_response["articles_by_source"].is_a?(Hash)
+    assert json_response["articles_by_source"].keys.length >= 2
   end
 
   test "should mark article as read" do

@@ -36,4 +36,31 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_selector "[data-testid='bookmarks-page']", wait: 12
     assert_no_text "Loading reading list...", wait: 12
   end
+
+  def visit_read_articles_index
+    visit read_articles_path
+    unless page.has_selector?("[data-testid='read-articles-page']", wait: 12)
+      visit read_articles_path
+    end
+    assert_selector "[data-testid='read-articles-page']", wait: 12
+    assert_no_text "Loading read articles...", wait: 12
+  end
+
+  def visit_dismissed_articles_index
+    visit dismissed_articles_path
+    unless page.has_selector?("[data-testid='dismissed-articles-page']", wait: 12)
+      visit dismissed_articles_path
+    end
+    assert_selector "[data-testid='dismissed-articles-page']", wait: 12
+    assert_no_text "Loading dismissed articles...", wait: 12
+  end
+
+  def visit_recently_dismissed
+    visit recently_dismissed_path
+    unless page.has_selector?("[data-testid='recently-dismissed-page']", wait: 12)
+      visit recently_dismissed_path
+    end
+    assert_selector "[data-testid='recently-dismissed-page']", wait: 12
+    assert_no_text "Loading recently dismissed articles...", wait: 12
+  end
 end

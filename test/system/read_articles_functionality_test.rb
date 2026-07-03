@@ -126,7 +126,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should show read articles in already read section" do
-    visit read_articles_path
+    visit_read_articles_index
 
     assert_selector "article.article-card[data-source='#{@read_article.source_type}']"
     within("article.article-card[data-source='#{@read_article.source_type}']") do
@@ -135,10 +135,12 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should be able to unmark article as read from already read section" do
-    visit read_articles_path
+    visit_read_articles_index
 
     within("article.article-card[data-source='#{@read_article.source_type}']") do
-      find("button[title='Mark as unread']").click
+      accept_confirm do
+        find("button[title='Mark as unread']").click
+      end
     end
 
     sleep 0.5
@@ -180,7 +182,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
     sleep 0.5
 
     # Visit already read section
-    visit read_articles_path
+    visit_read_articles_index
     assert_selector "article.article-card", minimum: 2
   end
 
@@ -188,7 +190,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
     # Unmark all articles as read
     Article.read.each(&:unmark_as_read!)
 
-    visit read_articles_path
+    visit_read_articles_index
 
     assert_selector "h2", text: "No read articles yet"
     assert_link "Browse Articles", href: articles_path

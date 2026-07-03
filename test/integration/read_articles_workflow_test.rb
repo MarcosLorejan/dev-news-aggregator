@@ -17,7 +17,7 @@ class ReadArticlesWorkflowTest < ActionDispatch::IntegrationTest
 
     get read_articles_path
     assert_response :success
-    assert_select "h1", "Already Read"
+    assert_select "#root"
 
     delete unmark_article_as_read_path(@article)
     assert_redirected_to read_articles_path
@@ -36,6 +36,7 @@ class ReadArticlesWorkflowTest < ActionDispatch::IntegrationTest
 
     get read_articles_path
     assert_response :success
+    assert_select "#root"
   end
 
   test "should show read articles when explicitly requested" do
@@ -73,7 +74,8 @@ class ReadArticlesWorkflowTest < ActionDispatch::IntegrationTest
     assert_select "#root"
 
     get read_articles_path
-    assert_select "a[href='#{articles_path}']", "Back to All Articles"
+    assert_response :success
+    assert_select "#root"
 
     get bookmarks_path
     assert_response :success
@@ -84,11 +86,13 @@ class ReadArticlesWorkflowTest < ActionDispatch::IntegrationTest
     @article.mark_as_read!
     @dev_article.mark_as_read!
 
-    get read_articles_path
+    get read_articles_path, as: :json
     assert_response :success
 
-    assert_select "[data-source='hacker_news']", minimum: 1
-    assert_select "[data-source='dev_to']", minimum: 1
+    json_response = JSON.parse(response.body)
+    source_types = json_response["articles"].map { |a| a["source_type"] }
+    assert_includes source_types, "hacker_news"
+    assert_includes source_types, "dev_to"
   end
 
   test "should handle error scenarios gracefully" do

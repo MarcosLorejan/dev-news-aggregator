@@ -14,84 +14,48 @@ class DismissedArticlesControllerTest < ActionDispatch::IntegrationTest
     get dismissed_articles_path
 
     assert_response :success
-    assert_select "h1", "Dismissed Articles"
-    assert_select "article.article-card", minimum: 1
+    assert_select "#root"
+    assert_select "script[type='module'][src*='application']"
   end
 
-  test "should show dismissed articles in index" do
-    get dismissed_articles_path
+  test "index JSON should include dismissed articles" do
+    get dismissed_articles_path, as: :json
 
     assert_response :success
-    assert_select "button", text: "Restore"
-    assert_select "article.article-card", minimum: 1
-  end
-
-  test "should show navigation links in index" do
-    get dismissed_articles_path
-
-    assert_response :success
-    assert_select "a[href='#{articles_path}']", "Back to All Articles"
-    assert_select "a[href='#{recently_dismissed_path}']", "Recently Dismissed"
+    json_response = JSON.parse(response.body)
+    assert json_response["articles"].is_a?(Array)
+    assert json_response["articles"].any? { |article| article["id"] == @dismissed_article.id }
+    assert json_response["articles"].all? { |article| article.key?("dismissed_at") }
   end
 
   test "should get recently_dismissed" do
     get recently_dismissed_path
 
     assert_response :success
-    assert_select "h1", "Recently Dismissed"
+    assert_select "#root"
+    assert_select "script[type='module'][src*='application']"
   end
 
-  test "should show recently dismissed articles" do
-    get recently_dismissed_path
+  test "recently dismissed JSON should include recent articles" do
+    get recently_dismissed_path, as: :json
 
     assert_response :success
-    assert_select "button", text: "Quick Restore"
+    json_response = JSON.parse(response.body)
+    assert json_response["articles"].is_a?(Array)
+    assert json_response["articles"].any? { |article| article["id"] == @recent_dismissed.id }
   end
 
-  test "should not show old dismissed articles in recently dismissed" do
+  test "should not show old dismissed articles in recently dismissed JSON" do
     old_dismissed = articles(:reddit_rust_article)
     old_dismissed.dismiss!
     old_dismissed.dismissed_article.update!(dismissed_at: 2.days.ago)
 
-    get recently_dismissed_path
+    get recently_dismissed_path, as: :json
 
     assert_response :success
-  end
-
-  test "should show navigation links in recently dismissed" do
-    get recently_dismissed_path
-
-    assert_response :success
-    assert_select "a[href='#{articles_path}']", "Back to All Articles"
-    assert_select "a[href='#{dismissed_articles_path}']", "All Dismissed"
-  end
-
-  test "should limit dismissed articles to 100" do
-    get dismissed_articles_path
-
-    assert_response :success
-    assert_select "article.article-card", maximum: 100
-  end
-
-  test "should limit recently dismissed articles to 10" do
-    get recently_dismissed_path
-
-    assert_response :success
-    assert_select "article.article-card", maximum: 10
-  end
-
-  test "should show articles in dismissed index" do
-    get dismissed_articles_path
-
-    assert_response :success
-    assert_select "article.article-card", minimum: 1
-  end
-
-  test "should show articles in recently dismissed" do
-    get recently_dismissed_path
-
-    assert_response :success
-    assert_select "article.article-card", minimum: 1
+    json_response = JSON.parse(response.body)
+    ids = json_response["articles"].map { |article| article["id"] }
+    assert_not_includes ids, old_dismissed.id
   end
 
   test "index should return JSON with dismissed articles" do
