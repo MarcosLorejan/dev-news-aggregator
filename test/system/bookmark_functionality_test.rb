@@ -42,7 +42,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should show bookmarked articles in reading list" do
-    visit bookmarks_path
+    visit_bookmarks_index
 
     assert_selector "article.article-card[data-source='reddit_rust']"
     assert_selector "article.article-card[data-source='reddit_ruby']"
@@ -119,7 +119,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should remove bookmark from reading list" do
-    visit bookmarks_path
+    visit_bookmarks_index
 
     if page.has_selector?("article.article-card[data-source='reddit_rust']")
       within("article.article-card[data-source='reddit_rust']") do
@@ -136,7 +136,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
   test "should show empty state when no bookmarks exist" do
     Bookmark.destroy_all
 
-    visit bookmarks_path
+    visit_bookmarks_index
 
     assert_selector "h2", text: "No bookmarked articles yet"
     assert_selector "p", text: "Articles you bookmark will appear here in your reading list."
