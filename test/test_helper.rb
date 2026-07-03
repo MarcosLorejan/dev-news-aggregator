@@ -40,6 +40,16 @@ module ActiveSupport
     # Run tests in parallel with specified workers (disable when running coverage)
     parallelize(workers: :number_of_processors) unless ENV["COVERAGE"]
 
+    parallelize_setup do |worker|
+      next unless worker == 0
+
+      manifest = Rails.root.join("public/vite-test/.vite/manifest.json")
+      next if manifest.exist?
+
+      success = system({ "RAILS_ENV" => "test" }, "npm run build:test", chdir: Rails.root)
+      raise "Vite test build failed. Run: npm run build:test" unless success
+    end
+
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 

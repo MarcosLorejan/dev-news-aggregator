@@ -50,7 +50,7 @@ class CategoryFilterTurboTest < ApplicationSystemTestCase
         all_articles_btn.click
         assert_selector "article.article-card", minimum: 1
 
-        visit bookmarks_path
+        visit_bookmarks_index
         assert_current_path bookmarks_path
 
         visit_articles_index

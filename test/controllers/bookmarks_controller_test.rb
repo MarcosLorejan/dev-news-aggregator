@@ -9,57 +9,38 @@ class BookmarksControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
     get bookmarks_url
     assert_response :success
-    assert_select "h1", "Reading List"
+    assert_select "#root"
+    assert_select "script[type='module'][src*='application']"
   end
 
-  test "should display bookmarked articles" do
-    get bookmarks_url
+  test "index JSON should include bookmarked articles" do
+    get bookmarks_url, as: :json
     assert_response :success
 
-    assert_select "article.article-card[data-source='reddit_rust']"
-    assert_select "article.article-card[data-source='reddit_ruby']"
+    json_response = JSON.parse(response.body)
+    assert json_response["articles"].is_a?(Array)
+    assert json_response["articles"].any? { |article| article["id"] == @bookmarked_article.id }
+    assert json_response["articles"].all? { |article| article.key?("bookmarked_at") }
   end
 
   test "should show empty state when no bookmarks exist" do
     Bookmark.destroy_all
 
-    get bookmarks_url
+    get bookmarks_url, as: :json
     assert_response :success
 
-    assert_select "h2", "No bookmarked articles yet"
-    assert_select "p", "Articles you bookmark will appear here in your reading list."
-    assert_select "a[href='#{articles_path}']", "Browse Articles"
+    json_response = JSON.parse(response.body)
+    assert_equal 0, json_response["pagination"]["total_count"]
+    assert_empty json_response["articles"]
   end
 
-  test "should group bookmarked articles by source" do
-    get bookmarks_url
+  test "index JSON should group articles by source" do
+    get bookmarks_url, as: :json
     assert_response :success
 
-    # Check for filter functionality when bookmarks exist
-    if Bookmark.exists?
-      assert_select "button", minimum: 1
-    end
-  end
-
-  test "should show back to articles link" do
-    get bookmarks_url
-    assert_response :success
-
-    assert_select "a[href='#{articles_path}']", "Back to All Articles"
-  end
-
-  test "should display bookmark timestamps" do
-    get bookmarks_url
-    assert_response :success
-
-    assert_select "span:contains('🔖 Bookmarked')", minimum: 1
-  end
-
-  test "should show unbookmark buttons" do
-    get bookmarks_path
-
-    assert_response :success
-    assert_select "button[title='Remove from reading list']", minimum: 1
+    json_response = JSON.parse(response.body)
+    assert json_response["articles_by_source"].is_a?(Hash)
+    assert json_response["articles_by_source"].key?(@bookmarked_article.source_type)
   end
 
   test "index should return JSON with bookmarked articles" do
