@@ -1,5 +1,6 @@
 class NewsFetchers::HackerNewsFetcher < NewsFetchers::BaseFetcher
   base_uri "https://hacker-news.firebaseio.com/v0"
+  format :json
 
   def fetch_articles
     Rails.logger.info "Fetching articles from Hacker News..."

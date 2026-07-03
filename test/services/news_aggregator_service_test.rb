@@ -79,15 +79,24 @@ class NewsAggregatorServiceTest < ActiveSupport::TestCase
     assert_includes result[:sources], "TestSuccessfulFetcher"
   end
 
-  test "class method fetch_all_news should work" do
-    # This will actually run the service but that's okay for integration testing
-    result = NewsAggregatorService.fetch_all_news
+  test "class method fetch_all_news should work without live API calls" do
+    mock_fetcher = Object.new
+    def mock_fetcher.fetch_articles; []; end
+    def mock_fetcher.class; OpenStruct.new(name: "MockFetcher"); end
 
-    assert_kind_of Hash, result
-    assert result.key?(:articles_count)
-    assert result.key?(:duration)
-    assert result.key?(:sources)
-    assert result.key?(:timestamp)
+    original = NewsAggregatorService.method(:build_fetchers)
+    NewsAggregatorService.define_singleton_method(:build_fetchers) { [ mock_fetcher ] }
+    begin
+      result = NewsAggregatorService.fetch_all_news
+
+      assert_kind_of Hash, result
+      assert result.key?(:articles_count)
+      assert result.key?(:duration)
+      assert result.key?(:sources)
+      assert result.key?(:timestamp)
+    ensure
+      NewsAggregatorService.define_singleton_method(:build_fetchers, original)
+    end
   end
 
   test "fetch_all_news should return proper structure" do

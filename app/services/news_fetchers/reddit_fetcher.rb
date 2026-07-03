@@ -1,5 +1,6 @@
 class NewsFetchers::RedditFetcher < NewsFetchers::BaseFetcher
   base_uri "https://www.reddit.com"
+  format :json
   headers "User-Agent" => "DevNewsAggregator/1.0"
 
   def initialize(subreddit: "programming")
