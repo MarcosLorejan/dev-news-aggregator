@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_03_150200) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_03_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -47,6 +47,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_150200) do
     t.index ["article_id"], name: "index_dismissed_articles_on_article_id"
     t.index ["dismissed_at"], name: "index_dismissed_articles_on_dismissed_at"
     t.index ["permanent"], name: "index_dismissed_articles_on_permanent"
+  end
+
+  create_table "fetch_runs", force: :cascade do |t|
+    t.integer "articles_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.decimal "duration_seconds", precision: 8, scale: 2
+    t.string "error_class"
+    t.text "error_message"
+    t.datetime "finished_at", null: false
+    t.string "source_key", null: false
+    t.string "status", null: false
+    t.datetime "updated_at", null: false
+    t.index ["finished_at"], name: "index_fetch_runs_on_finished_at"
+    t.index ["source_key"], name: "index_fetch_runs_on_source_key", unique: true
+    t.index ["status"], name: "index_fetch_runs_on_status"
   end
 
   create_table "news_sources", force: :cascade do |t|
