@@ -1,11 +1,11 @@
 class ArticlesController < ApplicationController
+  include Pagination
+
   FETCH_RATE_LIMIT = 2.minutes
 
   def index
     @show_read = params[:show_read] == "true"
-    page = params[:page]&.to_i || 1
-    per_page = params[:per_page]&.to_i || 50
-    per_page = [ per_page, 100 ].min
+    page, per_page = pagination_params
 
     base_scope = article_index_scope
     @total_count = base_scope.count
