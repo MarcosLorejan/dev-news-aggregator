@@ -1,8 +1,8 @@
 class DismissedArticlesController < ApplicationController
+  include Pagination
+
   def index
-    page = params[:page]&.to_i || 1
-    per_page = params[:per_page]&.to_i || 50
-    per_page = [ per_page, 100 ].min
+    page, per_page = pagination_params
 
     @dismissed_articles = Article.dismissed
                                 .includes(:dismissed_article)

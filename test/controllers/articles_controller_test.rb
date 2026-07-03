@@ -270,6 +270,17 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert json_response["pagination"]["per_page"] == 50
   end
 
+  test "index JSON should clamp invalid pagination params" do
+    get articles_url(page: 0, per_page: 0), as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+
+    assert_equal 1, json_response["pagination"]["current_page"]
+    assert_equal 1, json_response["pagination"]["per_page"]
+    assert json_response["pagination"]["total_pages"] >= 1
+  end
+
   test "index JSON avoids N+1 queries for article state" do
     @article.bookmark!
     @dev_to_article.mark_as_read!
