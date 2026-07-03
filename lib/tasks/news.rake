@@ -5,6 +5,26 @@ namespace :news do
     puts "Enqueued FetchNewsJob (job_id: #{job.job_id})"
   end
 
+  desc "Show last fetch outcome per source"
+  task fetch_status: :environment do
+    runs = FetchRun.order(:source_key)
+
+    if runs.none?
+      puts "No fetch runs recorded yet. Run 'rake news:fetch' first."
+    else
+      runs.each do |run|
+        line = "#{run.source_key}: #{run.status} (#{run.articles_count} articles"
+        line += ", #{run.duration_seconds}s" if run.duration_seconds
+        line += ") at #{run.finished_at}"
+        puts line
+        puts "  #{run.error_class}: #{run.error_message}" if run.failure?
+      end
+
+      failed = FetchRun.failed.count
+      puts "\n#{failed} source(s) failed on last fetch." if failed.positive?
+    end
+  end
+
   desc "Show latest articles"
   task latest: :environment do
     articles = Article.order(published_at: :desc).limit(10)

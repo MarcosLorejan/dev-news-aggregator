@@ -49,6 +49,9 @@ class NewsAggregatorServiceTest < ActiveSupport::TestCase
     def failing_fetcher.fetch_articles
       raise StandardError, "API is down"
     end
+    def failing_fetcher.source_key
+      "test_failing_fetcher"
+    end
 
     def failing_fetcher.class
       @class ||= Class.new do
@@ -62,6 +65,9 @@ class NewsAggregatorServiceTest < ActiveSupport::TestCase
     successful_fetcher = Object.new
     def successful_fetcher.fetch_articles
       [ Article.new(title: "Test", source_type: "test") ]
+    end
+    def successful_fetcher.source_key
+      "test_successful_fetcher"
     end
 
     def successful_fetcher.class
@@ -88,6 +94,9 @@ class NewsAggregatorServiceTest < ActiveSupport::TestCase
 
     assert_equal 1, result[:articles_count]
     assert_includes result[:sources], "TestSuccessfulFetcher"
+
+    assert_equal "success", FetchRun.find_by(source_key: "test_successful_fetcher").status
+    assert_equal "failure", FetchRun.find_by(source_key: "test_failing_fetcher").status
   end
 
   test "class method fetch_all_news should work without live API calls" do
