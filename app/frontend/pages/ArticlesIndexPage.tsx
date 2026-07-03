@@ -99,24 +99,27 @@ export default function ArticlesIndexPage() {
     const articleId = article?.id ?? toast?.articleId
     if (!articleId) return
 
-    clearDismissTimer()
-    setToast(null)
-    setDismissingIds((prev) => {
-      const next = new Set(prev)
-      next.delete(articleId)
-      return next
-    })
-    pendingDismissRef.current = null
-
     try {
       await undismissArticle(articleId)
+      clearDismissTimer()
+      setToast(null)
+      setDismissingIds((prev) => {
+        const next = new Set(prev)
+        next.delete(articleId)
+        return next
+      })
+      pendingDismissRef.current = null
     } catch {
       setError('Failed to restore article.')
     }
   }, [toast])
 
   const handleDismiss = useCallback(async (article: Article) => {
-    setDismissingIds((prev) => new Set(prev).add(article.id))
+    if (toast) {
+      finalizeDismiss(toast.articleId)
+    }
+
+    setDismissingIds(new Set([article.id]))
     pendingDismissRef.current = { articleId: article.id, title: truncate(article.title, 50) }
 
     try {
@@ -195,7 +198,7 @@ export default function ArticlesIndexPage() {
         updateArticle(article.id, { read: false })
       } else {
         await markArticleAsRead(article.id)
-        updateArticle(article.id, { read: true })
+        setRemovedIds((prev) => new Set(prev).add(article.id))
       }
     } catch {
       setError('Failed to update read status.')
@@ -225,7 +228,9 @@ export default function ArticlesIndexPage() {
     )
   }
 
-  if (!data || articles.length === 0) {
+  const showEmptyFeed = !data || ((data.pagination.total_count ?? 0) === 0 && articles.length === 0)
+
+  if (showEmptyFeed) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-7xl" data-testid="articles-page">
         <PageHeader totalCount={data?.pagination.total_count ?? 0} lastUpdated={data?.last_updated ?? null} />
