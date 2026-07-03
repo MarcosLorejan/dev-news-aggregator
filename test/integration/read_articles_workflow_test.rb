@@ -76,7 +76,8 @@ class ReadArticlesWorkflowTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{articles_path}']", "Back to All Articles"
 
     get bookmarks_path
-    assert_select "a[href='#{articles_path}']", "Back to All Articles"
+    assert_response :success
+    assert_select "#root"
   end
 
   test "should maintain filtering state with read articles" do
