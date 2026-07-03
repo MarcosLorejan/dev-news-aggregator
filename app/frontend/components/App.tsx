@@ -6,6 +6,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<ArticlesIndexPage />} />
+        <Route path="/articles" element={<ArticlesIndexPage />} />
       </Routes>
     </BrowserRouter>
   )
