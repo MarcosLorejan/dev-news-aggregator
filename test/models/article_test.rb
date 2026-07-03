@@ -260,4 +260,39 @@ class ArticleTest < ActiveSupport::TestCase
     not_dismissed = Article.not_dismissed
     assert_includes not_dismissed, temporary_dismissed
   end
+
+  test "requires title url external_id and source_type" do
+    article = Article.new
+    assert_not article.valid?
+    assert_includes article.errors[:title], "can't be blank"
+    assert_includes article.errors[:url], "can't be blank"
+    assert_includes article.errors[:external_id], "can't be blank"
+    assert_includes article.errors[:source_type], "can't be blank"
+  end
+
+  test "requires unique external_id per source_type" do
+    duplicate = Article.new(
+      title: "Duplicate",
+      url: "https://example.com/dup",
+      external_id: @article.external_id,
+      source_type: @article.source_type,
+      published_at: Time.current
+    )
+
+    assert_not duplicate.valid?
+    assert_includes duplicate.errors[:external_id], "has already been taken"
+  end
+
+  test "rejects invalid URLs" do
+    article = Article.new(
+      title: "Bad URL",
+      url: "not-a-url",
+      external_id: "bad-url",
+      source_type: "test",
+      published_at: Time.current
+    )
+
+    assert_not article.valid?
+    assert_includes article.errors[:url], "is invalid"
+  end
 end
