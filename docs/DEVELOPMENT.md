@@ -41,7 +41,7 @@ bin/dev
 ### News operations
 
 ```bash
-# Fetch news from all sources
+# Enqueue background job to fetch news from all sources (non-blocking)
 bin/rails news:fetch
 
 # Show latest 10 articles
@@ -50,7 +50,7 @@ bin/rails news:latest
 # Clean old articles (uses retention from config/news_aggregator.yml)
 bin/rails news:clean
 
-# Manual service call
+# Run fetch synchronously (e.g. debugging)
 bin/rails runner "NewsAggregatorService.fetch_all_news"
 ```
 
@@ -108,7 +108,7 @@ whenever --clear-crontab
 - `Bookmark`: Tracks bookmarked articles for personal reading list functionality
 - `NewsSource`: Optional database-backed source registry; when enabled records exist, they override the YAML default fetcher list
 
-**Scheduled jobs**: Uses `whenever` gem to run `news:fetch` hourly during business hours (9 AM - 6 PM) and `news:clean` daily at 2 AM. Logs to `log/cron.log`.
+**Scheduled jobs**: Uses `whenever` gem to run `news:fetch` hourly during business hours (9 AM - 6 PM) and `news:clean` daily at 2 AM. `news:fetch` enqueues `FetchNewsJob` so cron exits immediately; workers process the fetch asynchronously. Logs to `log/cron.log`.
 
 **Background jobs (Solid Queue)**: Active Job uses Solid Queue in development and production. `MakeDismissalPermanentJob` runs 15 seconds after an article is dismissed. In development, start the app with `SOLID_QUEUE_IN_PUMA=1 bin/rails server` (or run `bin/jobs` in a separate terminal). Production uses a dedicated queue database and `SOLID_QUEUE_IN_PUMA=true` in Kamal deploy config.
 

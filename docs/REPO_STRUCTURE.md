@@ -98,6 +98,7 @@ dev-news-aggregator/
 | File | Purpose |
 |------|---------|
 | `make_dismissal_permanent_job.rb` | Converts temporary dismissals to permanent |
+| `fetch_news_job.rb` | Fetches news from all sources asynchronously |
 
 ### Frontend
 

@@ -1,15 +1,8 @@
 namespace :news do
-  desc "Fetch news from all sources"
+  desc "Enqueue background job to fetch news from all sources"
   task fetch: :environment do
-    puts "Starting news aggregation..."
-
-    result = NewsAggregatorService.fetch_all_news
-
-    puts "News aggregation completed!"
-    puts "Articles processed: #{result[:articles_count]}"
-    puts "Duration: #{result[:duration]}s"
-    puts "Sources: #{result[:sources].join(', ')}"
-    puts "Timestamp: #{result[:timestamp]}"
+    job = FetchNewsJob.perform_later
+    puts "Enqueued FetchNewsJob (job_id: #{job.job_id})"
   end
 
   desc "Show latest articles"
