@@ -165,6 +165,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
     end
 
     assert_current_path recently_dismissed_path
+    assert_no_text recent_dismissed.title, wait: 10
     visit_articles_index
 
     assert_selector "article.article-card", minimum: 1
