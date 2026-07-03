@@ -44,7 +44,7 @@ bin/rails news:fetch
 # Show latest 10 articles
 bin/rails news:latest
 
-# Clean old articles (7+ days)
+# Clean old articles (uses retention from config/news_aggregator.yml)
 bin/rails news:clean
 
 # Manual service call
@@ -94,14 +94,16 @@ whenever --clear-crontab
 
 ### Core components
 
-**NewsAggregatorService**: Central orchestrator that coordinates all news fetchers. Initializes fetchers for Hacker News, Dev.to, and multiple Reddit subreddits covering programming languages (Ruby, Rust, JavaScript), web development, cybersecurity, AI/ML, and general tech. Handles error logging and aggregates results.
+**NewsAggregatorService**: Central orchestrator that coordinates all news fetchers. Builds the fetcher list from enabled `NewsSource` records when present, otherwise from `config/news_aggregator.yml` (Hacker News, Dev.to, and configured Reddit subreddits). Handles error logging and aggregates results.
+
+**NewsAggregatorConfig**: Loads `config/news_aggregator.yml` via `Rails.application.config_for`. Provides fetching limits (`max_articles_per_source`), retention settings, Reddit subreddit lists, and API endpoint metadata. Fetchers read article limits from config; `news:clean` uses configured retention days.
 
 **Fetcher architecture**: Modular fetcher system with `NewsFetchers::BaseFetcher` as the abstract base class. Each fetcher (HackerNews, DevTo, Reddit) inherits and implements `fetch_articles`. Common pattern: fetch from API, transform data, call `create_or_update_article`.
 
 **Data models**:
 - `Article`: Stores aggregated news with unified schema (title, url, published_at, description, external_id, source_type, score, comment_count)
 - `Bookmark`: Tracks bookmarked articles for personal reading list functionality
-- `NewsSource`: Configuration table for news sources (currently unused in favor of hard-coded fetchers)
+- `NewsSource`: Optional database-backed source registry; when enabled records exist, they override the YAML default fetcher list
 
 **Scheduled jobs**: Uses `whenever` gem to run `news:fetch` hourly during business hours (9 AM - 6 PM) and `news:clean` daily at 2 AM. Logs to `log/cron.log`.
 
@@ -113,14 +115,16 @@ whenever --clear-crontab
 
 **Idempotent updates**: Articles use `find_or_initialize_by(external_id, source_type)` to prevent duplicates while allowing updates to existing articles.
 
-**Rate limiting awareness**: Limits API calls (e.g., first 30 HN stories) and includes proper error handling for API failures.
+**Rate limiting awareness**: Per-source article limits come from `NewsAggregatorConfig.max_articles_per_source` (see `config/news_aggregator.yml`). Includes proper error handling for API failures.
 
 ### File structure
 
 ```
 app/
   controllers/articles_controller.rb    # Main web interface
-  models/article.rb                     # Article data model
+  models/
+    article.rb                          # Article data model
+    news_aggregator_config.rb           # YAML config loader for news fetching
   services/
     news_aggregator_service.rb          # Main orchestrator
     news_fetchers/
@@ -128,6 +132,7 @@ app/
       hacker_news_fetcher.rb            # HN API integration
       dev_to_fetcher.rb                 # Dev.to API integration
       reddit_fetcher.rb                 # Reddit API integration
+config/news_aggregator.yml              # Fetch limits, retention, subreddit list
 lib/tasks/news.rake                     # Rake tasks for news operations
 config/schedule.rb                      # Cron job definitions
 ```
@@ -161,18 +166,23 @@ Uses Docker Compose for PostgreSQL with environment variables:
 
 **Category filtering**: Articles are grouped into logical categories (Programming Languages, Web Development, Security, AI & Machine Learning, General Tech) for easier browsing.
 
-**Multi-source aggregation**: Fetches from 12+ different sources including:
-- Hacker News (hacker_news)
-- Dev.to (dev_to)
-- Reddit subreddits: ruby, rust, javascript, programming, webdev, netsec, cybersecurity, technology, MachineLearning, artificial, LocalLLaMA
+**Multi-source aggregation**: Default sources are defined in `config/news_aggregator.yml` — Hacker News, Dev.to, and 11 Reddit subreddits (programming, webdev, javascript, ruby, rust, netsec, cybersecurity, technology, MachineLearning, artificial, LocalLLaMA). Override via enabled `NewsSource` records.
 
 ### Adding new news sources
 
+**Via config (default path)**:
+1. For Reddit: add the subreddit to `config/news_aggregator.yml` under `apis.reddit.subreddits`
+2. Adjust `fetching.max_articles_per_source` if needed
+
+**Via database (optional override)**:
+1. Create or enable a `NewsSource` record (`NewsSource.bootstrap_defaults!` seeds defaults)
+2. Each source's `build_fetcher` method returns the appropriate fetcher instance
+
+**New fetcher type**:
 1. Create fetcher in `app/services/news_fetchers/` inheriting from `BaseFetcher`
-2. Implement `fetch_articles` method
-3. Add fetcher instance to `NewsAggregatorService#initialize`
-4. Use consistent `source_type` naming pattern
-5. Update category grouping in `articles_helper.rb` if needed
+2. Implement `fetch_articles` and wire it in `NewsSource#build_fetcher` and/or `NewsAggregatorService.default_fetchers`
+3. Use consistent `source_type` naming pattern
+4. Update category grouping in `articles_helper.rb` if needed
 
 ## Coding guidelines
 

@@ -2,7 +2,7 @@
 
 Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
 
-Last updated: 2026-07-02
+Last updated: 2026-07-03
 
 ## Maintenance
 
@@ -80,7 +80,8 @@ dev-news-aggregator/
 | `bookmark.rb` | `bookmarks` | User-saved article |
 | `read_article.rb` | `read_articles` | Article marked as read |
 | `dismissed_article.rb` | `dismissed_articles` | Article hidden from feed |
-| `news_source.rb` | `news_sources` | Source config (mostly unused; fetchers are hard-coded) |
+| `news_source.rb` | `news_sources` | Optional DB-backed source registry; overrides YAML defaults when enabled |
+| `news_aggregator_config.rb` | — | Loads `config/news_aggregator.yml` (limits, retention, subreddits) |
 
 ### Services
 
@@ -112,7 +113,7 @@ dev-news-aggregator/
 | `routes.rb` | URL routing |
 | `database.yml` | PostgreSQL connection |
 | `schedule.rb` | Cron definitions (`whenever` gem) |
-| `news_aggregator.yml` | News source configuration |
+| `news_aggregator.yml` | Fetch limits, retention, subreddit list, API endpoints |
 | `deploy.yml` | Kamal deployment |
 | `vite.json` | Vite-Rails integration |
 | `environments/` | Per-env Rails settings (development, test, production) |
