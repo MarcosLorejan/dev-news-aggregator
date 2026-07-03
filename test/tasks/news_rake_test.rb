@@ -1,12 +1,24 @@
 require "test_helper"
 require "rake"
+require "active_job/test_helper"
 
 class NewsRakeTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
   def setup
     Rails.application.load_tasks
     @article = articles(:hacker_news_article)
     @article.update!(published_at: 10.days.ago)
     @article.bookmark!
+  end
+
+  test "news:fetch enqueues FetchNewsJob instead of fetching synchronously" do
+    assert_enqueued_with(job: FetchNewsJob) do
+      capture_io do
+        Rake::Task["news:fetch"].invoke
+      end
+    end
+  ensure
+    Rake::Task["news:fetch"].reenable
   end
 
   test "news:clean removes old articles and dependent records" do
