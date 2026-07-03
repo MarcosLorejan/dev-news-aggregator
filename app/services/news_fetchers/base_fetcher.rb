@@ -1,9 +1,30 @@
 class NewsFetchers::BaseFetcher
   include HTTParty
 
+  RETRYABLE_ERRORS = [
+    Net::OpenTimeout,
+    Net::ReadTimeout,
+    Errno::ECONNRESET,
+    Errno::ETIMEDOUT,
+    SocketError
+  ].freeze
+
   class << self
     def get(*args, **kwargs)
-      parse_http_response(super)
+      kwargs[:timeout] = NewsAggregatorConfig.request_timeout unless kwargs.key?(:timeout)
+
+      attempt = 0
+      max_attempts = NewsAggregatorConfig.max_retries + 1
+
+      begin
+        parse_http_response(super(*args, **kwargs))
+      rescue *RETRYABLE_ERRORS
+        attempt += 1
+        raise if attempt >= max_attempts
+
+        sleep(2**(attempt - 1))
+        retry
+      end
     end
 
     private
