@@ -29,11 +29,13 @@ namespace :news do
     end
   end
 
-  desc "Clean old articles (older than 7 days)"
+  desc "Clean old articles past the configured retention period"
   task clean: :environment do
-    old_articles = Article.where("published_at < ?", 7.days.ago)
+    retention_days = NewsAggregatorConfig.retention_days
+    cutoff = retention_days.days.ago
+    old_articles = Article.where("published_at < ?", cutoff)
     count = old_articles.count
-    old_articles.delete_all
-    puts "Removed #{count} old articles"
+    old_articles.destroy_all
+    puts "Removed #{count} articles older than #{retention_days} days (before #{cutoff.to_date})"
   end
 end
