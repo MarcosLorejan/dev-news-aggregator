@@ -14,6 +14,17 @@ class NewsAggregatorServiceTest < ActiveSupport::TestCase
     assert fetchers.any? { |f| f.is_a?(NewsFetchers::RedditFetcher) }
   end
 
+  test "builds default fetchers from news aggregator config when database sources are absent" do
+    NewsSource.delete_all
+
+    fetchers = NewsAggregatorService.build_fetchers
+
+    assert fetchers.any? { |f| f.is_a?(NewsFetchers::HackerNewsFetcher) }
+    assert fetchers.any? { |f| f.is_a?(NewsFetchers::DevToFetcher) }
+    reddit_fetchers = fetchers.select { |f| f.is_a?(NewsFetchers::RedditFetcher) }
+    assert_equal NewsAggregatorConfig.reddit_subreddits.length, reddit_fetchers.length
+  end
+
   test "uses enabled database sources when present" do
     NewsSource.update_all(active: false)
     news_sources(:hacker_news).update!(active: true)
