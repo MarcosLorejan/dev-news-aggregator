@@ -87,7 +87,7 @@ No manual intervention needed for routine security patches and minor updates!
 
 ## Development
 
-See [WARP.md](WARP.md) for detailed development guidelines, architecture overview, and project-specific conventions.
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for development guidelines and [docs/REPO_STRUCTURE.md](docs/REPO_STRUCTURE.md) for the repository map (keep it updated when structure changes).
 
 ### Pre-commit Hooks
 
