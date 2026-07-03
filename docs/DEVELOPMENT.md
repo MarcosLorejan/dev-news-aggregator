@@ -44,6 +44,9 @@ bin/dev
 # Enqueue background job to fetch news from all sources (non-blocking)
 bin/rails news:fetch
 
+# Show last fetch outcome per source
+bin/rails news:fetch_status
+
 # Show latest 10 articles
 bin/rails news:latest
 

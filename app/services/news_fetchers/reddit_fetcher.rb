@@ -8,6 +8,10 @@ class NewsFetchers::RedditFetcher < NewsFetchers::BaseFetcher
     @subreddit = subreddit
   end
 
+  def source_key
+    "reddit_#{@subreddit}"
+  end
+
   def fetch_articles
     Rails.logger.info "Fetching articles from Reddit r/#{@subreddit}..."
 

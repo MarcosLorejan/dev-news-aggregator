@@ -82,11 +82,13 @@ dev-news-aggregator/
 | `dismissed_article.rb` | `dismissed_articles` | Article hidden from feed |
 | `news_source.rb` | `news_sources` | Optional DB-backed source registry; overrides YAML defaults when enabled |
 | `news_aggregator_config.rb` | — | Loads `config/news_aggregator.yml` (limits, retention, subreddits) |
+| `fetch_run.rb` | `fetch_runs` | Latest per-source news fetch outcome (status, duration, errors) |
 
 ### Services
 
 | File | Purpose |
 |------|---------|
+| `news_fetch_observability.rb` | Structured JSON logging for fetch outcomes |
 | `news_aggregator_service.rb` | Runs all fetchers, handles errors, aggregates results |
 | `news_fetchers/base_fetcher.rb` | Abstract fetcher — fetch, transform, upsert article |
 | `news_fetchers/hacker_news_fetcher.rb` | Hacker News Firebase API |
@@ -141,12 +143,13 @@ dev-news-aggregator/
 | `create_bookmarks` | `bookmarks` |
 | `create_read_articles` | `read_articles` |
 | `create_dismissed_articles` | `dismissed_articles` |
+| `create_fetch_runs` | `fetch_runs` |
 
 ## `lib/`
 
 | Path | Purpose |
 |------|---------|
-| `lib/tasks/news.rake` | `news:fetch`, `news:latest`, `news:clean` rake tasks |
+| `lib/tasks/news.rake` | `news:fetch`, `news:fetch_status`, `news:latest`, `news:clean` rake tasks |
 
 ## `test/`
 

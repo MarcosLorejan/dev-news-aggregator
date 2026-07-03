@@ -30,41 +30,72 @@ class NewsAggregatorService
   end
 
   def fetch_all_news
-    Rails.logger.info "Starting news aggregation from all sources..."
-    start_time = Time.current
+    start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     mutex = Mutex.new
 
     threads = @fetchers.map do |fetcher|
       Thread.new do
         Rails.application.executor.wrap do
           ActiveRecord::Base.connection_pool.with_connection do
-            articles = fetcher.fetch_articles
-            mutex.synchronize do
-              @all_articles.concat(articles)
-              Rails.logger.info "#{fetcher.class.name}: fetched #{articles.count} articles"
-            end
+            articles = run_fetcher(fetcher)
+            mutex.synchronize { @all_articles.concat(articles) }
           end
-        end
-      rescue StandardError => e
-        mutex.synchronize do
-          Rails.logger.error "Error with #{fetcher.class.name}: #{e.message}"
-          Rails.logger.error e.backtrace.join("\n")
         end
       end
     end
 
     threads.each(&:join)
 
-    end_time = Time.current
-    duration = (end_time - start_time).round(2)
+    duration = (Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time).round(2)
+    finished_at = Time.current
 
-    Rails.logger.info "News aggregation completed in #{duration}s. Total articles processed: #{@all_articles.count}"
+    NewsFetchObservability.log_aggregation_completed(
+      articles_count: @all_articles.count,
+      duration_seconds: duration,
+      source_count: @fetchers.length
+    )
 
     {
       articles_count: @all_articles.count,
       duration: duration,
       sources: @fetchers.map { |f| f.class.name.demodulize },
-      timestamp: end_time
+      timestamp: finished_at
     }
+  end
+
+  private
+
+  def run_fetcher(fetcher)
+    source_key = fetcher_source_key(fetcher)
+    started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    articles = fetcher.fetch_articles
+    duration = (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).round(2)
+
+    FetchRun.record_outcome(
+      source_key: source_key,
+      status: "success",
+      articles_count: articles.count,
+      duration_seconds: duration
+    )
+
+    articles
+  rescue StandardError => e
+    duration = (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).round(2)
+
+    FetchRun.record_outcome(
+      source_key: source_key,
+      status: "failure",
+      duration_seconds: duration,
+      error: e
+    )
+
+    Rails.logger.error e.backtrace.join("\n")
+    []
+  end
+
+  def fetcher_source_key(fetcher)
+    return fetcher.source_key if fetcher.respond_to?(:source_key)
+
+    fetcher.class.name.demodulize.underscore
   end
 end

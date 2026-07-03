@@ -42,6 +42,10 @@ class NewsFetchers::BaseFetcher
     @articles = []
   end
 
+  def source_key
+    self.class.name.demodulize.delete_suffix("Fetcher").underscore
+  end
+
   def fetch_articles
     raise NotImplementedError, "Subclasses must implement fetch_articles method"
   end
