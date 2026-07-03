@@ -1,6 +1,22 @@
 class NewsFetchers::BaseFetcher
   include HTTParty
 
+  class << self
+    def get(*args, **kwargs)
+      parse_http_response(super)
+    end
+
+    private
+
+    def parse_http_response(response)
+      return response unless response.is_a?(HTTParty::Response)
+
+      response.parsed_response
+    rescue JSON::ParserError
+      nil
+    end
+  end
+
   def initialize
     @articles = []
   end

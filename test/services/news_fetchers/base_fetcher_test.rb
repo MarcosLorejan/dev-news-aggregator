@@ -68,6 +68,24 @@ class NewsFetchers::BaseFetcherTest < ActiveSupport::TestCase
     end
   end
 
+  test "parse_http_response unwraps HTTParty responses" do
+    fake_response = Object.new
+    fake_response.define_singleton_method(:parsed_response) { %w[a b] }
+    fake_response.define_singleton_method(:is_a?) { |klass| klass == HTTParty::Response }
+
+    result = NewsFetchers::BaseFetcher.send(:parse_http_response, fake_response)
+    assert_equal %w[a b], result
+  end
+
+  test "parse_http_response returns nil for invalid JSON bodies" do
+    fake_response = Object.new
+    fake_response.define_singleton_method(:parsed_response) { raise JSON::ParserError, "unexpected character" }
+    fake_response.define_singleton_method(:is_a?) { |klass| klass == HTTParty::Response }
+
+    result = NewsFetchers::BaseFetcher.send(:parse_http_response, fake_response)
+    assert_nil result
+  end
+
   test "should skip invalid article attributes" do
     attributes = {
       title: nil,

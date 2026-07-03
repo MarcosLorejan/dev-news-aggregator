@@ -13,7 +13,7 @@ class NewsFetchers::RedditFetcher < NewsFetchers::BaseFetcher
 
     # Get hot posts from subreddit
     response = self.class.get("/r/#{@subreddit}.json", query: { limit: 25 })
-    return [] unless response && response["data"]
+    return [] unless response.is_a?(Hash) && response["data"]
 
     posts_data = response.dig("data", "children")
     return [] unless posts_data.is_a?(Array)
@@ -24,6 +24,9 @@ class NewsFetchers::RedditFetcher < NewsFetchers::BaseFetcher
 
     Rails.logger.info "Fetched #{@articles.length} articles from Reddit r/#{@subreddit}"
     @articles
+  rescue JSON::ParserError, StandardError => e
+    Rails.logger.error "Error fetching Reddit r/#{@subreddit}: #{e.message}"
+    []
   end
 
   private
