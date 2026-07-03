@@ -8,7 +8,7 @@ class CategoryFilterTurboTest < ApplicationSystemTestCase
   end
 
   test "should maintain category filter functionality after Turbo navigation" do
-    visit articles_path
+    visit_articles_index
 
     if has_button?("All Articles", wait: 2)
       first_category_btn = first("button.filter-btn[data-filter-type='category']")
@@ -42,7 +42,7 @@ class CategoryFilterTurboTest < ApplicationSystemTestCase
   end
 
   test "should handle multiple Turbo navigation cycles with category filtering" do
-    visit articles_path
+    visit_articles_index
 
     3.times do |i|
       if has_button?("All Articles", wait: 2)
@@ -53,7 +53,7 @@ class CategoryFilterTurboTest < ApplicationSystemTestCase
         visit bookmarks_path
         assert_current_path bookmarks_path
 
-        visit articles_path
+        visit_articles_index
         assert_current_path articles_path
 
         first_category_btn = first("button.filter-btn[data-filter-type='category']")
@@ -70,7 +70,7 @@ class CategoryFilterTurboTest < ApplicationSystemTestCase
   end
 
   test "should preserve filter state after JavaScript re-initialization" do
-    visit articles_path
+    visit_articles_index
 
     if has_button?("All Articles", wait: 2)
       first_category_btn = first("button.filter-btn[data-filter-type='category']")
