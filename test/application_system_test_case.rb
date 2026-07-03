@@ -24,4 +24,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_selector "[data-testid='articles-page']", wait: 10
     assert_no_text "Loading articles...", wait: 10
   end
+
+  def visit_bookmarks_index
+    visit bookmarks_path
+    assert_selector "[data-testid='bookmarks-page']", wait: 10
+    assert_no_text "Loading reading list...", wait: 10
+  end
 end
