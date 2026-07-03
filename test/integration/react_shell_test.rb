@@ -25,4 +25,28 @@ class ReactShellTest < ActionDispatch::IntegrationTest
     assert_select "#root"
     assert_select "script[type='module'][src*='application']"
   end
+
+  test "read articles index renders react mount point" do
+    get read_articles_path
+
+    assert_response :success
+    assert_select "#root"
+    assert_select "script[type='module'][src*='application']"
+  end
+
+  test "dismissed articles index renders react mount point" do
+    get dismissed_articles_path
+
+    assert_response :success
+    assert_select "#root"
+    assert_select "script[type='module'][src*='application']"
+  end
+
+  test "recently dismissed renders react mount point" do
+    get recently_dismissed_path
+
+    assert_response :success
+    assert_select "#root"
+    assert_select "script[type='module'][src*='application']"
+  end
 end

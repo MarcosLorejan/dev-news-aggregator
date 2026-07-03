@@ -112,7 +112,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
     recent_dismissed = articles(:dev_to_article)
     recent_dismissed.dismiss!
 
-    visit recently_dismissed_path
+    visit_recently_dismissed
 
     assert_selector "article.article-card", minimum: 1
     assert_text "ago"
@@ -129,7 +129,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
   end
 
   test "should show dismissed articles in dismissed index" do
-    visit dismissed_articles_path
+    visit_dismissed_articles_index
 
     assert_selector "article.article-card", minimum: 1
     within first("article.article-card") do
@@ -140,7 +140,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
 
   test "should restore article from dismissed page" do
     skip "JavaScript confirmation dialog test fails in CI headless environment"
-    visit dismissed_articles_path
+    visit_dismissed_articles_index
 
     within first("article.article-card") do
       accept_confirm do
@@ -158,7 +158,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
     recent_dismissed = articles(:dev_to_article)
     recent_dismissed.dismiss!
 
-    visit recently_dismissed_path
+    visit_recently_dismissed
 
     within first("article.article-card") do
       click_button "Quick Restore"
@@ -184,7 +184,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
   test "should show empty state when no dismissed articles" do
     DismissedArticle.destroy_all
 
-    visit dismissed_articles_path
+    visit_dismissed_articles_index
 
     assert_selector "h2", text: "No dismissed articles"
     assert_text "You haven't dismissed any articles yet"
@@ -194,7 +194,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
   test "should show empty state when no recently dismissed articles" do
     DismissedArticle.where("dismissed_at > ?", 24.hours.ago).destroy_all
 
-    visit recently_dismissed_path
+    visit_recently_dismissed
 
     assert_selector "h2", text: "No recently dismissed articles"
     assert_text "You haven't dismissed any articles in the last 24 hours"
