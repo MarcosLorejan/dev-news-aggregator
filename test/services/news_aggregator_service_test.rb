@@ -110,6 +110,30 @@ class NewsAggregatorServiceTest < ActiveSupport::TestCase
     end
   end
 
+  test "fetch_all_news runs fetchers concurrently" do
+    slow_fetcher = Object.new
+    slow_fetcher.define_singleton_method(:fetch_articles) do
+      sleep 0.3
+      [ Article.new(title: "Slow", source_type: "slow") ]
+    end
+    slow_fetcher.define_singleton_method(:class) { OpenStruct.new(name: "SlowFetcher") }
+
+    second_slow_fetcher = Object.new
+    second_slow_fetcher.define_singleton_method(:fetch_articles) do
+      sleep 0.3
+      [ Article.new(title: "Slow2", source_type: "slow2") ]
+    end
+    second_slow_fetcher.define_singleton_method(:class) { OpenStruct.new(name: "SlowFetcherTwo") }
+
+    @service.instance_variable_set(:@fetchers, [ slow_fetcher, second_slow_fetcher ])
+
+    start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    @service.fetch_all_news
+    elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+
+    assert_operator elapsed, :<, 0.5, "expected parallel fetch (~0.3s), took #{elapsed.round(2)}s"
+  end
+
   test "fetch_all_news should return proper structure" do
     # Mock fetchers to avoid actual API calls in this specific test
     mock_fetcher = Object.new

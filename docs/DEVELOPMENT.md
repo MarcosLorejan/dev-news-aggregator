@@ -116,7 +116,7 @@ whenever --clear-crontab
 
 **Service-oriented architecture**: Business logic separated into service classes rather than fat models. Each news source has its own fetcher service.
 
-**Fail-safe aggregation**: If one news source fails, others continue processing. Errors are logged but don't stop the entire aggregation process.
+**Fail-safe aggregation**: If one news source fails, others continue processing. Errors are logged but don't stop the entire aggregation process. Sources run in parallel threads; each fetcher uses configured HTTP timeouts and retries with exponential backoff.
 
 **Idempotent updates**: Articles use `find_or_initialize_by(external_id, source_type)` to prevent duplicates while allowing updates to existing articles.
 

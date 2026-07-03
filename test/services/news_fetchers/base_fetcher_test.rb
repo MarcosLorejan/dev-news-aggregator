@@ -86,6 +86,34 @@ class NewsFetchers::BaseFetcherTest < ActiveSupport::TestCase
     assert_nil result
   end
 
+  test "get retries transient network errors with backoff before succeeding" do
+    attempts = 0
+    stub_request(:get, "https://hacker-news.firebaseio.com/v0/topstories.json")
+      .to_return do
+        attempts += 1
+        raise Net::ReadTimeout if attempts < 3
+
+        { status: 200, body: [ 1, 2, 3 ].to_json, headers: { "Content-Type" => "application/json" } }
+      end
+
+    with_stubbed_sleep do
+      result = NewsFetchers::HackerNewsFetcher.get("/topstories.json")
+      assert_equal [ 1, 2, 3 ], result
+      assert_equal 3, attempts
+    end
+  end
+
+  test "get raises after exhausting configured retries" do
+    stub_request(:get, "https://hacker-news.firebaseio.com/v0/topstories.json")
+      .to_raise(Net::ReadTimeout)
+
+    with_stubbed_sleep do
+      assert_raises Net::ReadTimeout do
+        NewsFetchers::HackerNewsFetcher.get("/topstories.json")
+      end
+    end
+  end
+
   test "should skip invalid article attributes" do
     attributes = {
       title: nil,
@@ -121,5 +149,15 @@ class NewsFetchers::BaseFetcherTest < ActiveSupport::TestCase
 
     assert_equal article.id, updated_article.id
     assert_equal article.updated_at.to_i, updated_article.updated_at.to_i
+  end
+
+  private
+
+  def with_stubbed_sleep
+    original = Kernel.method(:sleep)
+    Kernel.define_singleton_method(:sleep) { |_duration = nil| }
+    yield
+  ensure
+    Kernel.define_singleton_method(:sleep, original)
   end
 end

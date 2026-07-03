@@ -32,17 +32,28 @@ class NewsAggregatorService
   def fetch_all_news
     Rails.logger.info "Starting news aggregation from all sources..."
     start_time = Time.current
+    mutex = Mutex.new
 
-    @fetchers.each do |fetcher|
-      begin
-        articles = fetcher.fetch_articles
-        @all_articles.concat(articles)
-        Rails.logger.info "#{fetcher.class.name}: fetched #{articles.count} articles"
+    threads = @fetchers.map do |fetcher|
+      Thread.new do
+        Rails.application.executor.wrap do
+          ActiveRecord::Base.connection_pool.with_connection do
+            articles = fetcher.fetch_articles
+            mutex.synchronize do
+              @all_articles.concat(articles)
+              Rails.logger.info "#{fetcher.class.name}: fetched #{articles.count} articles"
+            end
+          end
+        end
       rescue StandardError => e
-        Rails.logger.error "Error with #{fetcher.class.name}: #{e.message}"
-        Rails.logger.error e.backtrace.join("\n")
+        mutex.synchronize do
+          Rails.logger.error "Error with #{fetcher.class.name}: #{e.message}"
+          Rails.logger.error e.backtrace.join("\n")
+        end
       end
     end
+
+    threads.each(&:join)
 
     end_time = Time.current
     duration = (end_time - start_time).round(2)
