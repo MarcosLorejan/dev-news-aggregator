@@ -42,7 +42,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should mark article as read from article detail page" do
-    visit article_path(@article)
+    visit_article_show(@article)
 
     click_button "Mark as Read"
 
@@ -52,7 +52,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
 
   test "should mark article as unread from article detail page" do
     @article.mark_as_read!
-    visit article_path(@article)
+    visit_article_show(@article)
 
     click_button "Mark as Unread"
 
@@ -62,7 +62,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
 
   test "should show read status indicator on article detail page" do
     @article.mark_as_read!
-    visit article_path(@article)
+    visit_article_show(@article)
 
     assert_selector "span", text: "Already Read"
     within(find("span", text: "Already Read")) do
@@ -72,14 +72,14 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
 
   test "should show correct button state on article detail page for read article" do
     @article.mark_as_read!
-    visit article_path(@article)
+    visit_article_show(@article)
 
     assert_button "Mark as Unread"
     assert_no_button "Mark as Read"
   end
 
   test "should show correct button state on article detail page for unread article" do
-    visit article_path(@article)
+    visit_article_show(@article)
 
     assert_button "Mark as Read"
     assert_no_button "Mark as Unread"
@@ -153,7 +153,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
     @article.unmark_as_read! if @article.read?
 
     # Visit article detail and bookmark it
-    visit article_path(@article)
+    visit_article_show(@article)
     click_button "Add to Reading List"
     sleep 0.5
     assert @article.reload.bookmarked?
@@ -164,7 +164,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
     assert @article.reload.read?
 
     # Refresh page to see updated status
-    visit article_path(@article)
+    visit_article_show(@article)
 
     # Should show both statuses
     assert_selector "span", text: "Bookmarked"
@@ -173,11 +173,11 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
 
   test "should handle multiple articles workflow" do
     # Mark multiple articles as read
-    visit article_path(@article)
+    visit_article_show(@article)
     click_button "Mark as Read"
     sleep 0.5
 
-    visit article_path(@bookmarked_article)
+    visit_article_show(@bookmarked_article)
     click_button "Mark as Read"
     sleep 0.5
 

@@ -63,4 +63,13 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_selector "[data-testid='recently-dismissed-page']", wait: 12
     assert_no_text "Loading recently dismissed articles...", wait: 12
   end
+
+  def visit_article_show(article)
+    visit article_path(article)
+    unless page.has_selector?("[data-testid='article-show-page']", wait: 12)
+      visit article_path(article)
+    end
+    assert_selector "[data-testid='article-show-page']", wait: 12
+    assert_no_text "Loading article...", wait: 12
+  end
 end

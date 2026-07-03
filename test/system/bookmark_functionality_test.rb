@@ -95,7 +95,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should bookmark article from detail page" do
-    visit article_path(@article)
+    visit_article_show(@article)
 
     if page.has_button?("Add to Reading List")
       click_button "Add to Reading List"
@@ -107,10 +107,12 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should unbookmark article from detail page" do
-    visit article_path(@bookmarked_article)
+    visit_article_show(@bookmarked_article)
 
     if page.has_button?("Remove from Reading List")
-      click_button "Remove from Reading List"
+      accept_confirm do
+        click_button "Remove from Reading List"
+      end
       sleep 0.5
       assert_not @bookmarked_article.reload.bookmarked?
     else

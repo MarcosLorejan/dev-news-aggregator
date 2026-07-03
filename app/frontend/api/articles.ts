@@ -11,6 +11,10 @@ export function fetchArticles(params?: { page?: number; per_page?: number; show_
   return apiRequest<ArticlesIndexResponse>(`/articles.json${query ? `?${query}` : ''}`)
 }
 
+export function fetchArticle(id: number) {
+  return apiRequest<Article>(`/articles/${id}.json`)
+}
+
 export function bookmarkArticle(id: number) {
   return apiRequest<{ bookmarked: boolean }>(`/articles/${id}/bookmark`, { method: 'POST' })
 }
