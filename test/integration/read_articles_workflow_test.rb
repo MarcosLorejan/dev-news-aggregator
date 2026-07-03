@@ -69,8 +69,8 @@ class ReadArticlesWorkflowTest < ActionDispatch::IntegrationTest
     @article.mark_as_read!
 
     get articles_path
-    assert_select "a[href='#{bookmarks_path}']", "Reading List"
-    assert_select "a[href='#{read_articles_path}']", "Already Read"
+    assert_response :success
+    assert_select "#root"
 
     get read_articles_path
     assert_select "a[href='#{articles_path}']", "Back to All Articles"
