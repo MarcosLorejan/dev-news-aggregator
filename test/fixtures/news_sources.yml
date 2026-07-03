@@ -1,13 +1,25 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+hacker_news:
+  name: Hacker News
+  source_type: hacker_news
+  config: {}
+  active: true
 
-one:
-  name: MyString
-  api_url: MyString
-  source_type: MyString
-  active: false
+dev_to:
+  name: Dev.to
+  source_type: dev_to
+  config: {}
+  active: true
 
-two:
-  name: MyString
-  api_url: MyString
-  source_type: MyString
+reddit_rust:
+  name: rust
+  source_type: reddit
+  config:
+    subreddit: rust
+  active: true
+
+reddit_disabled:
+  name: programming
+  source_type: reddit
+  config:
+    subreddit: programming
   active: false

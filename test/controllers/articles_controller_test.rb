@@ -46,6 +46,64 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_includes titles, @dev_to_article.title
   end
 
+  test "index JSON should filter by min_score" do
+    get articles_url(min_score: 100), as: :json
+    assert_response :success
+
+    scores = JSON.parse(response.body)["articles"].map { |article| article["score"] }
+    assert scores.all? { |score| score >= 100 }
+    assert_not_includes scores, @dev_to_article.score
+  end
+
+  test "index JSON should filter by top_percent" do
+    get articles_url(top_percent: 50), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    assert body["articles"].is_a?(Array)
+    assert body["pagination"]["total_count"] <= Article.not_read.not_dismissed.count
+  end
+
+  test "fetch should trigger news aggregation" do
+    expected = {
+      articles_count: 3,
+      duration: 1.5,
+      sources: [ "HackerNewsFetcher" ],
+      timestamp: Time.current
+    }
+
+    original = NewsAggregatorService.method(:fetch_all_news)
+    NewsAggregatorService.define_singleton_method(:fetch_all_news) { expected }
+    begin
+      post fetch_articles_url, as: :json
+      assert_response :success
+
+      json = JSON.parse(response.body)
+      assert_equal 3, json["articles_count"]
+      assert_equal 1.5, json["duration"]
+    ensure
+      NewsAggregatorService.define_singleton_method(:fetch_all_news, original)
+    end
+  end
+
+  test "fetch should rate limit repeated requests" do
+    original_cache = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    payload = { articles_count: 1, duration: 1.0, sources: [], timestamp: Time.current }
+    original = NewsAggregatorService.method(:fetch_all_news)
+    NewsAggregatorService.define_singleton_method(:fetch_all_news) { payload }
+    begin
+      post fetch_articles_url, as: :json
+      assert_response :success
+
+      post fetch_articles_url, as: :json
+      assert_response :too_many_requests
+    ensure
+      NewsAggregatorService.define_singleton_method(:fetch_all_news, original)
+      Rails.cache = original_cache
+    end
+  end
+
   test "should get show" do
     get article_url(@article)
     assert_response :success

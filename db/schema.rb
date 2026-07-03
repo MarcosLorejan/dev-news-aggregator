@@ -10,21 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_16_172718) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_03_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "articles", force: :cascade do |t|
-    t.string "title"
-    t.string "url"
-    t.datetime "published_at"
-    t.text "description"
-    t.string "external_id"
-    t.string "source_type"
-    t.integer "score"
     t.integer "comment_count"
     t.datetime "created_at", null: false
+    t.text "description"
+    t.string "external_id"
+    t.datetime "published_at"
+    t.integer "score"
+    t.string "source_type"
+    t.string "title"
     t.datetime "updated_at", null: false
+    t.string "url"
   end
 
   create_table "bookmarks", force: :cascade do |t|
@@ -37,9 +37,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_172718) do
 
   create_table "dismissed_articles", force: :cascade do |t|
     t.bigint "article_id", null: false
+    t.datetime "created_at", null: false
     t.datetime "dismissed_at", null: false
     t.boolean "permanent", default: false
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["article_id"], name: "index_dismissed_articles_on_article_id"
     t.index ["dismissed_at"], name: "index_dismissed_articles_on_dismissed_at"
@@ -47,18 +47,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_172718) do
   end
 
   create_table "news_sources", force: :cascade do |t|
-    t.string "name"
+    t.boolean "active", default: true
     t.string "api_url"
-    t.string "source_type"
-    t.boolean "active"
+    t.jsonb "config", default: {}, null: false
     t.datetime "created_at", null: false
+    t.string "name"
+    t.string "source_type"
     t.datetime "updated_at", null: false
+    t.index ["source_type", "name"], name: "index_news_sources_on_source_type_and_name", unique: true
   end
 
   create_table "read_articles", force: :cascade do |t|
     t.bigint "article_id", null: false
-    t.datetime "read_at"
     t.datetime "created_at", null: false
+    t.datetime "read_at"
     t.datetime "updated_at", null: false
     t.index ["article_id"], name: "index_read_articles_on_article_id"
   end

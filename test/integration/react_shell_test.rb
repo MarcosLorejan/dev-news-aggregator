@@ -57,4 +57,12 @@ class ReactShellTest < ActionDispatch::IntegrationTest
     assert_select "#root"
     assert_select "script[type='module'][src*='application']"
   end
+
+  test "sources index renders react mount point" do
+    get sources_path
+
+    assert_response :success
+    assert_select "#root"
+    assert_select "script[type='module'][src*='application']"
+  end
 end

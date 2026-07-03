@@ -3,6 +3,7 @@ import {
   bookmarkArticle,
   dismissArticle,
   fetchArticles,
+  fetchNews,
   markArticleAsRead,
   undismissArticle,
   unbookmarkArticle,
@@ -15,6 +16,7 @@ import ArticleList from '../components/ArticleList'
 import CategoryFilter from '../components/CategoryFilter'
 import DismissToast from '../components/DismissToast'
 import PageHeader from '../components/PageHeader'
+import ScoreFilter, { scoreFilterParams, type ScoreFilterValue } from '../components/ScoreFilter'
 
 const DISMISS_TIMEOUT_SECONDS = 15
 
@@ -34,6 +36,10 @@ export default function ArticlesIndexPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeFilter, setActiveFilter] = useState('all')
+  const [activeScoreFilter, setActiveScoreFilter] = useState<ScoreFilterValue>('all')
+  const [showRead, setShowRead] = useState(false)
+  const [fetchingNews, setFetchingNews] = useState(false)
+  const [fetchMessage, setFetchMessage] = useState<string | null>(null)
   const [dismissingIds, setDismissingIds] = useState<Set<number>>(new Set())
   const [removedIds, setRemovedIds] = useState<Set<number>>(new Set())
   const [toast, setToast] = useState<{ articleId: number; title: string; timeLeft: number } | null>(null)
@@ -45,7 +51,10 @@ export default function ArticlesIndexPage() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetchArticles()
+      const response = await fetchArticles({
+        show_read: showRead,
+        ...scoreFilterParams(activeScoreFilter),
+      })
       setData(response)
       setRemovedIds(new Set())
     } catch {
@@ -53,7 +62,7 @@ export default function ArticlesIndexPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [showRead, activeScoreFilter])
 
   useEffect(() => {
     loadArticles()
@@ -149,7 +158,22 @@ export default function ArticlesIndexPage() {
       })
       setError('Failed to dismiss article.')
     }
-  }, [finalizeDismiss])
+  }, [finalizeDismiss, toast])
+
+  const handleFetchNews = async () => {
+    setFetchingNews(true)
+    setFetchMessage(null)
+    setError(null)
+    try {
+      const result = await fetchNews()
+      setFetchMessage(`Fetched ${result.articles_count} articles in ${result.duration}s`)
+      await loadArticles()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch news.')
+    } finally {
+      setFetchingNews(false)
+    }
+  }
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -198,7 +222,11 @@ export default function ArticlesIndexPage() {
         updateArticle(article.id, { read: false })
       } else {
         await markArticleAsRead(article.id)
-        setRemovedIds((prev) => new Set(prev).add(article.id))
+        if (!showRead) {
+          setRemovedIds((prev) => new Set(prev).add(article.id))
+        } else {
+          updateArticle(article.id, { read: true })
+        }
       }
     } catch {
       setError('Failed to update read status.')
@@ -233,7 +261,15 @@ export default function ArticlesIndexPage() {
   if (showEmptyFeed) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-7xl" data-testid="articles-page">
-        <PageHeader totalCount={data?.pagination.total_count ?? 0} lastUpdated={data?.last_updated ?? null} />
+        <PageHeader
+          totalCount={data?.pagination.total_count ?? 0}
+          lastUpdated={data?.last_updated ?? null}
+          showRead={showRead}
+          onShowReadChange={setShowRead}
+          onFetchNews={handleFetchNews}
+          fetchingNews={fetchingNews}
+          fetchMessage={fetchMessage}
+        />
         <div className="glass-effect rounded-2xl p-12 text-center animate-fade-in">
           <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-primary-600/20 to-primary-700/20 rounded-full flex items-center justify-center">
             <svg className="w-10 h-10 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,11 +278,17 @@ export default function ArticlesIndexPage() {
           </div>
           <h2 className="text-2xl font-bold text-gray-200 mb-4">No articles found</h2>
           <p className="text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">
-            The news aggregator hasn&apos;t fetched any articles yet. Run the following command to populate your feed with the latest tech news:
+            Your feed is empty. Click Fetch News to pull the latest articles from your configured sources.
           </p>
-          <div className="bg-dark-800 border border-dark-700 rounded-xl px-6 py-4 inline-block mb-6">
-            <code className="text-primary-300 font-mono text-sm">bin/rails news:fetch</code>
-          </div>
+          <button
+            type="button"
+            className="px-6 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 disabled:opacity-60"
+            onClick={handleFetchNews}
+            disabled={fetchingNews}
+            data-testid="fetch-news-button"
+          >
+            {fetchingNews ? 'Fetching...' : 'Fetch News'}
+          </button>
         </div>
       </div>
     )
@@ -254,11 +296,24 @@ export default function ArticlesIndexPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl" data-testid="articles-page">
-      <PageHeader totalCount={data.pagination.total_count} lastUpdated={data.last_updated} />
+      <PageHeader
+        totalCount={data.pagination.total_count}
+        lastUpdated={data.last_updated}
+        showRead={showRead}
+        onShowReadChange={setShowRead}
+        onFetchNews={handleFetchNews}
+        fetchingNews={fetchingNews}
+        fetchMessage={fetchMessage}
+      />
 
       {error && (
         <div className="mb-4 text-sm text-red-400">{error}</div>
       )}
+
+      <ScoreFilter
+        activeScoreFilter={activeScoreFilter}
+        onScoreFilterChange={setActiveScoreFilter}
+      />
 
       <CategoryFilter
         categories={data.categories}
@@ -290,7 +345,6 @@ export default function ArticlesIndexPage() {
   )
 }
 
-// Expose for system tests that call initializeCategoryFilter after Turbo navigation
 declare global {
   interface Window {
     initializeCategoryFilter?: () => void

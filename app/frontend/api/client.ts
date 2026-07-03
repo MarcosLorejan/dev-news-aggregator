@@ -17,7 +17,14 @@ export async function apiRequest<T>(
   const response = await fetch(path, { ...options, headers })
 
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`)
+    let message = `Request failed: ${response.status}`
+    try {
+      const body = await response.json()
+      if (body?.error) message = body.error
+    } catch {
+      // ignore JSON parse errors
+    }
+    throw new Error(message)
   }
 
   if (response.status === 204) {

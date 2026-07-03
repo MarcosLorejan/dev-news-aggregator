@@ -8,10 +8,23 @@ class NewsAggregatorServiceTest < ActiveSupport::TestCase
   test "should initialize with multiple fetchers" do
     fetchers = @service.instance_variable_get(:@fetchers)
 
-    assert fetchers.length > 1
+    assert fetchers.length >= 2
     assert fetchers.any? { |f| f.is_a?(NewsFetchers::HackerNewsFetcher) }
     assert fetchers.any? { |f| f.is_a?(NewsFetchers::DevToFetcher) }
-    assert fetchers.count { |f| f.is_a?(NewsFetchers::RedditFetcher) } > 1
+    assert fetchers.any? { |f| f.is_a?(NewsFetchers::RedditFetcher) }
+  end
+
+  test "uses enabled database sources when present" do
+    NewsSource.update_all(active: false)
+    news_sources(:hacker_news).update!(active: true)
+    news_sources(:reddit_rust).update!(active: true)
+
+    service = NewsAggregatorService.new
+    fetchers = service.instance_variable_get(:@fetchers)
+
+    assert_equal 2, fetchers.length
+    assert fetchers.any? { |f| f.is_a?(NewsFetchers::HackerNewsFetcher) }
+    assert fetchers.one? { |f| f.is_a?(NewsFetchers::RedditFetcher) }
   end
 
   test "should initialize with empty articles array" do

@@ -5,6 +5,7 @@ import BookmarksIndexPage from '../pages/BookmarksIndexPage'
 import DismissedArticlesIndexPage from '../pages/DismissedArticlesIndexPage'
 import ReadArticlesIndexPage from '../pages/ReadArticlesIndexPage'
 import RecentlyDismissedPage from '../pages/RecentlyDismissedPage'
+import SourcesIndexPage from '../pages/SourcesIndexPage'
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/read" element={<ReadArticlesIndexPage />} />
         <Route path="/dismissed" element={<DismissedArticlesIndexPage />} />
         <Route path="/recently_dismissed" element={<RecentlyDismissedPage />} />
+        <Route path="/sources" element={<SourcesIndexPage />} />
       </Routes>
     </BrowserRouter>
   )

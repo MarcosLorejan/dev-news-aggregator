@@ -4,25 +4,34 @@ class NewsAggregatorService
   end
 
   def initialize
-    @fetchers = [
+    @fetchers = self.class.build_fetchers
+    @all_articles = []
+  end
+
+  def self.build_fetchers
+    if NewsSource.enabled.exists?
+      NewsSource.enabled.order(:source_type, :name).filter_map(&:build_fetcher)
+    else
+      default_fetchers
+    end
+  end
+
+  def self.default_fetchers
+    [
       NewsFetchers::HackerNewsFetcher.new,
       NewsFetchers::DevToFetcher.new,
-      # Programming languages
       NewsFetchers::RedditFetcher.new(subreddit: "programming"),
       NewsFetchers::RedditFetcher.new(subreddit: "webdev"),
       NewsFetchers::RedditFetcher.new(subreddit: "javascript"),
       NewsFetchers::RedditFetcher.new(subreddit: "ruby"),
       NewsFetchers::RedditFetcher.new(subreddit: "rust"),
-      # Security and tech
       NewsFetchers::RedditFetcher.new(subreddit: "netsec"),
       NewsFetchers::RedditFetcher.new(subreddit: "cybersecurity"),
       NewsFetchers::RedditFetcher.new(subreddit: "technology"),
-      # AI and LLM
       NewsFetchers::RedditFetcher.new(subreddit: "MachineLearning"),
       NewsFetchers::RedditFetcher.new(subreddit: "artificial"),
       NewsFetchers::RedditFetcher.new(subreddit: "LocalLLaMA")
     ]
-    @all_articles = []
   end
 
   def fetch_all_news

@@ -1,14 +1,33 @@
 import { apiRequest } from './client'
 import type { Article, ArticlesIndexResponse } from '../types/article'
 
-export function fetchArticles(params?: { page?: number; per_page?: number; show_read?: boolean }) {
+export function fetchArticles(params?: {
+  page?: number
+  per_page?: number
+  show_read?: boolean
+  min_score?: number
+  top_percent?: number
+}) {
   const search = new URLSearchParams()
   if (params?.page) search.set('page', String(params.page))
   if (params?.per_page) search.set('per_page', String(params.per_page))
   if (params?.show_read) search.set('show_read', 'true')
+  if (params?.min_score) search.set('min_score', String(params.min_score))
+  if (params?.top_percent) search.set('top_percent', String(params.top_percent))
 
   const query = search.toString()
   return apiRequest<ArticlesIndexResponse>(`/articles.json${query ? `?${query}` : ''}`)
+}
+
+export interface FetchNewsResponse {
+  articles_count: number
+  duration: number
+  sources: string[]
+  timestamp: string
+}
+
+export function fetchNews() {
+  return apiRequest<FetchNewsResponse>('/articles/fetch', { method: 'POST' })
 }
 
 export function fetchArticle(id: number) {

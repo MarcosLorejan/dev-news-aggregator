@@ -1,23 +1,18 @@
 class ArticlesController < ApplicationController
+  FETCH_RATE_LIMIT = 2.minutes
+
   def index
     @show_read = params[:show_read] == "true"
     page = params[:page]&.to_i || 1
     per_page = params[:per_page]&.to_i || 50
     per_page = [ per_page, 100 ].min
 
-    @articles = if @show_read
-                  Article.not_dismissed.order(published_at: :desc)
-    else
-                  Article.not_read.not_dismissed.order(published_at: :desc)
-    end.limit(per_page).offset((page - 1) * per_page)
+    base_scope = article_index_scope
+    @total_count = base_scope.count
+    @articles = base_scope.limit(per_page).offset((page - 1) * per_page)
 
     @articles_by_source = @articles.group_by(&:source_type)
     @articles_by_category = helpers.group_sources_by_category(@articles_by_source)
-    @total_count = if @show_read
-                     Article.not_dismissed.count
-    else
-                     Article.not_read.not_dismissed.count
-    end
     @last_updated = Article.maximum(:updated_at)
 
     respond_to do |format|
@@ -37,6 +32,21 @@ class ArticlesController < ApplicationController
         }
       end
     end
+  end
+
+  def fetch
+    if fetch_rate_limited?
+      return render json: { error: "Please wait before fetching again" }, status: :too_many_requests
+    end
+
+    result = NewsAggregatorService.fetch_all_news
+
+    render json: {
+      articles_count: result[:articles_count],
+      duration: result[:duration],
+      sources: result[:sources],
+      timestamp: result[:timestamp]
+    }
   end
 
   def show
@@ -108,6 +118,41 @@ class ArticlesController < ApplicationController
   end
 
   private
+
+  def article_index_scope
+    scope = if @show_read
+              Article.not_dismissed
+    else
+              Article.not_read.not_dismissed
+    end
+
+    scope = apply_score_filter(scope)
+    scope.order(published_at: :desc)
+  end
+
+  def apply_score_filter(scope)
+    if params[:min_score].present?
+      scope.where("score >= ?", params[:min_score].to_i)
+    elsif params[:top_percent].present?
+      percent = params[:top_percent].to_i.clamp(1, 100)
+      scores = scope.where.not(score: nil).order(score: :desc).pluck(:score)
+      return scope if scores.empty?
+
+      index = [ (scores.size * percent / 100.0).ceil - 1, 0 ].max
+      scope.where("score >= ?", scores[index])
+    else
+      scope
+    end
+  end
+
+  def fetch_rate_limited?
+    key = "articles_fetch:#{request.remote_ip}"
+    last_fetch = Rails.cache.read(key)
+    return true if last_fetch && last_fetch > FETCH_RATE_LIMIT.ago
+
+    Rails.cache.write(key, Time.current, expires_in: FETCH_RATE_LIMIT)
+    false
+  end
 
   def article_json(article)
     {

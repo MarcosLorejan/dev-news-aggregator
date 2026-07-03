@@ -3,6 +3,10 @@ Rails.application.routes.draw do
 
   # Articles routes
   resources :articles, only: [ :index, :show ] do
+    collection do
+      post :fetch
+    end
+
     member do
       post :bookmark
       delete :unbookmark
@@ -10,6 +14,8 @@ Rails.application.routes.draw do
       delete :undismiss
     end
   end
+
+  resources :sources, only: [ :index, :create, :update, :destroy ]
 
   # Bookmarks routes
   resources :bookmarks, only: [ :index ]
