@@ -21,7 +21,11 @@ class NewsFetchers::BaseFetcher
 
     if article.new_record? || article.changed?
       is_new_record = article.new_record?
-      article.save!
+      unless article.save
+        Rails.logger.warn "Skipping invalid article (#{attributes[:source_type]}/#{attributes[:external_id]}): #{article.errors.full_messages.join(', ')}"
+        return article
+      end
+
       if is_new_record
         Rails.logger.info "Created article: #{article.title}"
       else

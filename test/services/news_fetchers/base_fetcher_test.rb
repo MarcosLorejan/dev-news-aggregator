@@ -68,6 +68,24 @@ class NewsFetchers::BaseFetcherTest < ActiveSupport::TestCase
     end
   end
 
+  test "should skip invalid article attributes" do
+    attributes = {
+      title: nil,
+      url: "https://example.com",
+      published_at: Time.current,
+      description: "Test description",
+      external_id: "invalid123",
+      source_type: "test_source",
+      score: 100,
+      comment_count: 10
+    }
+
+    assert_no_difference "Article.count" do
+      article = @fetcher.instance_eval { create_or_update_article(attributes) }
+      assert_not article.persisted?
+    end
+  end
+
   test "should not update article when no changes detected" do
     attributes = {
       title: "Test Article",

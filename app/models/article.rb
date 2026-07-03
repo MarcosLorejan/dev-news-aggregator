@@ -1,4 +1,8 @@
 class Article < ApplicationRecord
+  validates :title, :url, :external_id, :source_type, presence: true
+  validates :external_id, uniqueness: { scope: :source_type }
+  validates :url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
+
   has_one :bookmark, dependent: :destroy
   has_one :read_article, dependent: :destroy
   has_one :dismissed_article, dependent: :destroy
