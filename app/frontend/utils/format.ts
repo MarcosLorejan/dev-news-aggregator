@@ -23,7 +23,7 @@ export function formatBookmarkedDate(isoDate: string): string {
 
 export function formatTimeAgo(isoDate: string): string {
   const seconds = Math.floor((Date.now() - new Date(isoDate).getTime()) / 1000)
-  if (seconds < 60) return 'just now'
+  if (seconds < 60) return 'less than a minute ago'
   const minutes = Math.floor(seconds / 60)
   if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`
   const hours = Math.floor(minutes / 60)
