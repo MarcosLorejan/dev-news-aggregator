@@ -17,4 +17,12 @@ class ReactShellTest < ActionDispatch::IntegrationTest
     manifest = JSON.parse(manifest_path.read)
     assert manifest.key?("entrypoints/application.tsx")
   end
+
+  test "bookmarks index renders react mount point" do
+    get bookmarks_path
+
+    assert_response :success
+    assert_select "#root"
+    assert_select "script[type='module'][src*='application']"
+  end
 end
