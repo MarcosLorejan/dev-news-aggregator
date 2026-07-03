@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_03_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_03_150100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,6 +25,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_140000) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.string "url"
+    t.index ["external_id", "source_type"], name: "index_articles_on_external_id_and_source_type", unique: true
+    t.index ["published_at"], name: "index_articles_on_published_at"
+    t.index ["source_type"], name: "index_articles_on_source_type"
   end
 
   create_table "bookmarks", force: :cascade do |t|
