@@ -9,7 +9,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should bookmark article from index page" do
-    visit articles_path
+    visit_articles_index
 
     within("[data-source='#{@article.source_type}']") do
       bookmark_button = find("button[title='Add to reading list']")
@@ -21,7 +21,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should unbookmark article from index page" do
-    visit articles_path
+    visit_articles_index
 
     within("[data-source='#{@bookmarked_article.source_type}']") do
       unbookmark_button = find("button[title='Remove from reading list']")
@@ -33,7 +33,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should navigate to reading list" do
-    visit articles_path
+    visit_articles_index
 
     click_link "Reading List"
 
@@ -53,7 +53,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should filter articles by category" do
-    visit articles_path
+    visit_articles_index
 
     # Look for a category button (they contain emojis and text)
     if page.has_button?("🔨 Programming Languages", wait: 1)
@@ -66,7 +66,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should show all articles when clicking All Articles filter" do
-    visit articles_path
+    visit_articles_index
 
     # First click a category filter if it exists
     if page.has_button?("🔨 Programming Languages", wait: 1)
@@ -81,7 +81,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should filter by specific category" do
-    visit articles_path
+    visit_articles_index
 
     # Click the first available category filter (which filters by category, not source)
     first_category_btn = first("button.filter-btn[data-filter-type='category']")
@@ -144,7 +144,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should navigate between articles and reading list" do
-    visit articles_path
+    visit_articles_index
 
     click_link "Reading List"
     assert_current_path bookmarks_path

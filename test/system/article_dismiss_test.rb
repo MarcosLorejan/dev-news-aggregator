@@ -9,7 +9,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
   end
 
   test "should show dismiss button on each article" do
-    visit articles_path
+    visit_articles_index
 
     within first("article.article-card") do
       assert_selector "button[title='Dismiss article']"
@@ -18,7 +18,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
 
   test "should dismiss article and show undo toast" do
     skip "JavaScript-dependent test fails in CI headless environment"
-    visit articles_path
+    visit_articles_index
 
     within first("article.article-card") do
       find("button[title='Dismiss article']").click
@@ -33,7 +33,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
 
   test "should make article semi-transparent when dismissed" do
     skip "JavaScript-dependent test fails in CI headless environment"
-    visit articles_path
+    visit_articles_index
 
     article_card = first("article.article-card")
     dismiss_button = article_card.find("button[title='Dismiss article']")
@@ -46,7 +46,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
 
   test "should undo dismiss via toast UNDO button" do
     skip "JavaScript-dependent test fails in CI headless environment"
-    visit articles_path
+    visit_articles_index
 
     article_card = first("article.article-card")
     dismiss_button = article_card.find("button[title='Dismiss article']")
@@ -64,7 +64,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
 
   test "should undo dismiss by clicking faded article" do
     skip "JavaScript-dependent test fails in CI headless environment"
-    visit articles_path
+    visit_articles_index
 
     article_card = first("article.article-card")
     dismiss_button = article_card.find("button[title='Dismiss article']")
@@ -81,7 +81,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
 
   test "should show countdown timer in toast" do
     skip "JavaScript-dependent test fails in CI headless environment"
-    visit articles_path
+    visit_articles_index
 
     within first("article.article-card") do
       find("button[title='Dismiss article']").click
@@ -100,7 +100,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
   end
 
   test "should navigate to recently dismissed page" do
-    visit articles_path
+    visit_articles_index
 
     click_link "Recently Dismissed"
 
@@ -119,7 +119,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
   end
 
   test "should navigate to all dismissed articles page" do
-    visit articles_path
+    visit_articles_index
 
     click_link "Recently Dismissed"
     click_link "All Dismissed"
@@ -149,7 +149,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
     end
 
     assert_current_path dismissed_articles_path
-    visit articles_path
+    visit_articles_index
 
     assert_selector "article.article-card", minimum: 1
   end
@@ -165,7 +165,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
     end
 
     assert_current_path recently_dismissed_path
-    visit articles_path
+    visit_articles_index
 
     assert_selector "article.article-card", minimum: 1
   end
@@ -173,7 +173,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
   test "should exclude permanently dismissed articles from main feed" do
     @dismissed_article.dismissed_article.update!(permanent: true)
 
-    visit articles_path
+    visit_articles_index
 
     within "body" do
       assert_no_text @dismissed_article.title
@@ -200,7 +200,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
   end
 
   test "should handle dismiss API error gracefully" do
-    visit articles_path
+    visit_articles_index
 
     page.execute_script("
       window.fetch = function() {
@@ -220,7 +220,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
 
   test "should handle multiple rapid dismissals" do
     skip "JavaScript-dependent test fails in CI headless environment"
-    visit articles_path
+    visit_articles_index
 
     articles = all("article.article-card").first(3)
 
@@ -236,7 +236,7 @@ class ArticleDismissTest < ApplicationSystemTestCase
 
   test "should maintain filter functionality after dismissal" do
     skip "JavaScript-dependent test fails in CI headless environment"
-    visit articles_path
+    visit_articles_index
 
     if has_selector?("button.filter-btn[data-filter-type='category']")
       first("button.filter-btn[data-filter-type='category']").click

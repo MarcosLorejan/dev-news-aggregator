@@ -135,6 +135,9 @@ jobs:
           bundle config set --local deployment false
           bundle install --jobs 4 --retry 3
 
+      - name: Build Vite assets for tests
+        run: npm run build:test
+
       - name: Prepare test database
         env:
           RAILS_ENV: test
@@ -204,6 +207,9 @@ jobs:
           bundle config set --local path 'vendor/bundle'
           bundle config set --local deployment false
           bundle install --jobs 4 --retry 3
+
+      - name: Build Vite assets for tests
+        run: npm run build:test
 
       - name: Prepare test database
         env:

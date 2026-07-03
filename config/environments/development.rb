@@ -4,7 +4,12 @@ Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Make code changes take effect immediately without server restart.
-  config.enable_reloading = true
+  # Puma cannot restart safely on Windows (no SIGUSR2); auto-reload causes EADDRINUSE.
+  config.enable_reloading = !Gem.win_platform?
+
+  if Gem.win_platform?
+    config.file_watcher = ActiveSupport::FileUpdateChecker
+  end
 
   # Do not eager load code on boot.
   config.eager_load = false

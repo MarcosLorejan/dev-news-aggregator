@@ -24,14 +24,31 @@ npm install
 To run the application in development mode with hot module replacement:
 
 ```bash
-# Terminal 1: Start Vite dev server
+# Terminal 1: Start Vite dev server (port 3036)
 npm run dev
 
-# Terminal 2: Start Rails server
-bin/rails server
+# Terminal 2: Start Rails server (port 3000)
+bundle exec rails server
 ```
 
-Or use the Rails bin/dev command if configured with Foreman/Overmind.
+### Windows
+
+On Windows, `bin/rails` does not run directly in CMD/PowerShell. Use one of:
+
+```powershell
+# Recommended: setup once, then start both servers
+.\setup-local-env.ps1
+.\dev.ps1
+
+# Or manually:
+bundle exec rails server
+# or
+bin\rails.bat server
+```
+
+PostgreSQL must be running first (`docker compose up -d db` or local Postgres 15).
+
+Open **http://localhost:3000** (Rails). Vite runs on port 3036 and is proxied by Rails in development.
 
 ## Building for Production
 
