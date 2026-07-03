@@ -1,5 +1,6 @@
 class NewsFetchers::DevToFetcher < NewsFetchers::BaseFetcher
   base_uri "https://dev.to/api"
+  format :json
 
   def fetch_articles
     Rails.logger.info "Fetching articles from Dev.to..."

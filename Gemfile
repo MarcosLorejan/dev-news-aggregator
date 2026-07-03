@@ -73,6 +73,9 @@ group :test do
   # Time manipulation for tests
   gem "timecop"
 
+  # Stub HTTP requests in fetcher tests
+  gem "webmock"
+
   # Test coverage reporting
   gem "simplecov", require: false
   gem "simplecov-lcov", require: false

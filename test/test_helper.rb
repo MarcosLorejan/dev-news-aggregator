@@ -34,6 +34,9 @@ require_relative "../config/environment"
 require "rails/test_help"
 require "timecop"
 require "ostruct"
+require "webmock/minitest"
+
+WebMock.disable_net_connect!(allow_localhost: true)
 
 module ActiveSupport
   class TestCase
