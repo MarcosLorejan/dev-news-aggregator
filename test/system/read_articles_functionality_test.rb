@@ -117,7 +117,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should navigate to already read section" do
-    visit articles_path
+    visit_articles_index
 
     click_link "Already Read"
 
