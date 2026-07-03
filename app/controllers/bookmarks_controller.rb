@@ -2,7 +2,7 @@ class BookmarksController < ApplicationController
   def index
     page = params[:page]&.to_i || 1
     per_page = params[:per_page]&.to_i || 50
-    per_page = [per_page, 100].min
+    per_page = [ per_page, 100 ].min
 
     @bookmarked_articles = Article.bookmarked
                                  .includes(:bookmark)

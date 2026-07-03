@@ -194,13 +194,13 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     json_response = JSON.parse(response.body)
-    
+
     assert json_response.key?("articles")
     assert json_response.key?("pagination")
     assert json_response.key?("categories")
     assert json_response.key?("articles_by_category")
     assert json_response.key?("last_updated")
-    
+
     assert json_response["articles"].is_a?(Array)
     assert json_response["pagination"]["current_page"] == 1
     assert json_response["pagination"]["per_page"] == 50
@@ -211,7 +211,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     json_response = JSON.parse(response.body)
-    
+
     assert_equal 2, json_response["pagination"]["current_page"]
     assert_equal 10, json_response["pagination"]["per_page"]
   end
@@ -221,7 +221,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     json_response = JSON.parse(response.body)
-    
+
     assert_equal @article.id, json_response["id"]
     assert_equal @article.title, json_response["title"]
     assert_equal @article.url, json_response["url"]

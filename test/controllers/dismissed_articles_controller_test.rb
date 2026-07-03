@@ -99,10 +99,10 @@ class DismissedArticlesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     json_response = JSON.parse(response.body)
-    
+
     assert json_response.key?("articles")
     assert json_response.key?("pagination")
-    
+
     assert json_response["articles"].is_a?(Array)
     assert json_response["pagination"]["current_page"] == 1
   end
@@ -112,7 +112,7 @@ class DismissedArticlesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     json_response = JSON.parse(response.body)
-    
+
     assert_equal 1, json_response["pagination"]["current_page"]
     assert_equal 20, json_response["pagination"]["per_page"]
   end
@@ -122,7 +122,7 @@ class DismissedArticlesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     json_response = JSON.parse(response.body)
-    
+
     assert json_response.key?("articles")
     assert json_response["articles"].is_a?(Array)
   end

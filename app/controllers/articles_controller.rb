@@ -3,7 +3,7 @@ class ArticlesController < ApplicationController
     @show_read = params[:show_read] == "true"
     page = params[:page]&.to_i || 1
     per_page = params[:per_page]&.to_i || 50
-    per_page = [per_page, 100].min
+    per_page = [ per_page, 100 ].min
 
     @articles = if @show_read
                   Article.not_dismissed.order(published_at: :desc)
@@ -12,7 +12,7 @@ class ArticlesController < ApplicationController
     end.limit(per_page).offset((page - 1) * per_page)
 
     @articles_by_source = @articles.group_by(&:source_type)
-    @articles_by_category = group_sources_by_category(@articles_by_source)
+    @articles_by_category = helpers.group_sources_by_category(@articles_by_source)
     @total_count = if @show_read
                      Article.not_dismissed.count
     else
@@ -26,7 +26,7 @@ class ArticlesController < ApplicationController
         render json: {
           articles: @articles.map { |article| article_json(article) },
           articles_by_category: @articles_by_category.transform_values { |articles| articles.map(&:id) },
-          categories: @articles_by_category.keys.map { |name| { name: name, icon: category_icon(name) } },
+          categories: @articles_by_category.keys.map { |name| { name: name, icon: helpers.category_icon(name) } },
           pagination: {
             current_page: page,
             per_page: per_page,
@@ -41,7 +41,7 @@ class ArticlesController < ApplicationController
 
   def show
     @article = Article.find(params[:id])
-    
+
     respond_to do |format|
       format.html
       format.json { render json: article_json(@article) }
@@ -127,48 +127,5 @@ class ArticlesController < ApplicationController
       dismissed: article.dismissed?,
       pending_dismissal: article.pending_dismissal?
     }
-  end
-
-  def group_sources_by_category(articles_by_source)
-    categories = {
-      "Programming Languages" => %w[reddit_ruby reddit_rust reddit_javascript],
-      "Web Development" => %w[reddit_webdev reddit_programming],
-      "Security" => %w[reddit_netsec reddit_cybersecurity],
-      "AI & Machine Learning" => %w[reddit_MachineLearning reddit_artificial reddit_LocalLLaMA],
-      "General Tech" => %w[hacker_news dev_to reddit_technology]
-    }
-
-    grouped = {}
-
-    categories.each do |category_name, source_types|
-      category_articles = []
-      source_types.each do |source_type|
-        category_articles.concat(articles_by_source[source_type] || [])
-      end
-      grouped[category_name] = category_articles if category_articles.any?
-    end
-
-    other_sources = articles_by_source.keys - categories.values.flatten
-    if other_sources.any?
-      other_articles = []
-      other_sources.each do |source_type|
-        other_articles.concat(articles_by_source[source_type])
-      end
-      grouped["Other"] = other_articles if other_articles.any?
-    end
-
-    grouped
-  end
-
-  def category_icon(category_name)
-    icons = {
-      "Programming Languages" => "🔨",
-      "Web Development" => "🌐",
-      "Security" => "🔒",
-      "AI & Machine Learning" => "🤖",
-      "General Tech" => "💻",
-      "Other" => "📰"
-    }
-    icons[category_name] || "📄"
   end
 end
