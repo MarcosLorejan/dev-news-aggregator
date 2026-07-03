@@ -1,11 +1,7 @@
+# Database-backed source registry. When any enabled records exist,
+# NewsAggregatorService uses them instead of config/news_aggregator.yml defaults.
 class NewsSource < ApplicationRecord
   SOURCE_TYPES = %w[hacker_news dev_to reddit].freeze
-
-  REDDIT_SUBREDDITS = %w[
-    programming webdev javascript ruby rust
-    netsec cybersecurity technology
-    MachineLearning artificial LocalLLaMA
-  ].freeze
 
   validates :name, presence: true, uniqueness: { scope: :source_type }
   validates :source_type, inclusion: { in: SOURCE_TYPES }
@@ -24,7 +20,7 @@ class NewsSource < ApplicationRecord
       source.config = {}
     end
 
-    REDDIT_SUBREDDITS.each do |subreddit|
+    NewsAggregatorConfig.reddit_subreddits.each do |subreddit|
       find_or_create_by!(source_type: "reddit", name: subreddit) do |source|
         source.active = true
         source.config = { "subreddit" => subreddit }

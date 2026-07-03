@@ -30,6 +30,7 @@ class NewsSourceTest < ActiveSupport::TestCase
 
     assert NewsSource.exists?(source_type: "hacker_news")
     assert NewsSource.exists?(source_type: "dev_to")
-    assert_operator NewsSource.where(source_type: "reddit").count, :>, 1
+    assert_equal NewsAggregatorConfig.reddit_subreddits.length,
+                 NewsSource.where(source_type: "reddit").count
   end
 end
