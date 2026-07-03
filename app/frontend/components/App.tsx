@@ -1,16 +1,12 @@
-import React from 'react'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import ArticlesIndexPage from '../pages/ArticlesIndexPage'
 
-const App: React.FC = () => {
+export default function App() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-primary-400">
-        Developer News Aggregator
-      </h1>
-      <p className="text-gray-400 mt-4">
-        React with Vite is now configured!
-      </p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<ArticlesIndexPage />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
-
-export default App
