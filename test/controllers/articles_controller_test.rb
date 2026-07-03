@@ -7,6 +7,15 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     @rust_article = articles(:reddit_rust_article)
   end
 
+  def count_queries
+    count = 0
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") { count += 1 }
+    yield
+    count
+  ensure
+    ActiveSupport::Notifications.unsubscribe(subscriber)
+  end
+
   test "should get index" do
     get articles_url
     assert_response :success
@@ -259,6 +268,18 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert json_response["articles"].is_a?(Array)
     assert json_response["pagination"]["current_page"] == 1
     assert json_response["pagination"]["per_page"] == 50
+  end
+
+  test "index JSON avoids N+1 queries for article state" do
+    @article.bookmark!
+    @dev_to_article.mark_as_read!
+
+    query_count = count_queries do
+      get articles_url, as: :json
+    end
+
+    assert_response :success
+    assert_operator query_count, :<=, 15
   end
 
   test "index JSON should support pagination" do

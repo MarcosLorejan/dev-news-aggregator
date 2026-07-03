@@ -50,7 +50,7 @@ class ArticlesController < ApplicationController
   end
 
   def show
-    @article = Article.find(params[:id])
+    @article = Article.includes(:bookmark, :read_article, :dismissed_article).find(params[:id])
 
     respond_to do |format|
       format.html
@@ -127,7 +127,8 @@ class ArticlesController < ApplicationController
     end
 
     scope = apply_score_filter(scope)
-    scope.order(published_at: :desc)
+    scope.includes(:bookmark, :read_article, :dismissed_article)
+         .order(published_at: :desc)
   end
 
   def apply_score_filter(scope)
