@@ -11,50 +11,39 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get articles_url
     assert_response :success
 
-    assert_select "article.article-card", minimum: 1
-    assert_select "h1", "Developer News Aggregator"
+    assert_select "#root"
+    assert_select "script[type='module'][src*='application']"
   end
 
-  test "index should show articles grouped by source" do
-    get articles_url
+  test "index should expose categories in JSON" do
+    get articles_url, as: :json
     assert_response :success
 
-    assert_select "button[data-filter-type='all']", text: /All Articles/
-    assert_select "button[data-filter-type='category']", minimum: 1
+    json_response = JSON.parse(response.body)
+    assert json_response["categories"].is_a?(Array)
+    assert json_response["articles_by_category"].is_a?(Hash)
   end
 
-  test "index should show reading list link" do
-    get articles_url
-    assert_response :success
-
-    assert_select "a[href='#{bookmarks_path}']", "Reading List"
-  end
-
-  test "index should show already read link" do
-    get articles_url
-    assert_response :success
-
-    assert_select "a[href='#{read_articles_path}']", "Already Read"
-  end
-
-  test "index should exclude read articles by default" do
+  test "index JSON should exclude read articles by default" do
     @article.mark_as_read!
 
-    get articles_url
+    get articles_url, as: :json
     assert_response :success
 
-    assert_select "h2", text: @article.title, count: 0
-    assert_select "h2", text: @dev_to_article.title, count: 1
+    titles = JSON.parse(response.body)["articles"].map { |article| article["title"] }
+    assert_not_includes titles, @article.title
+    assert_includes titles, @dev_to_article.title
   end
 
-  test "index should include read articles when show_read param is true" do
+  test "index JSON should include read articles when show_read param is true" do
     @article.mark_as_read!
 
-    get articles_url(show_read: true)
+    get articles_url(show_read: true), as: :json
     assert_response :success
 
-    assert_select "h2", text: @article.title, count: 1
-    assert_select "h2", text: @dev_to_article.title, count: 1
+    titles = JSON.parse(response.body)["articles"].map { |article| article["title"] }
+    assert_includes titles, @article.title
+    assert_includes titles, @dev_to_article.title
   end
 
   test "should get show" do
@@ -170,23 +159,25 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Article not found.", flash[:alert]
   end
 
-  test "should exclude permanently dismissed articles from index" do
+  test "should exclude permanently dismissed articles from index JSON" do
     @article.dismiss!
     @article.dismissed_article.update!(permanent: true)
 
-    get articles_path
+    get articles_path, as: :json
 
     assert_response :success
-    assert_select "h2", text: @article.title, count: 0
+    titles = JSON.parse(response.body)["articles"].map { |article| article["title"] }
+    assert_not_includes titles, @article.title
   end
 
-  test "should include temporarily dismissed articles in index" do
+  test "should include temporarily dismissed articles in index JSON" do
     @article.dismiss!
 
-    get articles_path
+    get articles_path, as: :json
 
     assert_response :success
-    assert_select "h2", text: @article.title, count: 1
+    titles = JSON.parse(response.body)["articles"].map { |article| article["title"] }
+    assert_includes titles, @article.title
   end
 
   test "index should return JSON with articles" do
