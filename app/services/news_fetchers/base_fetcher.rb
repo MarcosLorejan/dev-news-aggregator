@@ -9,9 +9,11 @@ class NewsFetchers::BaseFetcher
     private
 
     def parse_http_response(response)
-      return response.parsed_response if response.is_a?(HTTParty::Response)
+      return response unless response.is_a?(HTTParty::Response)
 
-      response
+      response.parsed_response
+    rescue JSON::ParserError
+      nil
     end
   end
 
