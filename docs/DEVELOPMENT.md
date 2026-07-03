@@ -109,7 +109,7 @@ whenever --clear-crontab
 **Data models**:
 - `Article`: Stores aggregated news with unified schema (title, url, published_at, description, external_id, source_type, score, comment_count)
 - `Bookmark`: Tracks bookmarked articles for personal reading list functionality
-- `NewsSource`: Optional database-backed source registry; when enabled records exist, they override the YAML default fetcher list
+- `NewsSource`: Database-backed source registry with admin UI at `/sources`. `bootstrap_defaults!` seeds Hacker News, Dev.to, and Reddit subreddits from `config/news_aggregator.yml`. When any enabled records exist, they override the YAML default fetcher list
 
 **Scheduled jobs**: Uses `whenever` gem to run `news:fetch` hourly during business hours (9 AM - 6 PM) and `news:clean` daily at 2 AM. `news:fetch` enqueues `FetchNewsJob` so cron exits immediately; workers process the fetch asynchronously. Logs to `log/cron.log`.
 
@@ -130,9 +130,11 @@ whenever --clear-crontab
 ```
 app/
   controllers/articles_controller.rb    # Main web interface
+  controllers/sources_controller.rb     # Enable/disable sources, add Reddit subreddits
   models/
     article.rb                          # Article data model
     news_aggregator_config.rb           # YAML config loader for news fetching
+    news_source.rb                      # Database-backed source registry
   services/
     news_aggregator_service.rb          # Main orchestrator
     news_fetchers/
