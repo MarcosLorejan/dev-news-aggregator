@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { fetchBookmarks } from '../api/bookmarks'
 import {
   markArticleAsRead,
@@ -8,33 +8,19 @@ import {
 import type { BookmarkArticle } from '../types/bookmark'
 import BookmarksList from '../components/BookmarksList'
 import SourceFilter from '../components/SourceFilter'
+import PageShell from '../components/PageShell'
+import EmptyState from '../components/EmptyState'
+import { useAsyncResource } from '../hooks/useAsyncResource'
 
 export default function BookmarksIndexPage() {
-  const [articles, setArticles] = useState<BookmarkArticle[]>([])
-  const [articlesBySource, setArticlesBySource] = useState<Record<string, number[]>>({})
-  const [totalCount, setTotalCount] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, loading, error, reload, setData, setError } = useAsyncResource(fetchBookmarks, {
+    errorMessage: 'Failed to load reading list. Please try again.',
+  })
   const [activeSource, setActiveSource] = useState('all')
 
-  const loadBookmarks = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const response = await fetchBookmarks()
-      setArticles(response.articles)
-      setArticlesBySource(response.articles_by_source)
-      setTotalCount(response.pagination.total_count)
-    } catch {
-      setError('Failed to load reading list. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    loadBookmarks()
-  }, [loadBookmarks])
+  const articles = data?.articles ?? []
+  const articlesBySource = data?.articles_by_source ?? {}
+  const totalCount = data?.pagination.total_count ?? 0
 
   const sources = useMemo(() => Object.keys(articlesBySource).sort(), [articlesBySource])
 
@@ -46,15 +32,23 @@ export default function BookmarksIndexPage() {
   const handleRemoveBookmark = async (article: BookmarkArticle) => {
     try {
       await unbookmarkArticle(article.id)
-      setArticles((current) => current.filter((item) => item.id !== article.id))
-      setTotalCount((count) => Math.max(0, count - 1))
-      setArticlesBySource((current) => {
-        const next: Record<string, number[]> = {}
-        Object.entries(current).forEach(([source, ids]) => {
+      setData((current) => {
+        if (!current) return current
+        const nextArticles = current.articles.filter((item) => item.id !== article.id)
+        const nextBySource: Record<string, number[]> = {}
+        Object.entries(current.articles_by_source).forEach(([source, ids]) => {
           const filtered = ids.filter((id) => id !== article.id)
-          if (filtered.length > 0) next[source] = filtered
+          if (filtered.length > 0) nextBySource[source] = filtered
         })
-        return next
+        return {
+          ...current,
+          articles: nextArticles,
+          articles_by_source: nextBySource,
+          pagination: {
+            ...current.pagination,
+            total_count: Math.max(0, current.pagination.total_count - 1),
+          },
+        }
       })
     } catch {
       setError('Failed to remove bookmark.')
@@ -65,13 +59,27 @@ export default function BookmarksIndexPage() {
     try {
       if (article.read) {
         await unmarkArticleAsRead(article.id)
-        setArticles((current) =>
-          current.map((item) => (item.id === article.id ? { ...item, read: false } : item))
+        setData((current) =>
+          current
+            ? {
+                ...current,
+                articles: current.articles.map((item) =>
+                  item.id === article.id ? { ...item, read: false } : item
+                ),
+              }
+            : current
         )
       } else {
         await markArticleAsRead(article.id)
-        setArticles((current) =>
-          current.map((item) => (item.id === article.id ? { ...item, read: true } : item))
+        setData((current) =>
+          current
+            ? {
+                ...current,
+                articles: current.articles.map((item) =>
+                  item.id === article.id ? { ...item, read: true } : item
+                ),
+              }
+            : current
         )
       }
     } catch {
@@ -79,31 +87,15 @@ export default function BookmarksIndexPage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl text-center text-gray-400" data-testid="bookmarks-page">
-        Loading reading list...
-      </div>
-    )
-  }
-
-  if (error && articles.length === 0 && totalCount === 0) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl text-center" data-testid="bookmarks-page">
-        <p className="text-red-400 mb-4">{error}</p>
-        <button
-          type="button"
-          className="px-4 py-2 bg-primary-600 text-white rounded-lg"
-          onClick={loadBookmarks}
-        >
-          Retry
-        </button>
-      </div>
-    )
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl" data-testid="bookmarks-page">
+    <PageShell
+      testId="bookmarks-page"
+      loading={loading}
+      loadingMessage="Loading reading list..."
+      error={error}
+      showFatalError={articles.length === 0 && totalCount === 0}
+      onRetry={reload}
+    >
       <div className="glass-effect rounded-2xl p-8 mb-8 animate-fade-in">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
@@ -137,26 +129,28 @@ export default function BookmarksIndexPage() {
       {error && <div className="mb-4 text-sm text-red-400">{error}</div>}
 
       {totalCount === 0 ? (
-        <div className="glass-effect rounded-2xl p-12 text-center animate-fade-in">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-primary-600/20 to-primary-700/20 rounded-full flex items-center justify-center">
+        <EmptyState
+          icon={
             <svg className="w-10 h-10 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-200 mb-4">No bookmarked articles yet</h2>
-          <p className="text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">
-            Articles you bookmark will appear here in your reading list.
-          </p>
-          <a
-            href="/articles"
-            className="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25"
-          >
-            <svg className="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
-            </svg>
-            Browse Articles
-          </a>
-        </div>
+          }
+          title="No bookmarked articles yet"
+          description="Articles you bookmark will appear here in your reading list."
+          actions={[
+            {
+              href: '/articles',
+              label: 'Browse Articles',
+              className:
+                'group inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25',
+              icon: (
+                <svg className="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
+                </svg>
+              ),
+            },
+          ]}
+        />
       ) : (
         <>
           <SourceFilter
@@ -174,6 +168,6 @@ export default function BookmarksIndexPage() {
           />
         </>
       )}
-    </div>
+    </PageShell>
   )
 }

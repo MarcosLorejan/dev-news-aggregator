@@ -1,68 +1,48 @@
-import { useCallback, useEffect, useState } from 'react'
 import { undismissArticle } from '../api/articles'
 import { fetchDismissedArticles } from '../api/dismissedArticles'
 import type { DismissedArticle } from '../types/dismissedArticle'
 import DismissedArticlesList from '../components/DismissedArticlesList'
+import PageShell from '../components/PageShell'
+import EmptyState from '../components/EmptyState'
+import { useAsyncResource } from '../hooks/useAsyncResource'
 
 export default function DismissedArticlesIndexPage() {
-  const [articles, setArticles] = useState<DismissedArticle[]>([])
-  const [totalCount, setTotalCount] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, loading, error, reload, setData, setError } = useAsyncResource(fetchDismissedArticles, {
+    errorMessage: 'Failed to load dismissed articles. Please try again.',
+  })
 
-  const loadDismissedArticles = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const response = await fetchDismissedArticles()
-      setArticles(response.articles)
-      setTotalCount(response.pagination.total_count)
-    } catch {
-      setError('Failed to load dismissed articles. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    loadDismissedArticles()
-  }, [loadDismissedArticles])
+  const articles = data?.articles ?? []
+  const totalCount = data?.pagination.total_count ?? 0
 
   const handleRestore = async (article: DismissedArticle) => {
     try {
       await undismissArticle(article.id)
-      setArticles((current) => current.filter((item) => item.id !== article.id))
-      setTotalCount((count) => Math.max(0, count - 1))
+      setData((current) =>
+        current
+          ? {
+              ...current,
+              articles: current.articles.filter((item) => item.id !== article.id),
+              pagination: {
+                ...current.pagination,
+                total_count: Math.max(0, current.pagination.total_count - 1),
+              },
+            }
+          : current
+      )
     } catch {
       setError('Failed to restore article.')
     }
   }
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl text-center text-gray-400" data-testid="dismissed-articles-page">
-        Loading dismissed articles...
-      </div>
-    )
-  }
-
-  if (error && articles.length === 0 && totalCount === 0) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl text-center" data-testid="dismissed-articles-page">
-        <p className="text-red-400 mb-4">{error}</p>
-        <button
-          type="button"
-          className="px-4 py-2 bg-primary-600 text-white rounded-lg"
-          onClick={loadDismissedArticles}
-        >
-          Retry
-        </button>
-      </div>
-    )
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl" data-testid="dismissed-articles-page">
+    <PageShell
+      testId="dismissed-articles-page"
+      loading={loading}
+      loadingMessage="Loading dismissed articles..."
+      error={error}
+      showFatalError={articles.length === 0 && totalCount === 0}
+      onRetry={reload}
+    >
       <div className="glass-effect rounded-2xl p-8 mb-8 animate-fade-in">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
@@ -97,29 +77,32 @@ export default function DismissedArticlesIndexPage() {
       {error && <div className="mb-4 text-sm text-red-400">{error}</div>}
 
       {totalCount === 0 ? (
-        <div className="glass-effect rounded-2xl p-12 text-center animate-fade-in">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-red-600/20 to-red-700/20 rounded-full flex items-center justify-center">
+        <EmptyState
+          icon={
             <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-200 mb-4">No dismissed articles</h2>
-          <p className="text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">
-            You haven&apos;t dismissed any articles yet. Dismissed articles will appear here, and you can restore them to your main feed.
-          </p>
-          <a
-            href="/articles"
-            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Browse Articles
-          </a>
-        </div>
+          }
+          iconWrapperClassName="bg-gradient-to-r from-red-600/20 to-red-700/20"
+          title="No dismissed articles"
+          description="You haven't dismissed any articles yet. Dismissed articles will appear here, and you can restore them to your main feed."
+          actions={[
+            {
+              href: '/articles',
+              label: 'Browse Articles',
+              className:
+                'inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105',
+              icon: (
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              ),
+            },
+          ]}
+        />
       ) : (
         <DismissedArticlesList articles={articles} variant="dismissed" onRestore={handleRestore} />
       )}
-    </div>
+    </PageShell>
   )
 }

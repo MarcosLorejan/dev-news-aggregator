@@ -1,0 +1,52 @@
+import type { ReactNode } from 'react'
+
+interface EmptyStateAction {
+  href: string
+  label: string
+  className: string
+  icon?: ReactNode
+}
+
+interface EmptyStateProps {
+  icon: ReactNode
+  iconWrapperClassName?: string
+  title: string
+  description: string
+  actions?: EmptyStateAction[]
+}
+
+export default function EmptyState({
+  icon,
+  iconWrapperClassName = 'bg-gradient-to-r from-primary-600/20 to-primary-700/20',
+  title,
+  description,
+  actions = [],
+}: EmptyStateProps) {
+  return (
+    <div className="glass-effect rounded-2xl p-12 text-center animate-fade-in">
+      <div
+        className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${iconWrapperClassName}`}
+      >
+        {icon}
+      </div>
+      <h2 className="text-2xl font-bold text-gray-200 mb-4">{title}</h2>
+      <p className="text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">{description}</p>
+      {actions.length > 0 && (
+        <div
+          className={
+            actions.length > 1
+              ? 'flex flex-col sm:flex-row gap-4 justify-center'
+              : 'flex justify-center'
+          }
+        >
+          {actions.map((action) => (
+            <a key={`${action.href}-${action.label}`} href={action.href} className={action.className}>
+              {action.icon}
+              {action.label}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
