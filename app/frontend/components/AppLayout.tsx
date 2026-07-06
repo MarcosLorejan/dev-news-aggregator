@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom'
+import AppShell from './AppShell'
 
 export default function AppLayout() {
   return (
@@ -9,9 +10,11 @@ export default function AppLayout() {
       >
         Skip to main content
       </a>
-      <main id="main-content">
-        <Outlet />
-      </main>
+      <AppShell>
+        <main id="main-content" className="flex-1 pb-20 md:pb-0">
+          <Outlet />
+        </main>
+      </AppShell>
     </>
   )
 }

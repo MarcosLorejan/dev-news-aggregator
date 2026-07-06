@@ -22,8 +22,8 @@ class CategoryFilterTurboTest < ApplicationSystemTestCase
         click_link "Reading List"
         assert_current_path bookmarks_path
 
-        click_link "Back to All Articles"
-        assert_current_path articles_path
+        click_link "Feed", match: :first
+        assert_current_path root_path
 
         fresh_category_btn = first("button.filter-btn[data-filter-type='category']")
         if fresh_category_btn

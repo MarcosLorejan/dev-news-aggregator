@@ -26,6 +26,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
     assert_selector "[data-testid='articles-page']", wait: 12
     assert_selector "main#main-content", wait: 12
+    assert_selector "[data-testid='app-nav']", wait: 12
     assert_no_text "Loading articles...", wait: 12
   end
 
