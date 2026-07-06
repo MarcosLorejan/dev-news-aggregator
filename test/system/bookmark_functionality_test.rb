@@ -48,7 +48,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
     assert_selector "article.article-card[data-source='reddit_ruby']"
     within("article.article-card[data-source='reddit_rust']") do
       assert_text @bookmarked_article.title
-      assert_selector "span", text: /🔖 Bookmarked/
+      assert_selector "span", text: /Bookmarked/
     end
   end
 
