@@ -22,7 +22,13 @@ export default function PageShell({
 }: PageShellProps) {
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl text-center text-gray-400" data-testid={testId}>
+      <div
+        className="container mx-auto px-4 py-8 max-w-7xl text-center text-gray-400"
+        data-testid={testId}
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
         {loadingMessage}
       </div>
     )

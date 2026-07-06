@@ -53,6 +53,7 @@ export default function BookmarkCard({
                   : 'group/read p-2 bg-dark-700 border border-dark-600 text-gray-400 rounded-lg transition-all duration-200 hover:bg-green-600 hover:border-green-500 hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-green-500/25'
               }
               title={article.read ? 'Mark as unread' : 'Mark as read'}
+              aria-label={article.read ? 'Mark as unread' : 'Mark as read'}
               onClick={() => onReadToggle(article)}
             >
               <svg
@@ -74,6 +75,7 @@ export default function BookmarkCard({
               type="button"
               className="group/bookmark p-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg transition-all duration-200 hover:from-red-700 hover:to-red-800 hover:scale-110 hover:shadow-lg hover:shadow-red-500/25"
               title="Remove from reading list"
+              aria-label="Remove from reading list"
               onClick={handleRemove}
             >
               <svg
