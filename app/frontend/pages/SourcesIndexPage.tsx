@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   addRedditSource,
   fetchSources,
@@ -102,9 +103,9 @@ export default function SourcesIndexPage() {
             <h1 className="text-3xl font-bold text-gray-100 mb-2">News Sources</h1>
             <p className="text-gray-400">Enable or disable sources and manage Reddit subreddits.</p>
           </div>
-          <a href="/" className="px-4 py-2 bg-dark-700 border border-dark-600 text-gray-300 rounded-xl hover:bg-dark-600">
+          <Link to="/articles" className="px-4 py-2 bg-dark-700 border border-dark-600 text-gray-300 rounded-xl hover:bg-dark-600">
             Back to Articles
-          </a>
+          </Link>
         </div>
       </div>
 

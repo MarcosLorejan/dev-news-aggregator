@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { unmarkArticleAsRead } from '../api/articles'
 import { fetchReadArticles } from '../api/readArticles'
 import type { ReadArticle } from '../types/readArticle'
@@ -70,15 +71,15 @@ export default function ReadArticlesIndexPage() {
             <p className="text-gray-400 text-lg">Articles you&apos;ve finished reading</p>
           </div>
           <div className="flex items-center space-x-6">
-            <a
-              href="/articles"
+            <Link
+              to="/articles"
               className="group flex items-center px-4 py-3 bg-gradient-to-r from-dark-700 to-dark-600 border border-dark-500 text-gray-300 rounded-xl font-medium transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:border-primary-500 hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25"
             >
               <svg className="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
               </svg>
               Back to All Articles
-            </a>
+            </Link>
             <div className="text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />

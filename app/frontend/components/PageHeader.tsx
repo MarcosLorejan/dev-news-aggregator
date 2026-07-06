@@ -1,3 +1,4 @@
+import { NavLink } from 'react-router-dom'
 import { formatLastUpdated } from '../utils/format'
 
 interface PageHeaderProps {
@@ -8,6 +9,11 @@ interface PageHeaderProps {
   onFetchNews?: () => void
   fetchingNews?: boolean
   fetchMessage?: string | null
+}
+
+function navLinkClassName(base: string) {
+  return ({ isActive }: { isActive: boolean }) =>
+    isActive ? `${base} ring-2 ring-white/30` : base
 }
 
 export default function PageHeader({
@@ -46,39 +52,47 @@ export default function PageHeader({
               {fetchingNews ? 'Fetching...' : 'Fetch News'}
             </button>
           )}
-          <a
-            href="/sources"
-            className="group flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-purple-700 hover:to-purple-800 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25"
+          <NavLink
+            to="/sources"
+            className={navLinkClassName(
+              'group flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-purple-700 hover:to-purple-800 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25'
+            )}
           >
             Sources
-          </a>
-          <a
-            href="/bookmarks"
-            className="group flex items-center px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25"
+          </NavLink>
+          <NavLink
+            to="/bookmarks"
+            className={navLinkClassName(
+              'group flex items-center px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25'
+            )}
           >
             <svg className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
             </svg>
             Reading List
-          </a>
-          <a
-            href="/read"
-            className="group flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-lg hover:shadow-green-500/25"
+          </NavLink>
+          <NavLink
+            to="/read"
+            className={navLinkClassName(
+              'group flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-lg hover:shadow-green-500/25'
+            )}
           >
             <svg className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             Already Read
-          </a>
-          <a
-            href="/recently_dismissed"
-            className="group flex items-center px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-orange-700 hover:to-orange-800 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25"
+          </NavLink>
+          <NavLink
+            to="/recently_dismissed"
+            className={navLinkClassName(
+              'group flex items-center px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-orange-700 hover:to-orange-800 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25'
+            )}
           >
             <svg className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             Recently Dismissed
-          </a>
+          </NavLink>
           {onShowReadChange && (
             <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
               <input
