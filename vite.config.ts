@@ -12,4 +12,9 @@ export default defineConfig({
       '@': '/app/frontend',
     },
   },
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['test/setup.ts'],
+    include: ['**/*.test.{ts,tsx}'],
+  },
 })
