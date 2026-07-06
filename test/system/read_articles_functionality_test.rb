@@ -138,10 +138,9 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
     visit_read_articles_index
 
     within("article.article-card[data-source='#{@read_article.source_type}']") do
-      accept_confirm do
-        find("button[title='Mark as unread']").click
-      end
+      find("button[title='Mark as unread']").click
     end
+    find("[data-testid='confirm-dialog-confirm']").click
 
     sleep 0.5
     assert_not @read_article.reload.read?
