@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import {
   addRedditSource,
   fetchSources,
@@ -8,6 +7,7 @@ import {
   type NewsSource,
 } from '../api/sources'
 import { useConfirmDialog } from '../hooks/useConfirmDialog'
+import PageHeading from '../components/PageHeading'
 
 function sourceLabel(source: NewsSource): string {
   if (source.source_type === 'reddit') {
@@ -97,17 +97,11 @@ export default function SourcesIndexPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl" data-testid="sources-page">
-      <div className="glass-effect rounded-2xl p-8 mb-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-100 mb-2">News Sources</h1>
-            <p className="text-gray-400">Enable or disable sources and manage Reddit subreddits.</p>
-          </div>
-          <Link to="/articles" className="px-4 py-2 bg-dark-700 border border-dark-600 text-gray-300 rounded-xl hover:bg-dark-600">
-            Back to Articles
-          </Link>
-        </div>
-      </div>
+      <PageHeading
+        title="News Sources"
+        subtitle="Enable or disable sources and manage Reddit subreddits."
+        titleClassName="text-gray-100"
+      />
 
       {error && <div className="mb-4 text-sm text-red-400">{error}</div>}
 

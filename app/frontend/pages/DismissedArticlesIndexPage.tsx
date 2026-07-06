@@ -1,9 +1,10 @@
 import { undismissArticle } from '../api/articles'
 import { fetchDismissedArticles } from '../api/dismissedArticles'
 import type { DismissedArticle } from '../types/dismissedArticle'
-import { Link, NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import DismissedArticlesList from '../components/DismissedArticlesList'
 import PageShell from '../components/PageShell'
+import PageHeading from '../components/PageHeading'
 import EmptyState from '../components/EmptyState'
 import { useAsyncResource } from '../hooks/useAsyncResource'
 
@@ -44,41 +45,27 @@ export default function DismissedArticlesIndexPage() {
       showFatalError={articles.length === 0 && totalCount === 0}
       onRetry={reload}
     >
-      <div className="glass-effect rounded-2xl p-8 mb-8 animate-fade-in">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent mb-2">
-              Dismissed Articles
-            </h1>
-            <p className="text-gray-400 text-lg">Articles you&apos;ve dismissed from your feed</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link
-              to="/articles"
-              className="group flex items-center px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25"
-            >
-              <svg className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Back to All Articles
-            </Link>
-            <NavLink
-              to="/recently_dismissed"
-              className={({ isActive }) =>
-                [
-                  'group flex items-center px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-orange-700 hover:to-orange-800 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25',
-                  isActive ? 'ring-2 ring-white/30' : '',
-                ].join(' ')
-              }
-            >
-              <svg className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Recently Dismissed
-            </NavLink>
-          </div>
-        </div>
-      </div>
+      <PageHeading
+        title="Dismissed Articles"
+        subtitle="Articles you've dismissed from your feed"
+        titleClassName="bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent"
+        actions={
+          <NavLink
+            to="/recently_dismissed"
+            className={({ isActive }) =>
+              [
+                'group flex items-center px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-orange-700 hover:to-orange-800 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25',
+                isActive ? 'ring-2 ring-white/30' : '',
+              ].join(' ')
+            }
+          >
+            <svg className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Recently Dismissed
+          </NavLink>
+        }
+      />
 
       {error && <div className="mb-4 text-sm text-red-400">{error}</div>}
 
