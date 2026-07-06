@@ -37,6 +37,7 @@ export default function ArticleCard({
           type="button"
           className="group/dismiss p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all duration-200 hover:scale-110"
           title="Dismiss article"
+          aria-label="Dismiss article"
           onClick={(event) => {
             event.stopPropagation()
             onDismiss(article)
@@ -67,6 +68,7 @@ export default function ArticleCard({
                 : 'group/bookmark p-2 bg-dark-700 border border-dark-600 text-gray-400 rounded-lg transition-all duration-200 hover:bg-primary-600 hover:border-primary-500 hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-primary-500/25'
             }
             title={article.bookmarked ? 'Remove from reading list' : 'Add to reading list'}
+            aria-label={article.bookmarked ? 'Remove from reading list' : 'Add to reading list'}
             onClick={(event) => {
               event.stopPropagation()
               onBookmarkToggle(article)
@@ -95,6 +97,7 @@ export default function ArticleCard({
                 : 'group/read p-2 bg-dark-700 border border-dark-600 text-gray-400 rounded-lg transition-all duration-200 hover:bg-green-600 hover:border-green-500 hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-green-500/25'
             }
             title={article.read ? 'Mark as unread' : 'Mark as read'}
+            aria-label={article.read ? 'Mark as unread' : 'Mark as read'}
             onClick={(event) => {
               event.stopPropagation()
               onReadToggle(article)

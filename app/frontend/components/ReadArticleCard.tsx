@@ -49,6 +49,7 @@ export default function ReadArticleCard({ article, index, onUnmarkRead }: ReadAr
             type="button"
             className="group/read p-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg transition-all duration-200 hover:from-orange-700 hover:to-orange-800 hover:scale-110 hover:shadow-lg hover:shadow-orange-500/25"
             title="Mark as unread"
+            aria-label="Mark as unread"
             onClick={handleUnmark}
           >
             <svg

@@ -91,7 +91,13 @@ export default function ArticleShowPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl text-center text-gray-400" data-testid="article-show-page">
+      <div
+        className="container mx-auto px-4 py-8 max-w-4xl text-center text-gray-400"
+        data-testid="article-show-page"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
         Loading article...
       </div>
     )

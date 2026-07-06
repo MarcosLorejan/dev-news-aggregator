@@ -29,6 +29,7 @@ export default function ScoreFilter({ activeScoreFilter, onScoreFilterChange }: 
             type="button"
             className={activeScoreFilter === option.value ? activeClasses : inactiveClasses}
             data-score-filter={option.value}
+            aria-pressed={activeScoreFilter === option.value}
             onClick={() => onScoreFilterChange(option.value)}
           >
             {option.label}

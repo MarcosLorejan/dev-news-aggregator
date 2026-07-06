@@ -36,6 +36,7 @@ export default function CategoryFilter({
             className={activeFilter === 'all' ? activeClasses : inactiveClasses}
             data-filter-type="all"
             data-filter-value="all"
+            aria-pressed={activeFilter === 'all'}
             onClick={() => onFilterChange('all')}
           >
             <span className="flex items-center">
@@ -53,6 +54,7 @@ export default function CategoryFilter({
                 className={activeFilter === slug ? activeClasses : inactiveClasses}
                 data-filter-type="category"
                 data-filter-value={slug}
+                aria-pressed={activeFilter === slug}
                 onClick={() => onFilterChange(slug)}
               >
                 <span className="flex items-center">

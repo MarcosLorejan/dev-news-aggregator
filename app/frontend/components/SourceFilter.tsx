@@ -34,6 +34,7 @@ export default function SourceFilter({
             type="button"
             className={activeSource === 'all' ? activeClasses : inactiveClasses}
             data-source="all"
+            aria-pressed={activeSource === 'all'}
             onClick={() => onSourceChange('all')}
           >
             <span className="flex items-center">
@@ -47,6 +48,7 @@ export default function SourceFilter({
               type="button"
               className={activeSource === source ? activeClasses : inactiveClasses}
               data-source={source}
+              aria-pressed={activeSource === source}
               onClick={() => onSourceChange(source)}
             >
               {humanizeSourceType(source)} ({sourceCounts[source] ?? 0})
