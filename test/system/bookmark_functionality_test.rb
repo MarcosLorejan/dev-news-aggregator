@@ -125,8 +125,8 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
 
     if page.has_selector?("article.article-card[data-source='reddit_rust']")
       within("article.article-card[data-source='reddit_rust']") do
-        page.execute_script("window.confirm = function() { return true; }")
         find("button[title='Remove from reading list']").click
+        find("[data-testid='confirm-dialog-confirm']").click
       end
       sleep 0.5
       assert_not @bookmarked_article.reload.bookmarked?

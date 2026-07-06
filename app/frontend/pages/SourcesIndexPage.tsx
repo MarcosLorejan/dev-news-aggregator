@@ -6,6 +6,7 @@ import {
   updateSource,
   type NewsSource,
 } from '../api/sources'
+import { useConfirmDialog } from '../hooks/useConfirmDialog'
 
 function sourceLabel(source: NewsSource): string {
   if (source.source_type === 'reddit') {
@@ -21,6 +22,7 @@ export default function SourcesIndexPage() {
   const [subredditInput, setSubredditInput] = useState('')
   const [adding, setAdding] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
+  const { confirm, dialog } = useConfirmDialog()
 
   const loadSources = useCallback(async () => {
     setLoading(true)
@@ -67,7 +69,11 @@ export default function SourcesIndexPage() {
   }
 
   const handleRemove = async (source: NewsSource) => {
-    if (!window.confirm(`Remove r/${source.subreddit ?? source.name} from sources?`)) return
+    const confirmed = await confirm({
+      message: `Remove r/${source.subreddit ?? source.name} from sources?`,
+      confirmLabel: 'Remove',
+    })
+    if (!confirmed) return
 
     try {
       await removeSource(source.id)
@@ -180,6 +186,7 @@ export default function SourcesIndexPage() {
           )}
         </div>
       </section>
+      {dialog}
     </div>
   )
 }

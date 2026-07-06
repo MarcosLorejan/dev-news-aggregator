@@ -13,6 +13,7 @@ import {
   humanizeSourceType,
   safeExternalUrl,
 } from '../utils/format'
+import { useConfirmDialog } from '../hooks/useConfirmDialog'
 
 export default function ArticleShowPage() {
   const { id } = useParams<{ id: string }>()
@@ -22,6 +23,7 @@ export default function ArticleShowPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+  const { confirm, dialog } = useConfirmDialog()
 
   const loadArticle = useCallback(async () => {
     if (!articleId || Number.isNaN(articleId)) {
@@ -65,8 +67,12 @@ export default function ArticleShowPage() {
 
   const handleBookmarkToggle = async () => {
     if (!article) return
-    if (article.bookmarked && !window.confirm('Remove this article from your reading list?')) {
-      return
+    if (article.bookmarked) {
+      const confirmed = await confirm({
+        message: 'Remove this article from your reading list?',
+        confirmLabel: 'Remove',
+      })
+      if (!confirmed) return
     }
 
     setActionError(null)
@@ -258,6 +264,7 @@ export default function ArticleShowPage() {
           </div>
         </div>
       </article>
+      {dialog}
     </div>
   )
 }
