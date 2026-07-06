@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 
 interface EmptyStateAction {
   href: string
@@ -40,10 +41,10 @@ export default function EmptyState({
           }
         >
           {actions.map((action) => (
-            <a key={`${action.href}-${action.label}`} href={action.href} className={action.className}>
+            <Link key={`${action.href}-${action.label}`} to={action.href} className={action.className}>
               {action.icon}
               {action.label}
-            </a>
+            </Link>
           ))}
         </div>
       )}

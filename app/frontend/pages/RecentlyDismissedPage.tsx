@@ -1,6 +1,7 @@
 import { undismissArticle } from '../api/articles'
 import { fetchRecentlyDismissed } from '../api/dismissedArticles'
 import type { DismissedArticle } from '../types/dismissedArticle'
+import { Link, NavLink } from 'react-router-dom'
 import DismissedArticlesList from '../components/DismissedArticlesList'
 import PageShell from '../components/PageShell'
 import EmptyState from '../components/EmptyState'
@@ -47,24 +48,29 @@ export default function RecentlyDismissedPage() {
             <p className="text-gray-400 text-lg">Articles dismissed in the last 24 hours - easy to restore</p>
           </div>
           <div className="flex items-center space-x-4">
-            <a
-              href="/articles"
+            <Link
+              to="/articles"
               className="group flex items-center px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25"
             >
               <svg className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
               Back to All Articles
-            </a>
-            <a
-              href="/dismissed"
-              className="group flex items-center px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-red-700 hover:to-red-800 hover:scale-105 hover:shadow-lg hover:shadow-red-500/25"
+            </Link>
+            <NavLink
+              to="/dismissed"
+              className={({ isActive }) =>
+                [
+                  'group flex items-center px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-red-700 hover:to-red-800 hover:scale-105 hover:shadow-lg hover:shadow-red-500/25',
+                  isActive ? 'ring-2 ring-white/30' : '',
+                ].join(' ')
+              }
             >
               <svg className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
               All Dismissed
-            </a>
+            </NavLink>
           </div>
         </div>
       </div>

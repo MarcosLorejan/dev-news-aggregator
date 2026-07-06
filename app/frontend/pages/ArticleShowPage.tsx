@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import {
   bookmarkArticle,
   fetchArticle,
@@ -107,12 +107,12 @@ export default function ArticleShowPage() {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl text-center" data-testid="article-show-page">
         <p className="text-red-400 mb-4">{error ?? 'Article not found.'}</p>
-        <a
-          href="/articles"
+        <Link
+          to="/articles"
           className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg"
         >
           Back to Articles
-        </a>
+        </Link>
       </div>
     )
   }
@@ -122,15 +122,15 @@ export default function ArticleShowPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl" data-testid="article-show-page">
       <div className="mb-8 animate-fade-in">
-        <a
-          href="/articles"
+        <Link
+          to="/articles"
           className="group inline-flex items-center px-4 py-2 bg-gradient-to-r from-dark-700 to-dark-600 border border-dark-500 text-gray-300 rounded-xl font-medium transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:border-primary-500 hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25"
         >
           <svg className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Back to Articles
-        </a>
+        </Link>
       </div>
 
       <article className="glass-effect rounded-2xl p-8 md:p-12 animate-slide-up">

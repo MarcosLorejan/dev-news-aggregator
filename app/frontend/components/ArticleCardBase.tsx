@@ -1,4 +1,5 @@
 import type { CSSProperties, MouseEvent, ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import {
   formatPublishedDate,
   humanizeSourceType,
@@ -223,8 +224,8 @@ export default function ArticleCardBase({
         <div className="flex items-center space-x-3">
           {actions}
           {detailsHref && (
-            <a
-              href={detailsHref}
+            <Link
+              to={detailsHref}
               className={`group/detail px-4 py-2 bg-gradient-to-r from-dark-700 to-dark-600 border border-dark-500 text-gray-300 rounded-lg font-medium transition-all duration-200 ${styles.detailsHover} hover:text-white hover:scale-105 hover:shadow-lg`}
               onClick={stopPropagation}
             >
@@ -244,7 +245,7 @@ export default function ArticleCardBase({
                   />
                 </svg>
               </span>
-            </a>
+            </Link>
           )}
         </div>
       </div>
