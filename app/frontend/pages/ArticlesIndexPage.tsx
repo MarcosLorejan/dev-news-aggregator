@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import {
   bookmarkArticle,
   dismissArticle,
@@ -17,7 +18,8 @@ import CategoryFilter from '../components/CategoryFilter'
 import DismissToast from '../components/DismissToast'
 import PageHeader from '../components/PageHeader'
 import PaginationControls from '../components/PaginationControls'
-import ScoreFilter, { scoreFilterParams, type ScoreFilterValue } from '../components/ScoreFilter'
+import ScoreFilter, { parseScoreFilter, scoreFilterParams, type ScoreFilterValue } from '../components/ScoreFilter'
+import { usePatchSearchParams } from '../hooks/useSearchParamState'
 
 const DISMISS_TIMEOUT_SECONDS = 15
 
@@ -33,13 +35,20 @@ function buildArticleCategories(response: ArticlesIndexResponse): Record<number,
 }
 
 export default function ArticlesIndexPage() {
+  const [searchParams] = useSearchParams()
+  const patchSearchParams = usePatchSearchParams()
+
+  const currentPage = (() => {
+    const raw = parseInt(searchParams.get('page') ?? '1', 10)
+    return Number.isFinite(raw) && raw >= 1 ? raw : 1
+  })()
+  const activeFilter = searchParams.get('category') ?? 'all'
+  const activeScoreFilter = parseScoreFilter(searchParams.get('score'))
+  const showRead = searchParams.get('show_read') === 'true'
+
   const [data, setData] = useState<ArticlesIndexResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeFilter, setActiveFilter] = useState('all')
-  const [activeScoreFilter, setActiveScoreFilter] = useState<ScoreFilterValue>('all')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [showRead, setShowRead] = useState(false)
   const [fetchingNews, setFetchingNews] = useState(false)
   const [fetchMessage, setFetchMessage] = useState<string | null>(null)
   const [dismissingIds, setDismissingIds] = useState<Set<number>>(new Set())
@@ -62,14 +71,17 @@ export default function ArticlesIndexPage() {
       setData(response)
       setRemovedIds(new Set())
       if (options?.page !== undefined && options.page !== currentPage) {
-        setCurrentPage(options.page)
+        patchSearchParams((params) => {
+          if (options.page! <= 1) params.delete('page')
+          else params.set('page', String(options.page))
+        })
       }
     } catch {
       setError('Failed to load articles. Please try again.')
     } finally {
       setLoading(false)
     }
-  }, [showRead, activeScoreFilter, currentPage])
+  }, [showRead, activeScoreFilter, currentPage, patchSearchParams])
 
   useEffect(() => {
     loadArticles()
@@ -168,13 +180,34 @@ export default function ArticlesIndexPage() {
   }, [finalizeDismiss, toast])
 
   const handleShowReadChange = (value: boolean) => {
-    setCurrentPage(1)
-    setShowRead(value)
+    patchSearchParams((params) => {
+      if (value) params.set('show_read', 'true')
+      else params.delete('show_read')
+      params.delete('page')
+    })
   }
 
   const handleScoreFilterChange = (value: ScoreFilterValue) => {
-    setCurrentPage(1)
-    setActiveScoreFilter(value)
+    patchSearchParams((params) => {
+      if (value === 'all') params.delete('score')
+      else params.set('score', value)
+      params.delete('page')
+    })
+  }
+
+  const handleFilterChange = (filter: string) => {
+    patchSearchParams((params) => {
+      if (filter === 'all') params.delete('category')
+      else params.set('category', filter)
+      params.delete('page')
+    })
+  }
+
+  const handlePageChange = (page: number) => {
+    patchSearchParams((params) => {
+      if (page <= 1) params.delete('page')
+      else params.set('page', String(page))
+    })
   }
 
   const handleFetchNews = async () => {
@@ -184,6 +217,9 @@ export default function ArticlesIndexPage() {
     try {
       const result = await fetchNews()
       setFetchMessage(`Fetched ${result.articles_count} articles in ${result.duration}s`)
+      patchSearchParams((params) => {
+        params.delete('page')
+      })
       await loadArticles({ page: 1 })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch news.')
@@ -317,7 +353,7 @@ export default function ArticlesIndexPage() {
         totalCount={data.pagination.total_count}
         lastUpdated={data.last_updated}
         showRead={showRead}
-        onShowReadChange={setShowRead}
+        onShowReadChange={handleShowReadChange}
         onFetchNews={handleFetchNews}
         fetchingNews={fetchingNews}
         fetchMessage={fetchMessage}
@@ -337,7 +373,7 @@ export default function ArticlesIndexPage() {
         categoryCounts={categoryCounts}
         totalCount={articles.length}
         activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
+        onFilterChange={handleFilterChange}
       />
 
       <ArticleList
@@ -356,7 +392,7 @@ export default function ArticlesIndexPage() {
         totalPages={data.pagination.total_pages}
         totalCount={data.pagination.total_count}
         perPage={data.pagination.per_page}
-        onPageChange={setCurrentPage}
+        onPageChange={handlePageChange}
       />
 
       {toast && (
