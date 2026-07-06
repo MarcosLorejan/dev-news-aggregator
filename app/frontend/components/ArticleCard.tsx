@@ -1,7 +1,21 @@
 import type { Article } from '../types/article'
-import ArticleCardBase from './ArticleCardBase'
+import type { BookmarkArticle } from '../types/bookmark'
+import type { DismissedArticle } from '../types/dismissedArticle'
+import type { ReadArticle } from '../types/readArticle'
+import { formatBookmarkedDate, formatTimeAgo } from '../utils/format'
+import { useConfirmDialog } from '../hooks/useConfirmDialog'
+import ArticleCardLayout from './articleCard/ArticleCardLayout'
+import {
+  BookmarkButton,
+  DismissButton,
+  ReadButton,
+  RestoreButton,
+} from './articleCard/CardActions'
+import { variantBorderClass, variantTheme, type ArticleCardVariant } from './articleCard/cardThemes'
+import Badge from './ui/Badge'
 
-interface ArticleCardProps {
+type FeedCardProps = {
+  variant: 'feed'
   article: Article
   categorySlug: string
   index: number
@@ -12,114 +26,191 @@ interface ArticleCardProps {
   onReadToggle: (article: Article) => void
 }
 
-export default function ArticleCard({
-  article,
-  categorySlug,
-  index,
-  isDismissing,
-  onDismiss,
-  onUndoDismiss,
-  onBookmarkToggle,
-  onReadToggle,
-}: ArticleCardProps) {
-  return (
-    <ArticleCardBase
-      article={article}
-      index={index}
-      categorySlug={categorySlug}
-      onArticleClick={isDismissing ? () => onUndoDismiss?.(article) : undefined}
-      articleStyle={{
-        opacity: isDismissing ? 0.5 : 1,
-        cursor: isDismissing ? 'pointer' : undefined,
-      }}
-      headerActions={
-        <button
-          type="button"
-          className="group/dismiss p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all duration-200 hover:scale-110"
-          title="Dismiss article"
-          aria-label="Dismiss article"
-          onClick={(event) => {
-            event.stopPropagation()
-            onDismiss(article)
-          }}
-        >
-          <svg
-            className="w-4 h-4 transition-transform group-hover/dismiss:scale-110"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-      }
-      actions={
-        <>
-          <button
-            type="button"
-            className={
-              article.bookmarked
-                ? 'group/bookmark p-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-110 hover:shadow-lg hover:shadow-primary-500/25'
-                : 'group/bookmark p-2 bg-dark-700 border border-dark-600 text-gray-400 rounded-lg transition-all duration-200 hover:bg-primary-600 hover:border-primary-500 hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-primary-500/25'
-            }
-            title={article.bookmarked ? 'Remove from reading list' : 'Add to reading list'}
-            aria-label={article.bookmarked ? 'Remove from reading list' : 'Add to reading list'}
-            onClick={(event) => {
-              event.stopPropagation()
-              onBookmarkToggle(article)
-            }}
-          >
-            <svg
-              className="w-4 h-4 transition-transform group-hover/bookmark:scale-110"
-              fill={article.bookmarked ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-              />
-            </svg>
-          </button>
+type BookmarkCardProps = {
+  variant: 'bookmark'
+  article: BookmarkArticle
+  index: number
+  onRemoveBookmark: (article: BookmarkArticle) => void
+  onReadToggle: (article: BookmarkArticle) => void
+}
 
-          <button
-            type="button"
-            className={
-              article.read
-                ? 'group/read p-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg transition-all duration-200 hover:from-orange-600 hover:to-orange-700 hover:scale-110 hover:shadow-lg hover:shadow-orange-500/25'
-                : 'group/read p-2 bg-dark-700 border border-dark-600 text-gray-400 rounded-lg transition-all duration-200 hover:bg-green-600 hover:border-green-500 hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-green-500/25'
-            }
-            title={article.read ? 'Mark as unread' : 'Mark as read'}
-            aria-label={article.read ? 'Mark as unread' : 'Mark as read'}
-            onClick={(event) => {
-              event.stopPropagation()
-              onReadToggle(article)
-            }}
-          >
-            <svg
-              className="w-4 h-4 transition-transform group-hover/read:scale-110"
-              fill={article.read ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+type ReadCardProps = {
+  variant: 'read'
+  article: ReadArticle
+  index: number
+  onUnmarkRead: (article: ReadArticle) => void
+}
+
+type DismissedCardProps = {
+  variant: 'dismissed' | 'recent-dismissed'
+  article: DismissedArticle
+  index: number
+  onRestore: (article: DismissedArticle) => void
+}
+
+export type ArticleCardProps = FeedCardProps | BookmarkCardProps | ReadCardProps | DismissedCardProps
+
+export default function ArticleCard(props: ArticleCardProps) {
+  const { confirm, dialog } = useConfirmDialog()
+  const { variant, article, index } = props
+  const theme = variantTheme(variant)
+  const detailsHref = `/articles/${article.id}`
+
+  if (variant === 'feed') {
+    const { categorySlug, isDismissing, onDismiss, onUndoDismiss, onBookmarkToggle, onReadToggle } =
+      props
+    return (
+      <ArticleCardLayout
+        article={article}
+        index={index}
+        theme={theme}
+        categorySlug={categorySlug}
+        onArticleClick={isDismissing ? () => onUndoDismiss?.(article) : undefined}
+        articleStyle={{
+          opacity: isDismissing ? 0.5 : 1,
+          cursor: isDismissing ? 'pointer' : undefined,
+        }}
+        headerActions={<DismissButton onClick={() => onDismiss(article)} />}
+        actions={
+          <>
+            <BookmarkButton
+              active={article.bookmarked}
+              mode="toggle"
+              onClick={() => onBookmarkToggle(article)}
+            />
+            <ReadButton
+              active={article.read}
+              mode="toggle"
+              onClick={() => onReadToggle(article)}
+            />
+          </>
+        }
+        detailsHref={detailsHref}
+      />
+    )
+  }
+
+  if (variant === 'bookmark') {
+    const { onRemoveBookmark, onReadToggle } = props
+    const handleRemove = async () => {
+      const confirmed = await confirm({
+        message: 'Remove this article from your reading list?',
+        confirmLabel: 'Remove',
+      })
+      if (confirmed) onRemoveBookmark(article)
+    }
+
+    return (
+      <>
+        <ArticleCardLayout
+          article={article}
+          index={index}
+          theme={theme}
+          extraMetadata={
+            article.bookmarked_at ? (
+              <span className="flex items-center text-primary-400">
+                <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                </svg>
+                Bookmarked {formatBookmarkedDate(article.bookmarked_at)}
+              </span>
+            ) : undefined
+          }
+          actions={
+            <>
+              <ReadButton
+                active={article.read}
+                mode="toggle"
+                onClick={() => onReadToggle(article)}
               />
-            </svg>
-          </button>
-        </>
-      }
-      detailsHref={`/articles/${article.id}`}
-    />
+              <BookmarkButton active mode="remove" onClick={handleRemove} />
+            </>
+          }
+          detailsHref={detailsHref}
+        />
+        {dialog}
+      </>
+    )
+  }
+
+  if (variant === 'read') {
+    const { onUnmarkRead } = props
+    const handleUnmark = async () => {
+      const confirmed = await confirm({
+        message: 'Mark this article as unread?',
+        confirmLabel: 'Mark unread',
+        confirmTone: 'primary',
+      })
+      if (confirmed) onUnmarkRead(article)
+    }
+
+    return (
+      <>
+        <ArticleCardLayout
+          article={article}
+          index={index}
+          theme={theme}
+          extraMetadata={
+            article.read_at ? (
+              <span className="flex items-center text-green-400">
+                <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Read {formatBookmarkedDate(article.read_at)}
+              </span>
+            ) : undefined
+          }
+          actions={<ReadButton active mode="unmark" onClick={handleUnmark} />}
+          detailsHref={detailsHref}
+        />
+        {dialog}
+      </>
+    )
+  }
+
+  const isRecent = variant === 'recent-dismissed'
+  const { onRestore } = props
+  const restoreLabel = isRecent ? 'Quick Restore' : 'Restore'
+
+  const handleRestore = async () => {
+    if (!isRecent) {
+      const confirmed = await confirm({
+        message: 'Restore this article to your main feed?',
+        confirmLabel: 'Restore',
+        confirmTone: 'primary',
+      })
+      if (!confirmed) return
+    }
+    onRestore(article)
+  }
+
+  const badgeText = isRecent
+    ? article.dismissed_at
+      ? formatTimeAgo(article.dismissed_at)
+      : 'Recently'
+    : article.dismissed_at
+      ? `Dismissed ${formatBookmarkedDate(article.dismissed_at)}`
+      : 'Dismissed'
+
+  return (
+    <>
+      <ArticleCardLayout
+        article={article}
+        index={index}
+        theme={theme}
+        borderClass={variantBorderClass(variant)}
+        showSourceBadge={false}
+        badge={<Badge variant={isRecent ? 'orange' : 'red'}>{badgeText}</Badge>}
+        actions={<RestoreButton label={restoreLabel} onClick={handleRestore} />}
+      />
+      {dialog}
+    </>
   )
 }
+
+export type { ArticleCardData } from './articleCard/cardThemes'

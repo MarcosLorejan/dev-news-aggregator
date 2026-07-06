@@ -1,5 +1,5 @@
 import type { BookmarkArticle } from '../types/bookmark'
-import BookmarkCard from './BookmarkCard'
+import ArticleCard from './ArticleCard'
 
 interface BookmarksListProps {
   articles: BookmarkArticle[]
@@ -22,8 +22,9 @@ export default function BookmarksList({
   return (
     <div className="grid gap-6 animate-scale-in">
       {visibleArticles.map((article, index) => (
-        <BookmarkCard
+        <ArticleCard
           key={article.id}
+          variant="bookmark"
           article={article}
           index={index}
           onRemoveBookmark={onRemoveBookmark}

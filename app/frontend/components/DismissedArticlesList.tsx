@@ -1,5 +1,5 @@
 import type { DismissedArticle } from '../types/dismissedArticle'
-import DismissedArticleCard from './DismissedArticleCard'
+import ArticleCard from './ArticleCard'
 
 interface DismissedArticlesListProps {
   articles: DismissedArticle[]
@@ -12,14 +12,16 @@ export default function DismissedArticlesList({
   variant,
   onRestore,
 }: DismissedArticlesListProps) {
+  const cardVariant = variant === 'recent' ? 'recent-dismissed' : 'dismissed'
+
   return (
     <div className="grid gap-6 animate-scale-in">
       {articles.map((article, index) => (
-        <DismissedArticleCard
+        <ArticleCard
           key={article.id}
+          variant={cardVariant}
           article={article}
           index={index}
-          variant={variant}
           onRestore={onRestore}
         />
       ))}

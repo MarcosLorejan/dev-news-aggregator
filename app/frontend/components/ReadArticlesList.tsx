@@ -1,5 +1,5 @@
 import type { ReadArticle } from '../types/readArticle'
-import ReadArticleCard from './ReadArticleCard'
+import ArticleCard from './ArticleCard'
 
 interface ReadArticlesListProps {
   articles: ReadArticle[]
@@ -20,8 +20,9 @@ export default function ReadArticlesList({
   return (
     <div className="grid gap-6 animate-scale-in">
       {filtered.map((article, index) => (
-        <ReadArticleCard
+        <ArticleCard
           key={article.id}
+          variant="read"
           article={article}
           index={index}
           onUnmarkRead={onUnmarkRead}
