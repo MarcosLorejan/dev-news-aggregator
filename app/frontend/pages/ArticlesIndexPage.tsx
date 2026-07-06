@@ -16,6 +16,7 @@ import ArticleList from '../components/ArticleList'
 import CategoryFilter from '../components/CategoryFilter'
 import DismissToast from '../components/DismissToast'
 import PageHeader from '../components/PageHeader'
+import PaginationControls from '../components/PaginationControls'
 import ScoreFilter, { scoreFilterParams, type ScoreFilterValue } from '../components/ScoreFilter'
 
 const DISMISS_TIMEOUT_SECONDS = 15
@@ -37,6 +38,7 @@ export default function ArticlesIndexPage() {
   const [error, setError] = useState<string | null>(null)
   const [activeFilter, setActiveFilter] = useState('all')
   const [activeScoreFilter, setActiveScoreFilter] = useState<ScoreFilterValue>('all')
+  const [currentPage, setCurrentPage] = useState(1)
   const [showRead, setShowRead] = useState(false)
   const [fetchingNews, setFetchingNews] = useState(false)
   const [fetchMessage, setFetchMessage] = useState<string | null>(null)
@@ -47,22 +49,27 @@ export default function ArticlesIndexPage() {
   const countdownRef = useRef<number | null>(null)
   const pendingDismissRef = useRef<{ articleId: number; title: string } | null>(null)
 
-  const loadArticles = useCallback(async () => {
+  const loadArticles = useCallback(async (options?: { page?: number }) => {
+    const page = options?.page ?? currentPage
     setLoading(true)
     setError(null)
     try {
       const response = await fetchArticles({
+        page,
         show_read: showRead,
         ...scoreFilterParams(activeScoreFilter),
       })
       setData(response)
       setRemovedIds(new Set())
+      if (options?.page !== undefined && options.page !== currentPage) {
+        setCurrentPage(options.page)
+      }
     } catch {
       setError('Failed to load articles. Please try again.')
     } finally {
       setLoading(false)
     }
-  }, [showRead, activeScoreFilter])
+  }, [showRead, activeScoreFilter, currentPage])
 
   useEffect(() => {
     loadArticles()
@@ -160,6 +167,16 @@ export default function ArticlesIndexPage() {
     }
   }, [finalizeDismiss, toast])
 
+  const handleShowReadChange = (value: boolean) => {
+    setCurrentPage(1)
+    setShowRead(value)
+  }
+
+  const handleScoreFilterChange = (value: ScoreFilterValue) => {
+    setCurrentPage(1)
+    setActiveScoreFilter(value)
+  }
+
   const handleFetchNews = async () => {
     setFetchingNews(true)
     setFetchMessage(null)
@@ -167,7 +184,7 @@ export default function ArticlesIndexPage() {
     try {
       const result = await fetchNews()
       setFetchMessage(`Fetched ${result.articles_count} articles in ${result.duration}s`)
-      await loadArticles()
+      await loadArticles({ page: 1 })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch news.')
     } finally {
@@ -248,7 +265,7 @@ export default function ArticlesIndexPage() {
         <button
           type="button"
           className="px-4 py-2 bg-primary-600 text-white rounded-lg"
-          onClick={loadArticles}
+          onClick={() => loadArticles()}
         >
           Retry
         </button>
@@ -265,7 +282,7 @@ export default function ArticlesIndexPage() {
           totalCount={data?.pagination.total_count ?? 0}
           lastUpdated={data?.last_updated ?? null}
           showRead={showRead}
-          onShowReadChange={setShowRead}
+          onShowReadChange={handleShowReadChange}
           onFetchNews={handleFetchNews}
           fetchingNews={fetchingNews}
           fetchMessage={fetchMessage}
@@ -312,7 +329,7 @@ export default function ArticlesIndexPage() {
 
       <ScoreFilter
         activeScoreFilter={activeScoreFilter}
-        onScoreFilterChange={setActiveScoreFilter}
+        onScoreFilterChange={handleScoreFilterChange}
       />
 
       <CategoryFilter
@@ -332,6 +349,14 @@ export default function ArticlesIndexPage() {
         onUndoDismiss={handleUndoDismiss}
         onBookmarkToggle={handleBookmarkToggle}
         onReadToggle={handleReadToggle}
+      />
+
+      <PaginationControls
+        currentPage={data.pagination.current_page}
+        totalPages={data.pagination.total_pages}
+        totalCount={data.pagination.total_count}
+        perPage={data.pagination.per_page}
+        onPageChange={setCurrentPage}
       />
 
       {toast && (
