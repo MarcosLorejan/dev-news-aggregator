@@ -18,6 +18,19 @@ class ReactShellTest < ActionDispatch::IntegrationTest
     assert manifest.key?("entrypoints/application.tsx")
   end
 
+  test "vite test manifest lazy-loads route page chunks" do
+    manifest_path = Rails.root.join("public/vite-test/.vite/manifest.json")
+    skip "Run npm run build:test before this test" unless manifest_path.exist?
+
+    entry = JSON.parse(manifest_path.read).fetch("entrypoints/application.tsx")
+    dynamic_imports = entry.fetch("dynamicImports")
+
+    assert_includes dynamic_imports, "pages/ArticlesIndexPage.tsx"
+    assert_includes dynamic_imports, "pages/ArticleShowPage.tsx"
+    assert_includes dynamic_imports, "pages/BookmarksIndexPage.tsx"
+    assert_equal 7, dynamic_imports.size
+  end
+
   test "bookmarks index renders react mount point" do
     get bookmarks_path
 
