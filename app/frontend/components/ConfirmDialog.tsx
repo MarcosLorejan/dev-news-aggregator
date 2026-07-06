@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react'
+import Button from './ui/Button'
+import Card from './ui/Card'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -68,11 +70,6 @@ export default function ConfirmDialog({
 
   if (!open) return null
 
-  const confirmButtonClass =
-    confirmTone === 'primary'
-      ? 'px-4 py-2 rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium hover:from-primary-700 hover:to-primary-800 transition-colors'
-      : 'px-4 py-2 rounded-lg bg-gradient-to-r from-red-600 to-red-700 text-white font-medium hover:from-red-700 hover:to-red-800 transition-colors'
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -80,42 +77,46 @@ export default function ConfirmDialog({
       data-testid="confirm-dialog-backdrop"
       onClick={onCancel}
     >
-      <div
-        ref={dialogRef}
-        role="alertdialog"
-        aria-modal="true"
-        aria-labelledby="confirm-dialog-title"
-        aria-describedby="confirm-dialog-message"
-        className="glass-effect rounded-2xl p-6 w-full max-w-md shadow-2xl border border-dark-600 animate-fade-in"
-        data-testid="confirm-dialog"
-        onClick={(event) => event.stopPropagation()}
+      <Card
+        padding="md"
+        className="w-full max-w-md shadow-2xl border border-dark-600 animate-fade-in"
       >
-        <h2 id="confirm-dialog-title" className="text-xl font-bold text-gray-100 mb-3">
-          {title}
-        </h2>
-        <p id="confirm-dialog-message" className="text-gray-400 mb-6 leading-relaxed">
-          {message}
-        </p>
-        <div className="flex justify-end gap-3">
-          <button
-            ref={cancelRef}
-            type="button"
-            className="px-4 py-2 rounded-lg border border-dark-500 bg-dark-700 text-gray-300 font-medium hover:bg-dark-600 hover:text-white transition-colors"
-            onClick={onCancel}
-            data-testid="confirm-dialog-cancel"
-          >
-            {cancelLabel}
-          </button>
-          <button
-            type="button"
-            className={confirmButtonClass}
-            onClick={onConfirm}
-            data-testid="confirm-dialog-confirm"
-          >
-            {confirmLabel}
-          </button>
+        <div
+          ref={dialogRef}
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="confirm-dialog-title"
+          aria-describedby="confirm-dialog-message"
+          data-testid="confirm-dialog"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <h2 id="confirm-dialog-title" className="text-xl font-bold text-gray-100 mb-3">
+            {title}
+          </h2>
+          <p id="confirm-dialog-message" className="text-gray-400 mb-6 leading-relaxed">
+            {message}
+          </p>
+          <div className="flex justify-end gap-3">
+            <Button
+              ref={cancelRef}
+              variant="secondary"
+              size="sm"
+              onClick={onCancel}
+              data-testid="confirm-dialog-cancel"
+            >
+              {cancelLabel}
+            </Button>
+            <Button
+              variant={confirmTone === 'primary' ? 'primary' : 'danger'}
+              size="sm"
+              onClick={onConfirm}
+              data-testid="confirm-dialog-confirm"
+            >
+              {confirmLabel}
+            </Button>
+          </div>
         </div>
-      </div>
+      </Card>
     </div>
   )
 }

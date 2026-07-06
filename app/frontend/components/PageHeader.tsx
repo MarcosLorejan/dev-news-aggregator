@@ -1,5 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import { formatLastUpdated } from '../utils/format'
+import { buttonClassName } from './ui/Button'
+import Card from './ui/Card'
+import Button from './ui/Button'
 
 interface PageHeaderProps {
   totalCount: number
@@ -11,9 +14,12 @@ interface PageHeaderProps {
   fetchMessage?: string | null
 }
 
-function navLinkClassName(base: string) {
+function navLinkClassName(color: 'blue' | 'purple') {
   return ({ isActive }: { isActive: boolean }) =>
-    isActive ? `${base} ring-2 ring-white/30` : base
+    buttonClassName({
+      color,
+      className: isActive ? 'ring-2 ring-white/30' : undefined,
+    })
 }
 
 export default function PageHeader({
@@ -26,7 +32,7 @@ export default function PageHeader({
   fetchMessage = null,
 }: PageHeaderProps) {
   return (
-    <div className="glass-effect rounded-2xl p-8 mb-8 animate-fade-in">
+    <Card padding="lg" className="mb-8" animate>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent mb-2">
@@ -39,9 +45,9 @@ export default function PageHeader({
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {onFetchNews && (
-            <button
-              type="button"
-              className="group flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:scale-105 disabled:opacity-60 disabled:hover:scale-100"
+            <Button
+              color="blue"
+              className="group"
               onClick={onFetchNews}
               disabled={fetchingNews}
               data-testid="fetch-news-button"
@@ -50,14 +56,9 @@ export default function PageHeader({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
               {fetchingNews ? 'Fetching...' : 'Fetch News'}
-            </button>
+            </Button>
           )}
-          <NavLink
-            to="/sources"
-            className={navLinkClassName(
-              'group flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-purple-700 hover:to-purple-800 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25'
-            )}
-          >
+          <NavLink to="/sources" className={navLinkClassName('purple')}>
             Sources
           </NavLink>
           {onShowReadChange && (
@@ -87,6 +88,6 @@ export default function PageHeader({
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   )
 }

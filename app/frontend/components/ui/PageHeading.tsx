@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import Card from './Card'
 
 interface PageHeadingProps {
   title: string
@@ -16,7 +17,7 @@ export default function PageHeading({
   meta,
 }: PageHeadingProps) {
   return (
-    <div className="glass-effect rounded-2xl p-6 md:p-8 mb-8 animate-fade-in">
+    <Card padding="lg" className="mb-8" animate>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
         <div>
           <h1 className={`text-3xl md:text-4xl font-bold mb-2 ${titleClassName}`}>{title}</h1>
@@ -29,6 +30,6 @@ export default function PageHeading({
           </div>
         )}
       </div>
-    </div>
+    </Card>
   )
 }

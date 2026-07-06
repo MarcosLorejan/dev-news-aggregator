@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import PageContainer from './ui/PageContainer'
 import ErrorRetry from './ErrorRetry'
 
 interface PageShellProps {
@@ -22,29 +23,25 @@ export default function PageShell({
 }: PageShellProps) {
   if (loading) {
     return (
-      <div
-        className="container mx-auto px-4 py-8 max-w-7xl text-center text-gray-400"
-        data-testid={testId}
+      <PageContainer
+        testId={testId}
+        centered
         role="status"
         aria-live="polite"
-        aria-busy="true"
+        aria-busy
       >
         {loadingMessage}
-      </div>
+      </PageContainer>
     )
   }
 
   if (showFatalError && error) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl text-center" data-testid={testId}>
+      <PageContainer testId={testId} centered>
         <ErrorRetry message={error} onRetry={onRetry} />
-      </div>
+      </PageContainer>
     )
   }
 
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl" data-testid={testId}>
-      {children}
-    </div>
-  )
+  return <PageContainer testId={testId}>{children}</PageContainer>
 }

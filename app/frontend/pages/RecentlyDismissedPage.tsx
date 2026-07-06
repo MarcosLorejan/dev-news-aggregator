@@ -4,7 +4,8 @@ import type { DismissedArticle } from '../types/dismissedArticle'
 import { NavLink } from 'react-router-dom'
 import DismissedArticlesList from '../components/DismissedArticlesList'
 import PageShell from '../components/PageShell'
-import PageHeading from '../components/PageHeading'
+import { buttonClassName } from '../components/ui/Button'
+import PageHeading from '../components/ui/PageHeading'
 import EmptyState from '../components/EmptyState'
 import { useAsyncResource } from '../hooks/useAsyncResource'
 
@@ -48,10 +49,10 @@ export default function RecentlyDismissedPage() {
           <NavLink
             to="/dismissed"
             className={({ isActive }) =>
-              [
-                'group flex items-center px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-red-700 hover:to-red-800 hover:scale-105 hover:shadow-lg hover:shadow-red-500/25',
-                isActive ? 'ring-2 ring-white/30' : '',
-              ].join(' ')
+              buttonClassName({
+                color: 'red',
+                className: isActive ? 'ring-2 ring-white/30' : undefined,
+              })
             }
           >
             <svg className="w-4 h-4 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,8 +79,7 @@ export default function RecentlyDismissedPage() {
             {
               href: '/articles',
               label: 'Browse Articles',
-              className:
-                'inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105',
+              color: 'primary' as const,
               icon: (
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -89,8 +89,7 @@ export default function RecentlyDismissedPage() {
             {
               href: '/dismissed',
               label: 'View All Dismissed',
-              className:
-                'inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-red-700 hover:to-red-800 hover:scale-105',
+              color: 'red' as const,
               icon: (
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />

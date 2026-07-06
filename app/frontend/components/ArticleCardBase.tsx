@@ -5,6 +5,8 @@ import {
   humanizeSourceType,
   truncate,
 } from '../utils/format'
+import Badge, { type BadgeVariant } from './ui/Badge'
+import { cn } from '../utils/cn'
 
 export interface ArticleCardData {
   id: number
@@ -25,7 +27,7 @@ const CARD_THEMES: Record<
     titleHover: string
     linkHover: string
     shadowHover: string
-    badge: string
+    badgeVariant: BadgeVariant
     detailsHover: string
     dateAccent: string
   }
@@ -34,8 +36,7 @@ const CARD_THEMES: Record<
     titleHover: 'group-hover:text-primary-300',
     linkHover: 'hover:text-primary-400',
     shadowHover: 'hover:shadow-primary-500/10',
-    badge:
-      'bg-gradient-to-r from-primary-600/20 to-primary-700/20 text-primary-300 border border-primary-500/30',
+    badgeVariant: 'primary',
     detailsHover:
       'hover:from-primary-600 hover:to-primary-700 hover:border-primary-500 hover:shadow-primary-500/20',
     dateAccent: 'text-primary-400',
@@ -44,8 +45,7 @@ const CARD_THEMES: Record<
     titleHover: 'group-hover:text-green-300',
     linkHover: 'hover:text-green-400',
     shadowHover: 'hover:shadow-green-500/10',
-    badge:
-      'bg-gradient-to-r from-green-600/20 to-green-700/20 text-green-300 border border-green-500/30',
+    badgeVariant: 'green',
     detailsHover:
       'hover:from-green-600 hover:to-green-700 hover:border-green-500 hover:shadow-green-500/20',
     dateAccent: 'text-primary-400',
@@ -54,8 +54,7 @@ const CARD_THEMES: Record<
     titleHover: 'group-hover:text-red-300',
     linkHover: 'hover:text-red-400',
     shadowHover: 'hover:shadow-red-500/10',
-    badge:
-      'bg-gradient-to-r from-red-600/20 to-red-700/20 text-red-300 border border-red-500/30',
+    badgeVariant: 'red',
     detailsHover:
       'hover:from-primary-600 hover:to-primary-700 hover:border-primary-500 hover:shadow-primary-500/20',
     dateAccent: 'text-red-400',
@@ -64,8 +63,7 @@ const CARD_THEMES: Record<
     titleHover: 'group-hover:text-orange-300',
     linkHover: 'hover:text-orange-400',
     shadowHover: 'hover:shadow-orange-500/10',
-    badge:
-      'bg-gradient-to-r from-orange-600/20 to-orange-700/20 text-orange-300 border border-orange-500/30',
+    badgeVariant: 'orange',
     detailsHover:
       'hover:from-primary-600 hover:to-primary-700 hover:border-primary-500 hover:shadow-primary-500/20',
     dateAccent: 'text-orange-400',
@@ -111,7 +109,11 @@ export default function ArticleCardBase({
 
   return (
     <article
-      className={`article-card group glass-effect rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl ${styles.shadowHover} animate-fade-in ${borderClass}`}
+      className={cn(
+        'article-card group glass-effect rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl animate-fade-in',
+        styles.shadowHover,
+        borderClass
+      )}
       data-source={article.source_type}
       data-category={categorySlug}
       style={{
@@ -152,11 +154,7 @@ export default function ArticleCardBase({
         <div className="ml-4 flex items-center space-x-2">
           {badge}
           {showSourceBadge && !badge && (
-            <span
-              className={`inline-block px-3 py-1.5 text-xs font-semibold rounded-full ${styles.badge}`}
-            >
-              {humanizeSourceType(article.source_type)}
-            </span>
+            <Badge variant={styles.badgeVariant}>{humanizeSourceType(article.source_type)}</Badge>
           )}
           {headerActions}
         </div>

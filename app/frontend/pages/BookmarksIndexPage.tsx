@@ -9,7 +9,7 @@ import type { BookmarkArticle } from '../types/bookmark'
 import BookmarksList from '../components/BookmarksList'
 import SourceFilter from '../components/SourceFilter'
 import PageShell from '../components/PageShell'
-import PageHeading from '../components/PageHeading'
+import PageHeading from '../components/ui/PageHeading'
 import EmptyState from '../components/EmptyState'
 import { useAsyncResource } from '../hooks/useAsyncResource'
 import { useSearchParam } from '../hooks/useSearchParamState'
@@ -128,8 +128,7 @@ export default function BookmarksIndexPage() {
             {
               href: '/articles',
               label: 'Browse Articles',
-              className:
-                'group inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25',
+              color: 'primary' as const,
               icon: (
                 <svg className="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />

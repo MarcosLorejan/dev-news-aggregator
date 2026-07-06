@@ -11,6 +11,12 @@
   --dark-850: 23 32 51;
   --dark-900: 15 23 42;
   --dark-950: 2 6 23;
+  /* 8px spacing grid: 8, 16, 24, 32, 48 → space-2, space-4, space-6, space-8, space-12 */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-6: 3rem;
 }
 
 @layer utilities {
