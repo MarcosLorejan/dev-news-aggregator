@@ -7,7 +7,10 @@ import {
   type NewsSource,
 } from '../api/sources'
 import { useConfirmDialog } from '../hooks/useConfirmDialog'
-import PageHeading from '../components/PageHeading'
+import Button from '../components/ui/Button'
+import Card from '../components/ui/Card'
+import PageContainer from '../components/ui/PageContainer'
+import PageHeading from '../components/ui/PageHeading'
 
 function sourceLabel(source: NewsSource): string {
   if (source.source_type === 'reddit') {
@@ -89,14 +92,14 @@ export default function SourcesIndexPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl text-center text-gray-400" data-testid="sources-page">
+      <PageContainer width="4xl" testId="sources-page" centered>
         Loading sources...
-      </div>
+      </PageContainer>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl" data-testid="sources-page">
+    <PageContainer width="4xl" testId="sources-page">
       <PageHeading
         title="News Sources"
         subtitle="Enable or disable sources and manage Reddit subreddits."
@@ -105,7 +108,7 @@ export default function SourcesIndexPage() {
 
       {error && <div className="mb-4 text-sm text-red-400">{error}</div>}
 
-      <section className="glass-effect rounded-2xl p-6 mb-8">
+      <Card as="section" className="mb-8">
         <h2 className="text-lg font-semibold text-gray-200 mb-4">Built-in sources</h2>
         <div className="space-y-3">
           {fixedSources.map((source) => (
@@ -124,9 +127,9 @@ export default function SourcesIndexPage() {
             </div>
           ))}
         </div>
-      </section>
+      </Card>
 
-      <section className="glass-effect rounded-2xl p-6">
+      <Card as="section">
         <h2 className="text-lg font-semibold text-gray-200 mb-4">Reddit subreddits</h2>
 
         <form onSubmit={handleAddSubreddit} className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -138,14 +141,9 @@ export default function SourcesIndexPage() {
             className="flex-1 px-4 py-2 bg-dark-800 border border-dark-700 rounded-xl text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary-500"
             data-testid="subreddit-input"
           />
-          <button
-            type="submit"
-            disabled={adding || !subredditInput.trim()}
-            className="px-4 py-2 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 disabled:opacity-60"
-            data-testid="add-subreddit-button"
-          >
+          <Button type="submit" disabled={adding || !subredditInput.trim()} data-testid="add-subreddit-button">
             {adding ? 'Validating...' : 'Add subreddit'}
-          </button>
+          </Button>
         </form>
 
         {validationError && (
@@ -180,8 +178,8 @@ export default function SourcesIndexPage() {
             <p className="text-gray-500 text-sm">No Reddit subreddits configured.</p>
           )}
         </div>
-      </section>
+      </Card>
       {dialog}
-    </div>
+    </PageContainer>
   )
 }

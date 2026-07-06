@@ -1,10 +1,13 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import type { ButtonColor } from './ui/Button'
+import { buttonClassName } from './ui/Button'
+import Card from './ui/Card'
 
 interface EmptyStateAction {
   href: string
   label: string
-  className: string
+  color?: ButtonColor
   icon?: ReactNode
 }
 
@@ -24,7 +27,7 @@ export default function EmptyState({
   actions = [],
 }: EmptyStateProps) {
   return (
-    <div className="glass-effect rounded-2xl p-12 text-center animate-fade-in">
+    <Card padding="empty" animate>
       <div
         className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${iconWrapperClassName}`}
       >
@@ -41,13 +44,17 @@ export default function EmptyState({
           }
         >
           {actions.map((action) => (
-            <Link key={`${action.href}-${action.label}`} to={action.href} className={action.className}>
+            <Link
+              key={`${action.href}-${action.label}`}
+              to={action.href}
+              className={buttonClassName({ size: 'lg', color: action.color ?? 'primary' })}
+            >
               {action.icon}
               {action.label}
             </Link>
           ))}
         </div>
       )}
-    </div>
+    </Card>
   )
 }

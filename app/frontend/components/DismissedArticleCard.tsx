@@ -2,6 +2,8 @@ import type { DismissedArticle } from '../types/dismissedArticle'
 import { formatBookmarkedDate, formatTimeAgo } from '../utils/format'
 import { useConfirmDialog } from '../hooks/useConfirmDialog'
 import ArticleCardBase from './ArticleCardBase'
+import Badge from './ui/Badge'
+import Button from './ui/Button'
 
 interface DismissedArticleCardProps {
   article: DismissedArticle
@@ -42,10 +44,6 @@ export default function DismissedArticleCard({
       ? `Dismissed ${formatBookmarkedDate(article.dismissed_at)}`
       : 'Dismissed'
 
-  const styles = isRecent
-    ? 'bg-gradient-to-r from-orange-600/20 to-orange-700/20 text-orange-300 border border-orange-500/30'
-    : 'bg-gradient-to-r from-red-600/20 to-red-700/20 text-red-300 border border-red-500/30'
-
   return (
     <>
       <ArticleCardBase
@@ -54,18 +52,9 @@ export default function DismissedArticleCard({
         theme={theme}
         borderClass={borderClass}
         showSourceBadge={false}
-        badge={
-          <span className={`inline-block px-3 py-1.5 text-xs font-semibold rounded-full ${styles}`}>
-            {badgeText}
-          </span>
-        }
+        badge={<Badge variant={isRecent ? 'orange' : 'red'}>{badgeText}</Badge>}
         actions={
-          <button
-            type="button"
-            className="group/restore px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-medium transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-lg hover:shadow-green-500/25"
-            title="Restore article"
-            onClick={handleRestore}
-          >
+          <Button color="green" size="sm" className="group/restore" title="Restore article" onClick={handleRestore}>
             <span className="flex items-center">
               <svg
                 className="w-4 h-4 mr-2 transition-transform group-hover/restore:scale-110"
@@ -82,7 +71,7 @@ export default function DismissedArticleCard({
               </svg>
               {restoreLabel}
             </span>
-          </button>
+          </Button>
         }
       />
       {dialog}
