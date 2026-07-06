@@ -1,36 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { unmarkArticleAsRead } from '../api/articles'
 import { fetchReadArticles } from '../api/readArticles'
 import type { ReadArticle } from '../types/readArticle'
 import ReadArticlesList from '../components/ReadArticlesList'
 import SourceFilter from '../components/SourceFilter'
+import PageShell from '../components/PageShell'
+import EmptyState from '../components/EmptyState'
+import { useAsyncResource } from '../hooks/useAsyncResource'
 
 export default function ReadArticlesIndexPage() {
-  const [articles, setArticles] = useState<ReadArticle[]>([])
-  const [articlesBySource, setArticlesBySource] = useState<Record<string, number[]>>({})
-  const [totalCount, setTotalCount] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, loading, error, reload, setData, setError } = useAsyncResource(fetchReadArticles, {
+    errorMessage: 'Failed to load read articles. Please try again.',
+  })
   const [activeSource, setActiveSource] = useState('all')
 
-  const loadReadArticles = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const response = await fetchReadArticles()
-      setArticles(response.articles)
-      setArticlesBySource(response.articles_by_source)
-      setTotalCount(response.pagination.total_count)
-    } catch {
-      setError('Failed to load read articles. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    loadReadArticles()
-  }, [loadReadArticles])
+  const articles = data?.articles ?? []
+  const articlesBySource = data?.articles_by_source ?? {}
+  const totalCount = data?.pagination.total_count ?? 0
 
   const sources = useMemo(() => Object.keys(articlesBySource).sort(), [articlesBySource])
 
@@ -42,46 +28,38 @@ export default function ReadArticlesIndexPage() {
   const handleUnmarkRead = async (article: ReadArticle) => {
     try {
       await unmarkArticleAsRead(article.id)
-      setArticles((current) => current.filter((item) => item.id !== article.id))
-      setTotalCount((count) => Math.max(0, count - 1))
-      setArticlesBySource((current) => {
-        const next: Record<string, number[]> = {}
-        Object.entries(current).forEach(([source, ids]) => {
+      setData((current) => {
+        if (!current) return current
+        const nextArticles = current.articles.filter((item) => item.id !== article.id)
+        const nextBySource: Record<string, number[]> = {}
+        Object.entries(current.articles_by_source).forEach(([source, ids]) => {
           const filtered = ids.filter((id) => id !== article.id)
-          if (filtered.length > 0) next[source] = filtered
+          if (filtered.length > 0) nextBySource[source] = filtered
         })
-        return next
+        return {
+          ...current,
+          articles: nextArticles,
+          articles_by_source: nextBySource,
+          pagination: {
+            ...current.pagination,
+            total_count: Math.max(0, current.pagination.total_count - 1),
+          },
+        }
       })
     } catch {
       setError('Failed to mark article as unread.')
     }
   }
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl text-center text-gray-400" data-testid="read-articles-page">
-        Loading read articles...
-      </div>
-    )
-  }
-
-  if (error && articles.length === 0 && totalCount === 0) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl text-center" data-testid="read-articles-page">
-        <p className="text-red-400 mb-4">{error}</p>
-        <button
-          type="button"
-          className="px-4 py-2 bg-primary-600 text-white rounded-lg"
-          onClick={loadReadArticles}
-        >
-          Retry
-        </button>
-      </div>
-    )
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl" data-testid="read-articles-page">
+    <PageShell
+      testId="read-articles-page"
+      loading={loading}
+      loadingMessage="Loading read articles..."
+      error={error}
+      showFatalError={articles.length === 0 && totalCount === 0}
+      onRetry={reload}
+    >
       <div className="glass-effect rounded-2xl p-8 mb-8 animate-fade-in">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
@@ -115,26 +93,29 @@ export default function ReadArticlesIndexPage() {
       {error && <div className="mb-4 text-sm text-red-400">{error}</div>}
 
       {totalCount === 0 ? (
-        <div className="glass-effect rounded-2xl p-12 text-center animate-fade-in">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-green-600/20 to-green-700/20 rounded-full flex items-center justify-center">
+        <EmptyState
+          icon={
             <svg className="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-200 mb-4">No read articles yet</h2>
-          <p className="text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">
-            Articles you mark as read will appear here. Start reading and mark articles as finished to build your reading history.
-          </p>
-          <a
-            href="/articles"
-            className="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-lg hover:shadow-green-500/25"
-          >
-            <svg className="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
-            </svg>
-            Browse Articles
-          </a>
-        </div>
+          }
+          iconWrapperClassName="bg-gradient-to-r from-green-600/20 to-green-700/20"
+          title="No read articles yet"
+          description="Articles you mark as read will appear here. Start reading and mark articles as finished to build your reading history."
+          actions={[
+            {
+              href: '/articles',
+              label: 'Browse Articles',
+              className:
+                'group inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-lg hover:shadow-green-500/25',
+              icon: (
+                <svg className="w-5 h-5 mr-2 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
+                </svg>
+              ),
+            },
+          ]}
+        />
       ) : (
         <>
           <SourceFilter
@@ -151,6 +132,6 @@ export default function ReadArticlesIndexPage() {
           />
         </>
       )}
-    </div>
+    </PageShell>
   )
 }
