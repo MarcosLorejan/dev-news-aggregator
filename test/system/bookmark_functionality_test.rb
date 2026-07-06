@@ -110,9 +110,8 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
     visit_article_show(@bookmarked_article)
 
     if page.has_button?("Remove from Reading List")
-      accept_confirm do
-        click_button "Remove from Reading List"
-      end
+      click_button "Remove from Reading List"
+      find("[data-testid='confirm-dialog-confirm']").click
       sleep 0.5
       assert_not @bookmarked_article.reload.bookmarked?
     else
@@ -126,8 +125,8 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
     if page.has_selector?("article.article-card[data-source='reddit_rust']")
       within("article.article-card[data-source='reddit_rust']") do
         find("button[title='Remove from reading list']").click
-        find("[data-testid='confirm-dialog-confirm']").click
       end
+      find("[data-testid='confirm-dialog-confirm']").click
       sleep 0.5
       assert_not @bookmarked_article.reload.bookmarked?
     else
