@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-50: 250 245 255;
+  --primary-500: 168 85 247;
+  --primary-600: 147 51 234;
+  --primary-700: 124 58 237;
+  --dark-800: 30 41 59;
+  --dark-850: 23 32 51;
+  --dark-900: 15 23 42;
+  --dark-950: 2 6 23;
+}
+
+@layer utilities {
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .gradient-border {
+    background: linear-gradient(135deg, rgb(168 85 247 / 0.2), rgb(147 51 234 / 0.1));
+    border: 1px solid rgb(168 85 247 / 0.3);
+  }
+
+  .glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+  }
+}
