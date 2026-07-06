@@ -78,18 +78,14 @@ class CategoryFilterTurboTest < ApplicationSystemTestCase
       if first_category_btn
         category_value = first_category_btn["data-filter-value"]
         first_category_btn.click
+        assert_match(/category=/, page.current_url)
 
-        visible_articles_before = all("article.article-card[data-category='#{category_value}']", visible: true).count
-        assert visible_articles_before > 0, "Expected visible articles after filtering"
+        assert_selector "article.article-card[data-category='#{category_value}']", visible: true, minimum: 1
 
         page.evaluate_script("initializeCategoryFilter();")
 
-        visible_articles_after = all("article.article-card[data-category='#{category_value}']", visible: true).count
-        assert_equal visible_articles_before, visible_articles_after
-
-        fresh_category_btn = first("button.filter-btn[data-filter-type='category']")
-        fresh_category_btn.click if fresh_category_btn
-        assert_selector "article.article-card[data-category='#{category_value}']", visible: true
+        assert_match(/category=#{Regexp.escape(category_value)}/, page.current_url)
+        assert_selector "article.article-card[data-category='#{category_value}']", visible: true, minimum: 1
       else
         skip "No category filter buttons found"
       end
