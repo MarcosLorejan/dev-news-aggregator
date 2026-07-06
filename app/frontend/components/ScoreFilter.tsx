@@ -53,3 +53,12 @@ export function scoreFilterParams(value: ScoreFilterValue): { min_score?: number
       return {}
   }
 }
+
+const SCORE_FILTER_VALUES: ScoreFilterValue[] = ['all', '50', '100', '500', 'top10']
+
+export function parseScoreFilter(value: string | null): ScoreFilterValue {
+  if (value && SCORE_FILTER_VALUES.includes(value as ScoreFilterValue)) {
+    return value as ScoreFilterValue
+  }
+  return 'all'
+}

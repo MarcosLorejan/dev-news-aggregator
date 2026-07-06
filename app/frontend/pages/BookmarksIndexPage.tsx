@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { fetchBookmarks } from '../api/bookmarks'
 import {
   markArticleAsRead,
@@ -11,12 +11,13 @@ import SourceFilter from '../components/SourceFilter'
 import PageShell from '../components/PageShell'
 import EmptyState from '../components/EmptyState'
 import { useAsyncResource } from '../hooks/useAsyncResource'
+import { useSearchParam } from '../hooks/useSearchParamState'
 
 export default function BookmarksIndexPage() {
   const { data, loading, error, reload, setData, setError } = useAsyncResource(fetchBookmarks, {
     errorMessage: 'Failed to load reading list. Please try again.',
   })
-  const [activeSource, setActiveSource] = useState('all')
+  const [activeSource, setActiveSource] = useSearchParam('source', 'all')
 
   const articles = data?.articles ?? []
   const articlesBySource = data?.articles_by_source ?? {}
