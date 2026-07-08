@@ -44,7 +44,6 @@ export default function RecentlyDismissedPage() {
       <PageHeading
         title="Recently Dismissed"
         subtitle="Articles dismissed in the last 24 hours - easy to restore"
-        titleClassName="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent"
         actions={
           <NavLink
             to="/dismissed"
@@ -100,7 +99,7 @@ export default function RecentlyDismissedPage() {
         />
       ) : (
         <>
-          <div className="glass-effect rounded-xl p-4 mb-6 bg-gradient-to-r from-orange-600/10 to-orange-700/10 border border-orange-500/30">
+          <div className="surface-subtle rounded-xl p-4 mb-6 border border-orange-500/20 bg-orange-600/5">
             <div className="flex items-center text-orange-300">
               <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

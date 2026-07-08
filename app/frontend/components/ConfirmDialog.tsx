@@ -79,7 +79,8 @@ export default function ConfirmDialog({
     >
       <Card
         padding="md"
-        className="w-full max-w-md shadow-2xl border border-dark-600 animate-fade-in"
+        tone="panel"
+        className="w-full max-w-md shadow-2xl motion-safe:animate-fade-in motion-sensitive"
       >
         <div
           ref={dialogRef}

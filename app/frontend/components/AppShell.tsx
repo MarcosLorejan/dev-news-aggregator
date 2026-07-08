@@ -82,7 +82,7 @@ export default function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="sticky top-0 z-40 glass-effect border-b border-dark-700/50">
+      <header className="sticky top-0 z-40 surface-elevated border-b border-dark-700/50">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="hidden md:flex items-center justify-between h-14">
             <NavLink
@@ -121,7 +121,7 @@ export default function AppShell({ children }: AppShellProps) {
       <nav
         aria-label="Main navigation"
         data-testid="app-nav-mobile"
-        className="md:hidden fixed bottom-0 inset-x-0 z-40 glass-effect border-t border-dark-700/50 safe-area-pb"
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 surface-elevated border-t border-dark-700/50 safe-area-pb"
       >
         <div className="flex items-stretch h-16">
           {navItems.map((item) => (

@@ -12,12 +12,12 @@ interface PageHeadingProps {
 export default function PageHeading({
   title,
   subtitle,
-  titleClassName = 'bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent',
+  titleClassName = 'text-gray-100',
   actions,
   meta,
 }: PageHeadingProps) {
   return (
-    <Card padding="lg" className="mb-8" animate>
+    <Card padding="lg" tone="elevated" className="mb-8" animate>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
         <div>
           <h1 className={`text-3xl md:text-4xl font-bold mb-2 ${titleClassName}`}>{title}</h1>

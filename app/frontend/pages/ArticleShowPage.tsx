@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import {
   bookmarkArticle,
   fetchArticle,
@@ -14,6 +14,8 @@ import {
   safeExternalUrl,
 } from '../utils/format'
 import { useConfirmDialog } from '../hooks/useConfirmDialog'
+import Button from '../components/ui/Button'
+import { buttonClassName } from '../components/ui/Button'
 
 export default function ArticleShowPage() {
   const { id } = useParams<{ id: string }>()
@@ -115,7 +117,7 @@ export default function ArticleShowPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl" data-testid="article-show-page">
-      <article className="glass-effect rounded-2xl p-8 md:p-12 animate-slide-up">
+      <article className="surface-panel rounded-2xl p-8 md:p-12 motion-safe:animate-slide-up motion-sensitive">
         <div className="mb-8">
           <div className="flex flex-wrap items-center gap-4 mb-6">
             <span className="inline-block px-4 py-2 text-sm font-semibold bg-gradient-to-r from-primary-600/20 to-primary-700/20 text-primary-300 border border-primary-500/30 rounded-full">
@@ -191,17 +193,13 @@ export default function ArticleShowPage() {
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <button
-                type="button"
-                className={
-                  article.read
-                    ? 'group inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-orange-600 hover:to-orange-700 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25'
-                    : 'group inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-lg hover:shadow-green-500/25'
-                }
+              <Button
+                size="lg"
+                color={article.read ? 'orange' : 'green'}
                 onClick={handleReadToggle}
               >
                 <svg
-                  className="w-5 h-5 mr-2 transition-transform group-hover:scale-110"
+                  className="w-5 h-5 mr-2"
                   fill={article.read ? 'currentColor' : 'none'}
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -209,19 +207,15 @@ export default function ArticleShowPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {article.read ? 'Mark as Unread' : 'Mark as Read'}
-              </button>
+              </Button>
 
-              <button
-                type="button"
-                className={
-                  article.bookmarked
-                    ? 'group inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-red-700 hover:to-red-800 hover:scale-105 hover:shadow-lg hover:shadow-red-500/25'
-                    : 'group inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-medium transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25'
-                }
+              <Button
+                size="lg"
+                color={article.bookmarked ? 'red' : 'primary'}
                 onClick={handleBookmarkToggle}
               >
                 <svg
-                  className="w-5 h-5 mr-2 transition-transform group-hover:scale-110"
+                  className="w-5 h-5 mr-2"
                   fill={article.bookmarked ? 'currentColor' : 'none'}
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -233,17 +227,21 @@ export default function ArticleShowPage() {
                   )}
                 </svg>
                 {article.bookmarked ? 'Remove from Reading List' : 'Add to Reading List'}
-              </button>
+              </Button>
 
               {sourceUrl && (
                 <a
                   href={sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-dark-700 to-dark-600 border border-dark-500 text-gray-300 rounded-xl font-medium transition-all duration-200 hover:from-primary-600 hover:to-primary-700 hover:border-primary-500 hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25"
+                  className={buttonClassName({
+                    variant: 'secondary',
+                    size: 'lg',
+                    className: 'hover:border-primary-500/40 hover:text-white',
+                  })}
                 >
                   Visit Source
-                  <svg className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 ml-2 motion-safe:group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
                 </a>

@@ -104,7 +104,6 @@ export function buttonClassName({
         gradient.to,
         gradient.hoverFrom,
         gradient.hoverTo,
-        'hover:scale-105 hover:shadow-lg',
         gradient.shadow,
         className
       )
@@ -112,7 +111,7 @@ export function buttonClassName({
     return cn(
       base,
       filterSize,
-      'filter-btn bg-dark-800 border border-dark-700 text-gray-300 hover:bg-dark-700 hover:border-primary-500 hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-primary-500/10',
+      'filter-btn border border-dark-700 bg-transparent text-gray-400 hover:text-gray-200 hover:border-dark-500 hover:bg-dark-800/50',
       className
     )
   }

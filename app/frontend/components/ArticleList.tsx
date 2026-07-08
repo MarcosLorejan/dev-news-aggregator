@@ -29,7 +29,7 @@ export default function ArticleList({
   })
 
   return (
-    <div className="grid gap-6 animate-scale-in">
+    <div className="grid gap-5 md:gap-6 motion-safe:animate-scale-in motion-sensitive">
       {visibleArticles.map((article, index) => (
         <ArticleCard
           key={article.id}

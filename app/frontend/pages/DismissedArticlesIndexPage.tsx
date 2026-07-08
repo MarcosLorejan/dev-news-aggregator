@@ -49,7 +49,6 @@ export default function DismissedArticlesIndexPage() {
       <PageHeading
         title="Dismissed Articles"
         subtitle="Articles you've dismissed from your feed"
-        titleClassName="bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent"
         actions={
           <NavLink
             to="/recently_dismissed"

@@ -9,13 +9,13 @@ function stopPropagation(event: MouseEvent) {
 }
 
 const ICON_BTN =
-  'p-2 rounded-lg transition-all duration-200 hover:scale-110 hover:shadow-lg'
+  'p-2 rounded-lg border border-transparent transition-colors duration-200 motion-sensitive'
 
 export function DismissButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
-      className="group/dismiss p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all duration-200 hover:scale-110"
+      className="group/dismiss p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors duration-200 motion-sensitive"
       title="Dismiss article"
       aria-label="Dismiss article"
       onClick={(event) => {
@@ -24,7 +24,7 @@ export function DismissButton({ onClick }: { onClick: () => void }) {
       }}
     >
       <svg
-        className="w-4 h-4 transition-transform group-hover/dismiss:scale-110"
+        className="w-4 h-4"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -57,9 +57,9 @@ export function BookmarkButton({ active, mode, onClick }: BookmarkButtonProps) {
         'group/bookmark',
         isRemove || active
           ? isRemove
-            ? 'bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 hover:shadow-red-500/25'
-            : 'bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 hover:shadow-primary-500/25'
-          : 'bg-dark-700 border border-dark-600 text-gray-400 hover:bg-primary-600 hover:border-primary-500 hover:text-white hover:shadow-primary-500/25'
+            ? 'bg-red-600/15 border-red-500/40 text-red-300 hover:bg-red-600/25 hover:border-red-500/60'
+            : 'bg-primary-600/15 border-primary-500/40 text-primary-300 hover:bg-primary-600/25 hover:border-primary-500/60'
+          : 'bg-dark-800/80 border-dark-600 text-gray-400 hover:bg-primary-600/10 hover:border-primary-500/40 hover:text-primary-200'
       )}
       title={title}
       aria-label={title}
@@ -69,7 +69,7 @@ export function BookmarkButton({ active, mode, onClick }: BookmarkButtonProps) {
       }}
     >
       <svg
-        className="w-4 h-4 transition-transform group-hover/bookmark:scale-110"
+        className="w-4 h-4"
         fill={active || isRemove ? 'currentColor' : 'none'}
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -102,10 +102,10 @@ export function ReadButton({ active, mode, onClick }: ReadButtonProps) {
         ICON_BTN,
         'group/read',
         isUnmark
-          ? 'bg-gradient-to-r from-orange-600 to-orange-700 text-white hover:from-orange-700 hover:to-orange-800 hover:shadow-orange-500/25'
+          ? 'bg-orange-600/15 border-orange-500/40 text-orange-300 hover:bg-orange-600/25 hover:border-orange-500/60'
           : active
-            ? 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-orange-600 hover:to-orange-700 hover:shadow-orange-500/25'
-            : 'bg-dark-700 border border-dark-600 text-gray-400 hover:bg-green-600 hover:border-green-500 hover:text-white hover:shadow-green-500/25'
+            ? 'bg-green-600/15 border-green-500/40 text-green-300 hover:bg-orange-600/15 hover:border-orange-500/40 hover:text-orange-200'
+            : 'bg-dark-800/80 border-dark-600 text-gray-400 hover:bg-green-600/10 hover:border-green-500/40 hover:text-green-200'
       )}
       title={title}
       aria-label={title}
@@ -115,7 +115,7 @@ export function ReadButton({ active, mode, onClick }: ReadButtonProps) {
       }}
     >
       <svg
-        className="w-4 h-4 transition-transform group-hover/read:scale-110"
+        className="w-4 h-4"
         fill={active && !isUnmark ? 'currentColor' : 'none'}
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -136,7 +136,7 @@ export function RestoreButton({ label, onClick }: { label: string; onClick: () =
     <Button color="green" size="sm" className="group/restore" title="Restore article" onClick={onClick}>
       <span className="flex items-center">
         <svg
-          className="w-4 h-4 mr-2 transition-transform group-hover/restore:scale-110"
+          className="w-4 h-4 mr-2"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -158,13 +158,13 @@ export function DetailsLink({ href, styles }: { href: string; styles: CardThemeS
   return (
     <Link
       to={href}
-      className={`group/detail px-4 py-2 bg-gradient-to-r from-dark-700 to-dark-600 border border-dark-500 text-gray-300 rounded-lg font-medium transition-all duration-200 ${styles.detailsHover} hover:text-white hover:scale-105 hover:shadow-lg`}
+      className={`group/detail px-4 py-2 bg-dark-800/80 border border-dark-600 text-gray-300 rounded-lg font-medium transition-colors duration-200 motion-sensitive ${styles.detailsHover} hover:text-white hover:border-dark-500`}
       onClick={stopPropagation}
     >
       <span className="flex items-center">
         Details
         <svg
-          className="w-4 h-4 ml-2 transition-transform group-hover/detail:translate-x-1"
+          className="w-4 h-4 ml-2 transition-transform motion-safe:group-hover/detail:translate-x-0.5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

@@ -26,7 +26,7 @@ export default function PaginationControls({
 
   return (
     <nav
-      className="glass-effect rounded-2xl p-4 mt-8 flex flex-col sm:flex-row items-center justify-between gap-4"
+      className="surface-subtle rounded-xl p-4 mt-8 flex flex-col sm:flex-row items-center justify-between gap-4"
       aria-label="Articles pagination"
       data-testid="articles-pagination"
     >

@@ -4,7 +4,7 @@ import { cn } from '../../utils/cn'
 import { DetailsLink } from './CardActions'
 import CardMetadata from './CardMetadata'
 import CardTitle from './CardTitle'
-import { CARD_THEMES, type ArticleCardData, type ArticleCardTheme } from './cardThemes'
+import { CARD_THEMES, type ArticleCardData, type ArticleCardAccent, type ArticleCardTheme } from './cardThemes'
 
 interface ArticleCardLayoutProps {
   article: ArticleCardData
@@ -20,6 +20,15 @@ interface ArticleCardLayoutProps {
   detailsHref?: string
   onArticleClick?: () => void
   articleStyle?: CSSProperties
+  accentBar?: ArticleCardAccent
+  featured?: boolean
+}
+
+const ACCENT_BAR_CLASSES: Record<NonNullable<ArticleCardAccent>, string> = {
+  primary: 'border-l-[3px] border-l-primary-500/70',
+  green: 'border-l-[3px] border-l-green-500/70',
+  orange: 'border-l-[3px] border-l-orange-500/70',
+  red: 'border-l-[3px] border-l-red-500/70',
 }
 
 export default function ArticleCardLayout({
@@ -36,18 +45,24 @@ export default function ArticleCardLayout({
   detailsHref,
   onArticleClick,
   articleStyle,
+  accentBar,
+  featured = false,
 }: ArticleCardLayoutProps) {
   const styles = CARD_THEMES[theme]
 
   return (
     <article
       className={cn(
-        'article-card group glass-effect rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl animate-fade-in',
-        styles.shadowHover,
+        'article-card group surface-card rounded-2xl transition-colors duration-200 motion-safe:animate-fade-in motion-sensitive',
+        featured ? 'p-7 md:p-8' : 'p-6',
+        accentBar && ACCENT_BAR_CLASSES[accentBar],
+        accentBar && 'pl-5',
+        styles.borderHover,
         borderClass
       )}
       data-source={article.source_type}
       data-category={categorySlug}
+      data-featured={featured || undefined}
       style={{
         animationDelay: `${index * 50}ms`,
         ...articleStyle,
@@ -68,7 +83,7 @@ export default function ArticleCardLayout({
         </p>
       )}
 
-      <div className="flex justify-between items-center text-sm border-t border-dark-700 pt-4">
+      <div className="flex justify-between items-center text-sm border-t border-dark-700/80 pt-4">
         <CardMetadata article={article} styles={styles} extra={extraMetadata} />
         <div className="flex items-center space-x-3">
           {actions}
