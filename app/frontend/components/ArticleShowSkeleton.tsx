@@ -1,14 +1,12 @@
 import { Skeleton } from './ui/Skeleton'
 
-export default function ArticleShowSkeleton() {
-  return (
-    <div
-      className="container mx-auto px-4 py-8 max-w-4xl"
-      data-testid="article-show-skeleton"
-      role="status"
-      aria-live="polite"
-      aria-busy="true"
-    >
+interface ArticleShowSkeletonProps {
+  embedded?: boolean
+}
+
+export default function ArticleShowSkeleton({ embedded = false }: ArticleShowSkeletonProps) {
+  const content = (
+    <>
       <span className="sr-only">Loading article</span>
       <article className="surface-panel rounded-2xl p-8 md:p-12">
         <div className="mb-8">
@@ -40,6 +38,26 @@ export default function ArticleShowSkeleton() {
           <Skeleton className="h-11 w-36 rounded-xl" />
         </div>
       </article>
+    </>
+  )
+
+  if (embedded) {
+    return (
+      <div data-testid="article-show-skeleton" role="status" aria-live="polite" aria-busy="true">
+        {content}
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className="container mx-auto px-4 py-8 max-w-4xl"
+      data-testid="article-show-skeleton"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      {content}
     </div>
   )
 }

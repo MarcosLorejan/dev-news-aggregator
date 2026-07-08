@@ -3,6 +3,8 @@ import { fetchDismissedArticles } from '../api/dismissedArticles'
 import type { DismissedArticle } from '../types/dismissedArticle'
 import { NavLink } from 'react-router-dom'
 import DismissedArticlesList from '../components/DismissedArticlesList'
+import Breadcrumbs from '../components/Breadcrumbs'
+import { allDismissedBreadcrumbs } from '../components/breadcrumbTrails'
 import PageShell from '../components/PageShell'
 import { buttonClassName } from '../components/ui/Button'
 import PageHeading from '../components/ui/PageHeading'
@@ -46,6 +48,7 @@ export default function DismissedArticlesIndexPage() {
       showFatalError={articles.length === 0 && totalCount === 0}
       onRetry={reload}
     >
+      <Breadcrumbs items={allDismissedBreadcrumbs} />
       <PageHeading
         title="Dismissed Articles"
         subtitle="Articles you've dismissed from your feed"

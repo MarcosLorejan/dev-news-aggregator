@@ -7,6 +7,8 @@ import {
 } from '../api/articles'
 import type { BookmarkArticle } from '../types/bookmark'
 import BookmarksList from '../components/BookmarksList'
+import Breadcrumbs from '../components/Breadcrumbs'
+import { bookmarksBreadcrumbs } from '../components/breadcrumbTrails'
 import SourceFilter from '../components/SourceFilter'
 import PageShell from '../components/PageShell'
 import PageHeading from '../components/ui/PageHeading'
@@ -98,6 +100,7 @@ export default function BookmarksIndexPage() {
       showFatalError={articles.length === 0 && totalCount === 0}
       onRetry={reload}
     >
+      <Breadcrumbs items={bookmarksBreadcrumbs} />
       <PageHeading
         title="Reading List"
         subtitle="Your curated collection of bookmarked articles"
