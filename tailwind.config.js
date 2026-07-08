@@ -8,6 +8,20 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+      },
+      /* Modular scale ~1.25 from 16px body */
+      fontSize: {
+        display: ['3rem', { lineHeight: '1.15', letterSpacing: '-0.02em', fontWeight: '700' }],
+        h1: ['2.25rem', { lineHeight: '1.25', letterSpacing: '-0.01em', fontWeight: '700' }],
+        h2: ['1.5rem', { lineHeight: '1.3', fontWeight: '600' }],
+        h3: ['1.125rem', { lineHeight: '1.4', fontWeight: '600' }],
+        body: ['1rem', { lineHeight: '1.6' }],
+        'body-lg': ['1.125rem', { lineHeight: '1.65' }],
+        caption: ['0.875rem', { lineHeight: '1.5' }],
+        overline: ['0.75rem', { lineHeight: '1.5', letterSpacing: '0.02em' }],
+      },
       colors: {
         primary: {
           50: '#faf5ff',
@@ -61,6 +75,27 @@ export default {
           '100%': { transform: 'translateX(0)', opacity: '1' },
         },
       },
+      typography: ({ theme }) => ({
+        invert: {
+          css: {
+            '--tw-prose-body': theme('colors.gray.300'),
+            '--tw-prose-headings': theme('colors.gray.100'),
+            '--tw-prose-lead': theme('colors.gray.300'),
+            '--tw-prose-links': theme('colors.primary.400'),
+            '--tw-prose-bold': theme('colors.gray.100'),
+            '--tw-prose-counters': theme('colors.gray.400'),
+            '--tw-prose-bullets': theme('colors.gray.500'),
+            '--tw-prose-quotes': theme('colors.gray.300'),
+            '--tw-prose-quote-borders': theme('colors.dark.600'),
+            '--tw-prose-captions': theme('colors.gray.400'),
+            '--tw-prose-code': theme('colors.primary.300'),
+            '--tw-prose-pre-code': theme('colors.gray.200'),
+            '--tw-prose-pre-bg': theme('colors.dark.800'),
+            maxWidth: '65ch',
+            lineHeight: '1.65',
+          },
+        },
+      }),
     },
   },
   plugins: [typography],

@@ -91,10 +91,10 @@ export default function ConfirmDialog({
           data-testid="confirm-dialog"
           onClick={(event) => event.stopPropagation()}
         >
-          <h2 id="confirm-dialog-title" className="text-xl font-bold text-gray-100 mb-3">
+          <h2 id="confirm-dialog-title" className="text-h3 text-gray-100 mb-3">
             {title}
           </h2>
-          <p id="confirm-dialog-message" className="text-gray-400 mb-6 leading-relaxed">
+          <p id="confirm-dialog-message" className="text-body text-gray-400 mb-6">
             {message}
           </p>
           <div className="flex justify-end gap-3">

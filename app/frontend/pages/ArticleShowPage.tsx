@@ -141,9 +141,9 @@ export default function ArticleShowPage() {
             )}
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-100 mb-6 leading-tight">{article.title}</h1>
+          <h1 className="text-h1 font-bold text-gray-100 mb-6 leading-tight">{article.title}</h1>
 
-          <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400 mb-6">
+          <div className="flex flex-wrap items-center gap-6 text-caption text-gray-400 mb-6">
             <span className="flex items-center">
               <svg className="w-4 h-4 mr-2 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -167,8 +167,8 @@ export default function ArticleShowPage() {
 
         {article.description && (
           <div className="mb-8">
-            <div className="prose prose-lg max-w-none">
-              <div className="text-gray-300 leading-relaxed text-lg whitespace-pre-wrap">{article.description}</div>
+            <div className="prose prose-lg prose-invert max-w-prose">
+              <p className="whitespace-pre-wrap">{article.description}</p>
             </div>
           </div>
         )}
@@ -177,7 +177,7 @@ export default function ArticleShowPage() {
           {actionError && <div className="mb-4 text-sm text-red-400">{actionError}</div>}
 
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div className="text-sm text-gray-500 space-y-1">
+            <div className="text-caption text-gray-500 space-y-1">
               <p className="flex items-center">
                 <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />

@@ -109,7 +109,7 @@ export default function SourcesIndexPage() {
       {error && <div className="mb-4 text-sm text-red-400">{error}</div>}
 
       <Card as="section" className="mb-8">
-        <h2 className="text-lg font-semibold text-gray-200 mb-4">Built-in sources</h2>
+        <h2 className="text-h3 text-gray-200 mb-4">Built-in sources</h2>
         <div className="space-y-3">
           {fixedSources.map((source) => (
             <div key={source.id} className="flex items-center justify-between py-3 border-b border-dark-700 last:border-0">
@@ -130,7 +130,7 @@ export default function SourcesIndexPage() {
       </Card>
 
       <Card as="section">
-        <h2 className="text-lg font-semibold text-gray-200 mb-4">Reddit subreddits</h2>
+        <h2 className="text-h3 text-gray-200 mb-4">Reddit subreddits</h2>
 
         <form onSubmit={handleAddSubreddit} className="flex flex-col sm:flex-row gap-3 mb-6">
           <input

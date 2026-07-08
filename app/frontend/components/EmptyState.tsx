@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import type { ButtonColor } from './ui/Button'
+import type { ButtonColor } from './ui/buttonStyles'
 import { buttonClassName } from './ui/Button'
 import Card from './ui/Card'
 
@@ -33,8 +33,8 @@ export default function EmptyState({
       >
         {icon}
       </div>
-      <h2 className="text-2xl font-bold text-gray-200 mb-4">{title}</h2>
-      <p className="text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">{description}</p>
+      <h2 className="text-h2 text-gray-100 mb-4">{title}</h2>
+      <p className="text-body text-gray-400 mb-8 max-w-prose mx-auto leading-relaxed">{description}</p>
       {actions.length > 0 && (
         <div
           className={

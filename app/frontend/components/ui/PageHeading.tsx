@@ -20,8 +20,8 @@ export default function PageHeading({
     <Card padding="lg" tone="elevated" className="mb-8" animate>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
         <div>
-          <h1 className={`text-3xl md:text-4xl font-bold mb-2 ${titleClassName}`}>{title}</h1>
-          {subtitle && <p className="text-gray-400 text-base md:text-lg">{subtitle}</p>}
+          <h1 className={`text-h1 font-bold mb-2 ${titleClassName}`}>{title}</h1>
+          {subtitle && <p className="text-body-lg text-gray-400">{subtitle}</p>}
         </div>
         {(actions || meta) && (
           <div className="flex flex-wrap items-center gap-3 md:gap-4">

@@ -11,7 +11,7 @@ import {
   ReadButton,
   RestoreButton,
 } from './articleCard/CardActions'
-import { variantBorderClass, variantTheme, type ArticleCardVariant } from './articleCard/cardThemes'
+import { variantBorderClass, variantTheme } from './articleCard/cardThemes'
 import Badge from './ui/Badge'
 
 type FeedCardProps = {

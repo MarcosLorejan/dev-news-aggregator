@@ -20,7 +20,16 @@ describe('ArticleCard', () => {
       <MemoryRouter>
         <ArticleCard
           variant="feed"
-          article={{ ...baseArticle, bookmarked: false, read: false }}
+          article={{
+            ...baseArticle,
+            external_id: 'hn-1',
+            created_at: '2024-01-15T10:00:00Z',
+            updated_at: '2024-01-15T10:00:00Z',
+            bookmarked: false,
+            read: false,
+            dismissed: false,
+            pending_dismissal: false,
+          }}
           categorySlug="programming"
           index={0}
           isDismissing={false}
