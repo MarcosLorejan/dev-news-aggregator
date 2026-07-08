@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+set -u -o pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage: bin/validate [--fast]
+
+Run CI-equivalent local validation checks.
+
+Options:
+  --fast   Skip slower checks that usually need more setup, such as Brakeman
+           and Rails tests.
+  -h, --help  Show this help.
+USAGE
+}
+
+fast=false
+for arg in "$@"; do
+  case "$arg" in
+    --fast)
+      fast=true
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $arg" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+failures=0
+
+run_check() {
+  local name="$1"
+  shift
+
+  printf '\n==> %s\n' "$name"
+  if "$@"; then
+    printf '✓ %s passed\n' "$name"
+  else
+    local status=$?
+    printf '✗ %s failed with exit code %s\n' "$name" "$status" >&2
+    failures=$((failures + 1))
+  fi
+}
+
+skip_check() {
+  local name="$1"
+  printf '\n==> %s\n' "$name"
+  printf '↷ skipped in --fast mode\n'
+}
+
+run_check "RuboCop" bundle exec rubocop -f github
+
+if "$fast"; then
+  skip_check "Brakeman"
+else
+  run_check "Brakeman" bundle exec brakeman --no-pager --no-exit-on-warn
+fi
+
+run_check "TypeScript typecheck" npm run typecheck
+run_check "Frontend tests" npm test
+
+if "$fast"; then
+  skip_check "Rails tests"
+else
+  run_check "Rails tests" env RAILS_ENV=test bin/rails test
+fi
+
+if [ "$failures" -eq 0 ]; then
+  printf '\nAll validation checks passed.\n'
+  exit 0
+fi
+
+printf '\n%s validation check(s) failed.\n' "$failures" >&2
+exit 1
