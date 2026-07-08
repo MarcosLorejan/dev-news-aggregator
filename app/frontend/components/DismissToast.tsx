@@ -7,7 +7,7 @@ interface DismissToastProps {
 export default function DismissToast({ articleTitle, timeLeft, onUndo }: DismissToastProps) {
   return (
     <div
-      className="dismiss-toast fixed top-4 right-4 bg-dark-800 border border-primary-500/30 rounded-xl p-4 shadow-2xl z-50 max-w-sm animate-slide-in"
+      className="dismiss-toast fixed top-4 right-4 surface-panel rounded-xl p-4 shadow-2xl z-50 max-w-sm motion-safe:animate-slide-in motion-sensitive border border-dark-700"
       role="status"
       aria-live="polite"
       aria-atomic="true"
@@ -20,7 +20,7 @@ export default function DismissToast({ articleTitle, timeLeft, onUndo }: Dismiss
         <div className="flex items-center space-x-2">
           <button
             type="button"
-            className="undo-btn px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:scale-105"
+            className="undo-btn px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
             aria-label="Undo dismiss"
             onClick={onUndo}
           >

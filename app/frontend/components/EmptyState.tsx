@@ -27,7 +27,7 @@ export default function EmptyState({
   actions = [],
 }: EmptyStateProps) {
   return (
-    <Card padding="empty" animate>
+    <Card tone="panel" padding="empty" animate>
       <div
         className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${iconWrapperClassName}`}
       >

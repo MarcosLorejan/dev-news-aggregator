@@ -65,6 +65,8 @@ export default function ArticleCard(props: ArticleCardProps) {
         index={index}
         theme={theme}
         categorySlug={categorySlug}
+        accentBar={article.bookmarked ? 'primary' : article.read ? 'green' : undefined}
+        featured={article.score >= 100}
         onArticleClick={isDismissing ? () => onUndoDismiss?.(article) : undefined}
         articleStyle={{
           opacity: isDismissing ? 0.5 : 1,
@@ -106,6 +108,7 @@ export default function ArticleCard(props: ArticleCardProps) {
           article={article}
           index={index}
           theme={theme}
+          accentBar="primary"
           extraMetadata={
             article.bookmarked_at ? (
               <span className="flex items-center text-primary-400">
@@ -150,6 +153,7 @@ export default function ArticleCard(props: ArticleCardProps) {
           article={article}
           index={index}
           theme={theme}
+          accentBar="green"
           extraMetadata={
             article.read_at ? (
               <span className="flex items-center text-green-400">
@@ -204,6 +208,7 @@ export default function ArticleCard(props: ArticleCardProps) {
         index={index}
         theme={theme}
         borderClass={variantBorderClass(variant)}
+        accentBar={isRecent ? 'orange' : 'red'}
         showSourceBadge={false}
         badge={<Badge variant={isRecent ? 'orange' : 'red'}>{badgeText}</Badge>}
         actions={<RestoreButton label={restoreLabel} onClick={handleRestore} />}

@@ -17,6 +17,7 @@ import ArticleList from '../components/ArticleList'
 import CategoryFilter from '../components/CategoryFilter'
 import DismissToast from '../components/DismissToast'
 import PageHeader from '../components/PageHeader'
+import Card from '../components/ui/Card'
 import PaginationControls from '../components/PaginationControls'
 import ScoreFilter, { parseScoreFilter, scoreFilterParams, type ScoreFilterValue } from '../components/ScoreFilter'
 import { usePatchSearchParams } from '../hooks/useSearchParamState'
@@ -323,7 +324,7 @@ export default function ArticlesIndexPage() {
           fetchingNews={fetchingNews}
           fetchMessage={fetchMessage}
         />
-        <div className="glass-effect rounded-2xl p-12 text-center animate-fade-in">
+        <Card tone="panel" padding="empty" animate>
           <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-primary-600/20 to-primary-700/20 rounded-full flex items-center justify-center">
             <svg className="w-10 h-10 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
@@ -342,7 +343,7 @@ export default function ArticlesIndexPage() {
           >
             {fetchingNews ? 'Fetching...' : 'Fetch News'}
           </button>
-        </div>
+        </Card>
       </div>
     )
   }

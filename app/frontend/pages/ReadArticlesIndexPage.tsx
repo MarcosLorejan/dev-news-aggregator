@@ -65,7 +65,6 @@ export default function ReadArticlesIndexPage() {
       <PageHeading
         title="Already Read"
         subtitle="Articles you've finished reading"
-        titleClassName="bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent"
         meta={
           <div className="text-sm text-gray-400">
             <div className="flex items-center space-x-2">

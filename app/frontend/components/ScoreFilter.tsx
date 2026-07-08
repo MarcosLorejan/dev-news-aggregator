@@ -1,3 +1,6 @@
+import Button from './ui/Button'
+import Card from './ui/Card'
+
 export type ScoreFilterValue = 'all' | '50' | '100' | '500' | 'top10'
 
 interface ScoreFilterProps {
@@ -14,29 +17,24 @@ const OPTIONS: { value: ScoreFilterValue; label: string }[] = [
 ]
 
 export default function ScoreFilter({ activeScoreFilter, onScoreFilterChange }: ScoreFilterProps) {
-  const activeClasses =
-    'px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-500/20'
-  const inactiveClasses =
-    'px-4 py-2 rounded-xl text-sm font-medium bg-dark-800 border border-dark-700 text-gray-400 hover:text-gray-200 hover:border-dark-600 transition-colors'
-
   return (
-    <div className="glass-effect rounded-2xl p-6 mb-8 animate-fade-in">
+    <Card tone="subtle" className="mb-8">
       <h2 className="text-lg font-semibold text-gray-200 mb-4">Filter by score</h2>
       <div className="flex flex-wrap gap-3">
         {OPTIONS.map((option) => (
-          <button
+          <Button
             key={option.value}
-            type="button"
-            className={activeScoreFilter === option.value ? activeClasses : inactiveClasses}
+            variant="filter"
+            active={activeScoreFilter === option.value}
             data-score-filter={option.value}
             aria-pressed={activeScoreFilter === option.value}
             onClick={() => onScoreFilterChange(option.value)}
           >
             {option.label}
-          </button>
+          </Button>
         ))}
       </div>
-    </div>
+    </Card>
   )
 }
 

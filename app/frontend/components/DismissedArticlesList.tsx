@@ -15,7 +15,7 @@ export default function DismissedArticlesList({
   const cardVariant = variant === 'recent' ? 'recent-dismissed' : 'dismissed'
 
   return (
-    <div className="grid gap-6 animate-scale-in">
+    <div className="grid gap-5 md:gap-6 motion-safe:animate-scale-in motion-sensitive">
       {articles.map((article, index) => (
         <ArticleCard
           key={article.id}
