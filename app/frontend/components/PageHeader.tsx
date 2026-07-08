@@ -65,7 +65,7 @@ export default function PageHeader({
             <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
               <input
                 type="checkbox"
-                className="rounded border-dark-600 bg-dark-800 text-primary-500 focus:ring-primary-500"
+                className="rounded border-dark-600 bg-dark-800 text-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                 checked={showRead}
                 onChange={(event) => onShowReadChange(event.target.checked)}
                 data-testid="show-read-toggle"

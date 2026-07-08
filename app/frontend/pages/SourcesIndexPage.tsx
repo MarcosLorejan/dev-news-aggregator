@@ -118,7 +118,7 @@ export default function SourcesIndexPage() {
               <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
                 <input
                   type="checkbox"
-                  className="rounded border-dark-600 bg-dark-800 text-primary-500 focus:ring-primary-500"
+                  className="rounded border-dark-600 bg-dark-800 text-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                   checked={source.active}
                   onChange={() => handleToggle(source)}
                   data-testid={`source-toggle-${source.source_type}`}
@@ -139,7 +139,7 @@ export default function SourcesIndexPage() {
             value={subredditInput}
             onChange={(event) => setSubredditInput(event.target.value)}
             placeholder="e.g. programming"
-            className="flex-1 px-4 py-2 bg-dark-800 border border-dark-700 rounded-xl text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary-500"
+            className="flex-1 px-4 py-2 bg-dark-800 border border-dark-700 rounded-xl text-gray-200 placeholder-gray-500 focus-visible:outline-none focus-visible:border-primary-500 focus-visible:ring-2 focus-visible:ring-primary-500"
             data-testid="subreddit-input"
           />
           <Button type="submit" disabled={adding || !subredditInput.trim()} data-testid="add-subreddit-button">
@@ -159,7 +159,7 @@ export default function SourcesIndexPage() {
                 <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
                   <input
                     type="checkbox"
-                    className="rounded border-dark-600 bg-dark-800 text-primary-500 focus:ring-primary-500"
+                    className="rounded border-dark-600 bg-dark-800 text-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                     checked={source.active}
                     onChange={() => handleToggle(source)}
                   />

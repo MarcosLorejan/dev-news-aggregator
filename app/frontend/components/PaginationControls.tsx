@@ -1,3 +1,5 @@
+import { FOCUS_RING } from './ui/buttonStyles'
+
 interface PaginationControlsProps {
   currentPage: number
   totalPages: number
@@ -5,6 +7,8 @@ interface PaginationControlsProps {
   perPage: number
   onPageChange: (page: number) => void
 }
+
+const PAGINATION_BUTTON = `px-4 py-2 rounded-lg border border-dark-500 bg-dark-700 text-gray-300 font-medium transition-all duration-200 hover:bg-dark-600 hover:text-white disabled:opacity-40 disabled:hover:bg-dark-700 disabled:hover:text-gray-300 ${FOCUS_RING}`
 
 export default function PaginationControls({
   currentPage,
@@ -41,7 +45,7 @@ export default function PaginationControls({
       <div className="flex items-center gap-2">
         <button
           type="button"
-          className="px-4 py-2 rounded-lg border border-dark-500 bg-dark-700 text-gray-300 font-medium transition-all duration-200 hover:bg-dark-600 hover:text-white disabled:opacity-40 disabled:hover:bg-dark-700 disabled:hover:text-gray-300"
+          className={PAGINATION_BUTTON}
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage <= 1}
           aria-label="Previous page"
@@ -57,7 +61,7 @@ export default function PaginationControls({
 
         <button
           type="button"
-          className="px-4 py-2 rounded-lg border border-dark-500 bg-dark-700 text-gray-300 font-medium transition-all duration-200 hover:bg-dark-600 hover:text-white disabled:opacity-40 disabled:hover:bg-dark-700 disabled:hover:text-gray-300"
+          className={PAGINATION_BUTTON}
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage >= totalPages}
           aria-label="Next page"
