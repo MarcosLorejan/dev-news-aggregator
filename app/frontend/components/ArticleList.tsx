@@ -33,6 +33,7 @@ export default function ArticleList({
       {visibleArticles.map((article, index) => (
         <ArticleCard
           key={article.id}
+          variant="feed"
           article={article}
           categorySlug={articleCategories[article.id] ?? 'other'}
           index={index}
