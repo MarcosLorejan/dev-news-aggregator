@@ -1,5 +1,8 @@
 import { cn } from '../../utils/cn'
 
+export const FOCUS_RING =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-950'
+
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'filter'
 export type ButtonSize = 'sm' | 'md' | 'lg'
 export type ButtonColor = 'primary' | 'blue' | 'purple' | 'green' | 'red' | 'orange'
@@ -73,7 +76,10 @@ export function buttonClassName({
   active = false,
   className,
 }: ButtonStyleOptions = {}) {
-  const base = 'inline-flex items-center justify-center font-medium transition-all duration-200'
+  const base = cn(
+    'inline-flex items-center justify-center font-medium transition-all duration-200',
+    FOCUS_RING
+  )
 
   if (variant === 'ghost') {
     return cn(

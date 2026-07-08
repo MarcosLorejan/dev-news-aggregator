@@ -1,6 +1,7 @@
 import type { MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../ui/Button'
+import { FOCUS_RING } from '../ui/buttonStyles'
 import { cn } from '../../utils/cn'
 import type { CardThemeStyles } from './cardThemes'
 
@@ -8,14 +9,19 @@ function stopPropagation(event: MouseEvent) {
   event.stopPropagation()
 }
 
-const ICON_BTN =
-  'p-2 rounded-lg border border-transparent transition-colors duration-200 motion-sensitive'
+const ICON_BTN = cn(
+  'p-2 rounded-lg border border-transparent transition-colors duration-200 motion-sensitive',
+  FOCUS_RING
+)
 
 export function DismissButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
-      className="group/dismiss p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors duration-200 motion-sensitive"
+      className={cn(
+        'group/dismiss p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors duration-200 motion-sensitive',
+        FOCUS_RING
+      )}
       title="Dismiss article"
       aria-label="Dismiss article"
       onClick={(event) => {
@@ -28,6 +34,7 @@ export function DismissButton({ onClick }: { onClick: () => void }) {
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
+        aria-hidden="true"
       >
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
       </svg>
@@ -73,6 +80,7 @@ export function BookmarkButton({ active, mode, onClick }: BookmarkButtonProps) {
         fill={active || isRemove ? 'currentColor' : 'none'}
         stroke="currentColor"
         viewBox="0 0 24 24"
+        aria-hidden="true"
       >
         <path
           strokeLinecap="round"
@@ -119,6 +127,7 @@ export function ReadButton({ active, mode, onClick }: ReadButtonProps) {
         fill={active && !isUnmark ? 'currentColor' : 'none'}
         stroke="currentColor"
         viewBox="0 0 24 24"
+        aria-hidden="true"
       >
         <path
           strokeLinecap="round"
@@ -140,6 +149,7 @@ export function RestoreButton({ label, onClick }: { label: string; onClick: () =
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -158,7 +168,12 @@ export function DetailsLink({ href, styles }: { href: string; styles: CardThemeS
   return (
     <Link
       to={href}
-      className={`group/detail px-4 py-2 bg-dark-800/80 border border-dark-600 text-gray-300 rounded-lg font-medium transition-colors duration-200 motion-sensitive ${styles.detailsHover} hover:text-white hover:border-dark-500`}
+      className={cn(
+        'group/detail px-4 py-2 bg-dark-800/80 border border-dark-600 text-gray-300 rounded-lg font-medium transition-colors duration-200 motion-sensitive',
+        FOCUS_RING,
+        styles.detailsHover,
+        'hover:text-white hover:border-dark-500'
+      )}
       onClick={stopPropagation}
     >
       <span className="flex items-center">
@@ -168,6 +183,7 @@ export function DetailsLink({ href, styles }: { href: string; styles: CardThemeS
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
         </svg>

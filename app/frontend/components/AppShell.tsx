@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
+import { cn } from '../utils/cn'
+import { FOCUS_RING } from './ui/buttonStyles'
 
 interface NavItem {
   to: string
@@ -60,6 +62,7 @@ const navItems: NavItem[] = [
 function desktopLinkClassName(isActive: boolean) {
   return [
     'px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
+    FOCUS_RING,
     isActive
       ? 'bg-primary-600/20 text-primary-300 ring-1 ring-primary-500/40'
       : 'text-gray-400 hover:text-gray-200 hover:bg-dark-700/60',
@@ -69,6 +72,7 @@ function desktopLinkClassName(isActive: boolean) {
 function mobileLinkClassName(isActive: boolean) {
   return [
     'flex flex-1 flex-col items-center justify-center gap-1 py-2 text-xs font-medium transition-colors duration-200',
+    FOCUS_RING,
     isActive ? 'text-primary-400' : 'text-gray-500 hover:text-gray-300',
   ].join(' ')
 }
@@ -87,7 +91,11 @@ export default function AppShell({ children }: AppShellProps) {
           <div className="hidden md:flex items-center justify-between h-14">
             <NavLink
               to="/"
-              className="text-h3 font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent shrink-0"
+              className={cn(
+                'text-h3 font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent shrink-0',
+                FOCUS_RING,
+                'rounded-lg'
+              )}
             >
               Dev News
             </NavLink>
@@ -108,7 +116,11 @@ export default function AppShell({ children }: AppShellProps) {
           <div className="flex md:hidden items-center justify-center h-12">
             <NavLink
               to="/"
-              className="text-h3 font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent"
+              className={cn(
+                'text-h3 font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent',
+                FOCUS_RING,
+                'rounded-lg'
+              )}
             >
               Dev News
             </NavLink>
@@ -119,7 +131,7 @@ export default function AppShell({ children }: AppShellProps) {
       {children}
 
       <nav
-        aria-label="Main navigation"
+        aria-label="Mobile navigation"
         data-testid="app-nav-mobile"
         className="md:hidden fixed bottom-0 inset-x-0 z-40 surface-elevated border-t border-dark-700/50 safe-area-pb"
       >
@@ -131,6 +143,7 @@ export default function AppShell({ children }: AppShellProps) {
               end={item.to === '/'}
               className={() => mobileLinkClassName(item.isActive(pathname))}
               data-testid={`app-nav-mobile-${item.shortLabel.toLowerCase()}`}
+              aria-label={item.label}
             >
               {item.icon}
               <span>{item.shortLabel}</span>

@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { buttonClassName } from './buttonStyles'
+import { buttonClassName, FOCUS_RING } from './buttonStyles'
 import { badgeClassName } from './Badge'
 
 describe('buttonClassName', () => {
+  it('includes keyboard focus ring styles', () => {
+    expect(buttonClassName()).toContain(FOCUS_RING)
+  })
+
   it('returns primary gradient classes by default', () => {
     const classes = buttonClassName()
     expect(classes).toContain('from-primary-600')
