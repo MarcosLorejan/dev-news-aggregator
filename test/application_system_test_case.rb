@@ -36,6 +36,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       visit bookmarks_path
     end
     assert_selector "[data-testid='bookmarks-page']", wait: 12
+    assert_selector "[data-testid='breadcrumbs']", wait: 12
+    assert_selector "[data-testid='breadcrumbs']", text: "Reading List", wait: 12
     assert_no_selector "[data-testid='article-list-skeleton']", wait: 12
   end
 
@@ -72,6 +74,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       visit article_path(article)
     end
     assert_selector "[data-testid='article-show-page']", wait: 12
+    assert_selector "[data-testid='breadcrumbs']", wait: 12
     assert_no_selector "[data-testid='article-show-skeleton']", wait: 12
   end
 end

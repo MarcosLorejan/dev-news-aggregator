@@ -3,6 +3,8 @@ import { unmarkArticleAsRead } from '../api/articles'
 import { fetchReadArticles } from '../api/readArticles'
 import type { ReadArticle } from '../types/readArticle'
 import ReadArticlesList from '../components/ReadArticlesList'
+import Breadcrumbs from '../components/Breadcrumbs'
+import { readArticlesBreadcrumbs } from '../components/breadcrumbTrails'
 import SourceFilter from '../components/SourceFilter'
 import PageShell from '../components/PageShell'
 import PageHeading from '../components/ui/PageHeading'
@@ -62,6 +64,7 @@ export default function ReadArticlesIndexPage() {
       showFatalError={articles.length === 0 && totalCount === 0}
       onRetry={reload}
     >
+      <Breadcrumbs items={readArticlesBreadcrumbs} />
       <PageHeading
         title="Already Read"
         subtitle="Articles you've finished reading"

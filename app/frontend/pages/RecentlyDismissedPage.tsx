@@ -3,6 +3,8 @@ import { fetchRecentlyDismissed } from '../api/dismissedArticles'
 import type { DismissedArticle } from '../types/dismissedArticle'
 import { NavLink } from 'react-router-dom'
 import DismissedArticlesList from '../components/DismissedArticlesList'
+import Breadcrumbs from '../components/Breadcrumbs'
+import { recentlyDismissedBreadcrumbs } from '../components/breadcrumbTrails'
 import PageShell from '../components/PageShell'
 import { buttonClassName } from '../components/ui/Button'
 import PageHeading from '../components/ui/PageHeading'
@@ -41,6 +43,7 @@ export default function RecentlyDismissedPage() {
       showFatalError={articles.length === 0}
       onRetry={reload}
     >
+      <Breadcrumbs items={recentlyDismissedBreadcrumbs} />
       <PageHeading
         title="Recently Dismissed"
         subtitle="Articles dismissed in the last 24 hours - easy to restore"

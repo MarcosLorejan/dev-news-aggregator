@@ -10,6 +10,8 @@ import { useConfirmDialog } from '../hooks/useConfirmDialog'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import PageContainer from '../components/ui/PageContainer'
+import Breadcrumbs from '../components/Breadcrumbs'
+import { sourcesBreadcrumbs } from '../components/breadcrumbTrails'
 import SourcesIndexSkeleton from '../components/SourcesIndexSkeleton'
 import PageHeading from '../components/ui/PageHeading'
 
@@ -101,6 +103,7 @@ export default function SourcesIndexPage() {
 
   return (
     <PageContainer width="4xl" testId="sources-page">
+      <Breadcrumbs items={sourcesBreadcrumbs} />
       <PageHeading
         title="News Sources"
         subtitle="Enable or disable sources and manage Reddit subreddits."

@@ -15,6 +15,8 @@ import {
 } from '../utils/format'
 import { useConfirmDialog } from '../hooks/useConfirmDialog'
 import ArticleShowSkeleton from '../components/ArticleShowSkeleton'
+import Breadcrumbs from '../components/Breadcrumbs'
+import { articleBreadcrumbs, feedBreadcrumb } from '../components/breadcrumbTrails'
 import Button from '../components/ui/Button'
 import { buttonClassName } from '../components/ui/Button'
 
@@ -94,8 +96,9 @@ export default function ArticleShowPage() {
 
   if (loading) {
     return (
-      <div data-testid="article-show-page">
-        <ArticleShowSkeleton />
+      <div className="container mx-auto px-4 py-8 max-w-4xl" data-testid="article-show-page">
+        <Breadcrumbs items={articleBreadcrumbs('Article')} />
+        <ArticleShowSkeleton embedded />
       </div>
     )
   }
@@ -103,6 +106,7 @@ export default function ArticleShowPage() {
   if (error || !article) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl text-center" data-testid="article-show-page">
+        <Breadcrumbs items={[feedBreadcrumb, { label: 'Article not found' }]} />
         <p className="text-red-400 mb-4">{error ?? 'Article not found.'}</p>
       </div>
     )
@@ -112,6 +116,7 @@ export default function ArticleShowPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl" data-testid="article-show-page">
+      <Breadcrumbs items={articleBreadcrumbs(article.title)} />
       <article className="surface-panel rounded-2xl p-8 md:p-12 motion-safe:animate-slide-up motion-sensitive">
         <div className="mb-8">
           <div className="flex flex-wrap items-center gap-4 mb-6">
