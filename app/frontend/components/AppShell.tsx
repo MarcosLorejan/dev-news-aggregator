@@ -87,7 +87,7 @@ export default function AppShell({ children }: AppShellProps) {
           <div className="hidden md:flex items-center justify-between h-14">
             <NavLink
               to="/"
-              className="text-lg font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent shrink-0"
+              className="text-h3 font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent shrink-0"
             >
               Dev News
             </NavLink>
@@ -108,7 +108,7 @@ export default function AppShell({ children }: AppShellProps) {
           <div className="flex md:hidden items-center justify-center h-12">
             <NavLink
               to="/"
-              className="text-base font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent"
+              className="text-h3 font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent"
             >
               Dev News
             </NavLink>

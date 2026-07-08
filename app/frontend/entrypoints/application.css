@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    @apply font-sans antialiased;
+  }
+
+  body {
+    @apply text-body text-gray-300;
+  }
+}
+
 :root {
   --primary-50: 250 245 255;
   --primary-500: 168 85 247;

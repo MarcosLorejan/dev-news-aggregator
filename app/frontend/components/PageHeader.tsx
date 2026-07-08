@@ -35,10 +35,10 @@ export default function PageHeader({
     <Card padding="lg" tone="elevated" className="mb-8" animate>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-h1 md:text-display font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent mb-2">
             Developer News Aggregator
           </h1>
-          <p className="text-gray-400 text-lg">Stay updated with the latest in tech and development</p>
+          <p className="text-body-lg text-gray-400">Stay updated with the latest in tech and development</p>
           {fetchMessage && (
             <p className="text-sm text-primary-300 mt-2" data-testid="fetch-message">{fetchMessage}</p>
           )}

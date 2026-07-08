@@ -26,7 +26,7 @@ export default function CardTitle({
     <div className="flex justify-between items-start mb-4">
       <div className="flex-1">
         <h2
-          className={`text-xl font-bold text-gray-100 mb-2 leading-tight ${styles.titleHover} transition-colors duration-200`}
+          className={`text-h3 font-semibold text-gray-50 mb-2 leading-snug ${styles.titleHover} transition-colors duration-200`}
         >
           <a
             href={article.url}
