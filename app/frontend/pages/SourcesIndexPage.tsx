@@ -10,6 +10,7 @@ import { useConfirmDialog } from '../hooks/useConfirmDialog'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import PageContainer from '../components/ui/PageContainer'
+import SourcesIndexSkeleton from '../components/SourcesIndexSkeleton'
 import PageHeading from '../components/ui/PageHeading'
 
 function sourceLabel(source: NewsSource): string {
@@ -92,8 +93,8 @@ export default function SourcesIndexPage() {
 
   if (loading) {
     return (
-      <PageContainer width="4xl" testId="sources-page" centered>
-        Loading sources...
+      <PageContainer width="4xl" testId="sources-page" role="status" aria-live="polite" aria-busy>
+        <SourcesIndexSkeleton />
       </PageContainer>
     )
   }

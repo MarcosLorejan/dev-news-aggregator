@@ -27,7 +27,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_selector "[data-testid='articles-page']", wait: 12
     assert_selector "main#main-content", wait: 12
     assert_selector "[data-testid='app-nav']", wait: 12
-    assert_no_text "Loading articles...", wait: 12
+    assert_no_selector "[data-testid='article-list-skeleton']", wait: 12
   end
 
   def visit_bookmarks_index
@@ -36,7 +36,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       visit bookmarks_path
     end
     assert_selector "[data-testid='bookmarks-page']", wait: 12
-    assert_no_text "Loading reading list...", wait: 12
+    assert_no_selector "[data-testid='article-list-skeleton']", wait: 12
   end
 
   def visit_read_articles_index
@@ -45,7 +45,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       visit read_articles_path
     end
     assert_selector "[data-testid='read-articles-page']", wait: 12
-    assert_no_text "Loading read articles...", wait: 12
+    assert_no_selector "[data-testid='article-list-skeleton']", wait: 12
   end
 
   def visit_dismissed_articles_index
@@ -54,7 +54,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       visit dismissed_articles_path
     end
     assert_selector "[data-testid='dismissed-articles-page']", wait: 12
-    assert_no_text "Loading dismissed articles...", wait: 12
+    assert_no_selector "[data-testid='article-list-skeleton']", wait: 12
   end
 
   def visit_recently_dismissed
@@ -63,7 +63,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       visit recently_dismissed_path
     end
     assert_selector "[data-testid='recently-dismissed-page']", wait: 12
-    assert_no_text "Loading recently dismissed articles...", wait: 12
+    assert_no_selector "[data-testid='article-list-skeleton']", wait: 12
   end
 
   def visit_article_show(article)
@@ -72,6 +72,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       visit article_path(article)
     end
     assert_selector "[data-testid='article-show-page']", wait: 12
-    assert_no_text "Loading article...", wait: 12
+    assert_no_selector "[data-testid='article-show-skeleton']", wait: 12
   end
 end

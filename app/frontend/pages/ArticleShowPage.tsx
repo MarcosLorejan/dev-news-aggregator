@@ -14,6 +14,7 @@ import {
   safeExternalUrl,
 } from '../utils/format'
 import { useConfirmDialog } from '../hooks/useConfirmDialog'
+import ArticleShowSkeleton from '../components/ArticleShowSkeleton'
 import Button from '../components/ui/Button'
 import { buttonClassName } from '../components/ui/Button'
 
@@ -93,14 +94,8 @@ export default function ArticleShowPage() {
 
   if (loading) {
     return (
-      <div
-        className="container mx-auto px-4 py-8 max-w-4xl text-center text-gray-400"
-        data-testid="article-show-page"
-        role="status"
-        aria-live="polite"
-        aria-busy="true"
-      >
-        Loading article...
+      <div data-testid="article-show-page">
+        <ArticleShowSkeleton />
       </div>
     )
   }

@@ -14,9 +14,12 @@ import {
 import type { ArticlesIndexResponse } from '../types/article'
 import { parameterize, truncate } from '../utils/format'
 import ArticleList from '../components/ArticleList'
+import ArticleListSkeleton from '../components/ArticleListSkeleton'
 import CategoryFilter from '../components/CategoryFilter'
 import DismissToast from '../components/DismissToast'
 import PageHeader from '../components/PageHeader'
+import PageHeaderSkeleton from '../components/PageHeaderSkeleton'
+import PageContainer from '../components/ui/PageContainer'
 import Card from '../components/ui/Card'
 import PaginationControls from '../components/PaginationControls'
 import ScoreFilter, { parseScoreFilter, scoreFilterParams, type ScoreFilterValue } from '../components/ScoreFilter'
@@ -289,9 +292,10 @@ export default function ArticlesIndexPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl text-center text-gray-400" data-testid="articles-page">
-        Loading articles...
-      </div>
+      <PageContainer testId="articles-page" role="status" aria-live="polite" aria-busy>
+        <PageHeaderSkeleton />
+        <ArticleListSkeleton count={6} label="Loading articles" />
+      </PageContainer>
     )
   }
 

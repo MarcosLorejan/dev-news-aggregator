@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import ArticleListSkeleton from './ArticleListSkeleton'
 import PageContainer from './ui/PageContainer'
 import ErrorRetry from './ErrorRetry'
 
@@ -9,6 +10,7 @@ interface PageShellProps {
   error: string | null
   showFatalError: boolean
   onRetry: () => void
+  loadingSkeleton?: ReactNode
   children: ReactNode
 }
 
@@ -19,18 +21,13 @@ export default function PageShell({
   error,
   showFatalError,
   onRetry,
+  loadingSkeleton,
   children,
 }: PageShellProps) {
   if (loading) {
     return (
-      <PageContainer
-        testId={testId}
-        centered
-        role="status"
-        aria-live="polite"
-        aria-busy
-      >
-        {loadingMessage}
+      <PageContainer testId={testId} role="status" aria-live="polite" aria-busy>
+        {loadingSkeleton ?? <ArticleListSkeleton label={loadingMessage} />}
       </PageContainer>
     )
   }
