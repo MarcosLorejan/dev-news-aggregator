@@ -27,6 +27,20 @@ class DismissedArticleTest < ActiveSupport::TestCase
     assert_includes duplicate.errors[:article_id], "has already been taken"
   end
 
+  test "database enforces unique article_id" do
+    now = Time.current
+
+    assert_raises(ActiveRecord::RecordNotUnique) do
+      DismissedArticle.insert!({
+        article_id: @article.id,
+        dismissed_at: now,
+        permanent: false,
+        created_at: now,
+        updated_at: now
+      })
+    end
+  end
+
   test "should have default permanent value of false" do
     dismissed = DismissedArticle.create!(
       article: articles(:dev_to_article),

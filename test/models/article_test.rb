@@ -37,6 +37,17 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal 1, @article.reload.bookmark ? 1 : 0 # Ensure only one bookmark
   end
 
+  test "bookmark! recovers from RecordNotUnique race" do
+    existing_bookmark = @article.create_bookmark
+    article = Article.find(@article.id)
+    article.extend(Module.new do
+      def bookmarked? = false
+      def create_bookmark = raise ActiveRecord::RecordNotUnique, "duplicate"
+    end)
+
+    assert_equal existing_bookmark, article.bookmark!
+  end
+
   test "unbookmark! destroys existing bookmark" do
     @article.create_bookmark
     assert @article.bookmarked?
@@ -125,6 +136,17 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal 1, @article.reload.read_article ? 1 : 0 # Ensure only one read_article
   end
 
+  test "mark_as_read! recovers from RecordNotUnique race" do
+    existing_read = @article.create_read_article
+    article = Article.find(@article.id)
+    article.extend(Module.new do
+      def read? = false
+      def create_read_article = raise ActiveRecord::RecordNotUnique, "duplicate"
+    end)
+
+    assert_equal existing_read, article.mark_as_read!
+  end
+
   test "should destroy existing read_article when unmark_as_read! is called" do
     @article.create_read_article
     assert @article.read?
@@ -201,6 +223,21 @@ class ArticleTest < ActiveSupport::TestCase
     first_dismiss = @article.dismiss!
     second_dismiss = @article.dismiss!
     assert_equal first_dismiss, second_dismiss
+  end
+
+  test "dismiss! recovers from RecordNotUnique race" do
+    existing_dismissed = @article.dismiss!
+    article = Article.find(@article.id)
+    lookups = 0
+    article.define_singleton_method(:dismissed_article) do
+      lookups += 1
+      lookups == 1 ? nil : existing_dismissed
+    end
+    article.define_singleton_method(:create_dismissed_article) do |*_args, **_kwargs|
+      raise ActiveRecord::RecordNotUnique, "duplicate"
+    end
+
+    assert_equal existing_dismissed, article.dismiss!
   end
 
   test "should undismiss article" do
