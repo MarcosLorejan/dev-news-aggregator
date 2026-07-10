@@ -56,6 +56,22 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
-    # Add more helper methods to be used by all tests here...
+    # Temporarily replace a method so it always raises RecordNotUnique (for rescue_from tests).
+    def force_record_not_unique!(klass, method_name)
+      alias_name = :"__original_#{method_name}"
+      klass.class_eval do
+        alias_method alias_name, method_name
+        define_method(method_name) do |*_args, **_kwargs|
+          raise ActiveRecord::RecordNotUnique, "duplicate"
+        end
+      end
+
+      yield
+    ensure
+      klass.class_eval do
+        alias_method method_name, alias_name
+        remove_method alias_name
+      end
+    end
   end
 end

@@ -40,12 +40,13 @@ class ArticleTest < ActiveSupport::TestCase
   test "bookmark! recovers from RecordNotUnique race" do
     existing_bookmark = @article.create_bookmark
     article = Article.find(@article.id)
-    article.extend(Module.new do
-      def bookmarked? = false
-      def create_bookmark = raise ActiveRecord::RecordNotUnique, "duplicate"
-    end)
+    Bookmark.define_singleton_method(:find_or_create_by!) do |*_args, **_kwargs, &_block|
+      raise ActiveRecord::RecordNotUnique, "duplicate"
+    end
 
     assert_equal existing_bookmark, article.bookmark!
+  ensure
+    Bookmark.singleton_class.remove_method(:find_or_create_by!)
   end
 
   test "unbookmark! destroys existing bookmark" do
@@ -139,12 +140,13 @@ class ArticleTest < ActiveSupport::TestCase
   test "mark_as_read! recovers from RecordNotUnique race" do
     existing_read = @article.create_read_article
     article = Article.find(@article.id)
-    article.extend(Module.new do
-      def read? = false
-      def create_read_article = raise ActiveRecord::RecordNotUnique, "duplicate"
-    end)
+    ReadArticle.define_singleton_method(:find_or_create_by!) do |*_args, **_kwargs, &_block|
+      raise ActiveRecord::RecordNotUnique, "duplicate"
+    end
 
     assert_equal existing_read, article.mark_as_read!
+  ensure
+    ReadArticle.singleton_class.remove_method(:find_or_create_by!)
   end
 
   test "should destroy existing read_article when unmark_as_read! is called" do
@@ -228,16 +230,13 @@ class ArticleTest < ActiveSupport::TestCase
   test "dismiss! recovers from RecordNotUnique race" do
     existing_dismissed = @article.dismiss!
     article = Article.find(@article.id)
-    lookups = 0
-    article.define_singleton_method(:dismissed_article) do
-      lookups += 1
-      lookups == 1 ? nil : existing_dismissed
-    end
-    article.define_singleton_method(:create_dismissed_article) do |*_args, **_kwargs|
+    DismissedArticle.define_singleton_method(:find_or_create_by!) do |*_args, **_kwargs, &_block|
       raise ActiveRecord::RecordNotUnique, "duplicate"
     end
 
     assert_equal existing_dismissed, article.dismiss!
+  ensure
+    DismissedArticle.singleton_class.remove_method(:find_or_create_by!)
   end
 
   test "should undismiss article" do
