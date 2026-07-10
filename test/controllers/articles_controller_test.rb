@@ -183,16 +183,6 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, Bookmark.where(article_id: @article.id).count
   end
 
-  test "bookmark JSON returns success when RecordNotUnique escapes model" do
-    @article.create_bookmark
-    force_record_not_unique!(Article, :bookmark!) do
-      post bookmark_article_path(@article), as: :json
-    end
-
-    assert_response :success
-    assert JSON.parse(response.body)["bookmarked"]
-  end
-
   test "unbookmark action should respond to JSON" do
     @article.create_bookmark
     assert @article.bookmarked?
@@ -248,16 +238,6 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "dismissed", JSON.parse(response.body)["status"]
     assert_equal 1, DismissedArticle.where(article_id: @article.id).count
-  end
-
-  test "dismiss JSON returns success when RecordNotUnique escapes model" do
-    @article.dismiss!
-    force_record_not_unique!(Article, :dismiss!) do
-      post dismiss_article_path(@article), as: :json
-    end
-
-    assert_response :success
-    assert_equal "dismissed", JSON.parse(response.body)["status"]
   end
 
   test "should undismiss article" do

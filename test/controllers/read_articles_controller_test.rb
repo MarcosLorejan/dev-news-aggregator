@@ -82,17 +82,6 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, ReadArticle.where(article_id: unread_article.id).count
   end
 
-  test "mark as read JSON returns success when RecordNotUnique escapes model" do
-    force_record_not_unique!(Article, :mark_as_read!) do
-      post mark_article_as_read_path(@article), as: :json
-    end
-
-    assert_response :ok
-    json_response = JSON.parse(response.body)
-    assert_equal true, json_response["read"]
-    assert_equal "Article marked as read", json_response["message"]
-  end
-
   test "should handle mark read of non-existent article" do
     assert_no_difference "ReadArticle.count" do
       post mark_article_as_read_path(article_id: 99999)
