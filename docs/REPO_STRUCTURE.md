@@ -2,7 +2,7 @@
 
 Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
 
-Last updated: 2026-07-03
+Last updated: 2026-07-10
 
 ## Maintenance
 
@@ -187,6 +187,8 @@ dev-news-aggregator/
 | File | Purpose |
 |------|---------|
 | `README.md` | Project overview and quick start |
+| `CONTRIBUTING.md` | Contributor entry point and PR workflow links |
+| `AGENTS.md` | AI-agent workflow and verification guardrails |
 | `Gemfile` / `Gemfile.lock` | Ruby gems |
 | `package.json` / `package-lock.json` | Node packages |
 | `docker-compose.yml` | Local PostgreSQL container |
