@@ -29,6 +29,20 @@ class BookmarkTest < ActiveSupport::TestCase
     assert_includes duplicate_bookmark.errors[:article_id], "has already been taken"
   end
 
+  test "database enforces unique article_id" do
+    @bookmark.save!
+    now = Time.current
+
+    assert_raises(ActiveRecord::RecordNotUnique) do
+      Bookmark.insert!({
+        article_id: @article.id,
+        bookmarked_at: now,
+        created_at: now,
+        updated_at: now
+      })
+    end
+  end
+
   test "should set bookmarked_at before create" do
     freeze_time = Time.parse("2025-01-01 12:00:00 UTC")
 

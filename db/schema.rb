@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_03_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_10_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -35,7 +35,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_160000) do
     t.datetime "bookmarked_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["article_id"], name: "index_bookmarks_on_article_id"
+    t.index ["article_id"], name: "index_bookmarks_on_article_id", unique: true
   end
 
   create_table "dismissed_articles", force: :cascade do |t|
@@ -44,7 +44,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_160000) do
     t.datetime "dismissed_at", null: false
     t.boolean "permanent", default: false
     t.datetime "updated_at", null: false
-    t.index ["article_id"], name: "index_dismissed_articles_on_article_id"
+    t.index ["article_id"], name: "index_dismissed_articles_on_article_id", unique: true
     t.index ["dismissed_at"], name: "index_dismissed_articles_on_dismissed_at"
     t.index ["permanent"], name: "index_dismissed_articles_on_permanent"
   end
@@ -80,7 +80,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_160000) do
     t.datetime "created_at", null: false
     t.datetime "read_at"
     t.datetime "updated_at", null: false
-    t.index ["article_id"], name: "index_read_articles_on_article_id"
+    t.index ["article_id"], name: "index_read_articles_on_article_id", unique: true
   end
 
   add_foreign_key "bookmarks", "articles"

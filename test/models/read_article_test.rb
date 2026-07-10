@@ -28,6 +28,20 @@ class ReadArticleTest < ActiveSupport::TestCase
     assert_includes duplicate.errors[:article_id], "has already been taken"
   end
 
+  test "database enforces unique article_id" do
+    @read_article.save!
+    now = Time.current
+
+    assert_raises(ActiveRecord::RecordNotUnique) do
+      ReadArticle.insert!({
+        article_id: @article.id,
+        read_at: now,
+        created_at: now,
+        updated_at: now
+      })
+    end
+  end
+
   test "should set read_at before create" do
     @read_article.save!
     assert @read_article.read_at.present?

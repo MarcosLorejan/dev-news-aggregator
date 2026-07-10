@@ -21,7 +21,10 @@ class Article < ApplicationRecord
 
   def bookmark!
     return bookmark if bookmarked?
+
     create_bookmark
+  rescue ActiveRecord::RecordNotUnique
+    reload.bookmark
   end
 
   def unbookmark!
@@ -42,7 +45,10 @@ class Article < ApplicationRecord
 
   def mark_as_read!
     return read_article if read?
+
     create_read_article
+  rescue ActiveRecord::RecordNotUnique
+    reload.read_article
   end
 
   def unmark_as_read!
@@ -67,7 +73,10 @@ class Article < ApplicationRecord
 
   def dismiss!
     return dismissed_article if dismissed_article.present?
+
     create_dismissed_article(dismissed_at: Time.current, permanent: false)
+  rescue ActiveRecord::RecordNotUnique
+    reload.dismissed_article
   end
 
   def undismiss!
