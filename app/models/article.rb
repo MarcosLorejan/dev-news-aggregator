@@ -20,9 +20,11 @@ class Article < ApplicationRecord
   end
 
   def bookmark!
-    return bookmark if bookmarked?
-
-    create_bookmark
+    record = Bookmark.find_or_create_by!(article_id: id) do |bookmark|
+      bookmark.bookmarked_at = Time.current
+    end
+    association(:bookmark).target = record
+    record
   rescue ActiveRecord::RecordNotUnique
     reload.bookmark
   end
@@ -44,9 +46,11 @@ class Article < ApplicationRecord
   end
 
   def mark_as_read!
-    return read_article if read?
-
-    create_read_article
+    record = ReadArticle.find_or_create_by!(article_id: id) do |read_article|
+      read_article.read_at = Time.current
+    end
+    association(:read_article).target = record
+    record
   rescue ActiveRecord::RecordNotUnique
     reload.read_article
   end
@@ -72,9 +76,12 @@ class Article < ApplicationRecord
   end
 
   def dismiss!
-    return dismissed_article if dismissed_article.present?
-
-    create_dismissed_article(dismissed_at: Time.current, permanent: false)
+    record = DismissedArticle.find_or_create_by!(article_id: id) do |dismissed_article|
+      dismissed_article.dismissed_at = Time.current
+      dismissed_article.permanent = false
+    end
+    association(:dismissed_article).target = record
+    record
   rescue ActiveRecord::RecordNotUnique
     reload.dismissed_article
   end

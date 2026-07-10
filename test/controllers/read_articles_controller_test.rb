@@ -66,6 +66,22 @@ class ReadArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal true, json_response["read"]
   end
 
+  test "double mark as read JSON is idempotent" do
+    unread_article = articles(:dev_to_article)
+
+    post mark_article_as_read_path(unread_article), as: :json
+    assert_response :ok
+
+    assert_no_difference "ReadArticle.count" do
+      post mark_article_as_read_path(unread_article), as: :json
+    end
+
+    assert_response :ok
+    json_response = JSON.parse(response.body)
+    assert_equal true, json_response["read"]
+    assert_equal 1, ReadArticle.where(article_id: unread_article.id).count
+  end
+
   test "should handle mark read of non-existent article" do
     assert_no_difference "ReadArticle.count" do
       post mark_article_as_read_path(article_id: 99999)
