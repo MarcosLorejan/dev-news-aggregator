@@ -87,7 +87,7 @@ No manual intervention needed for routine security patches and minor updates!
 
 ## Development
 
-See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for development guidelines and [docs/REPO_STRUCTURE.md](docs/REPO_STRUCTURE.md) for the repository map (keep it updated when structure changes).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contributor entry point, [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for development guidelines, and [docs/REPO_STRUCTURE.md](docs/REPO_STRUCTURE.md) for the repository map (keep it updated when structure changes).
 
 ### Pre-commit Hooks
 
