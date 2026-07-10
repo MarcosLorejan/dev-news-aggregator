@@ -170,6 +170,19 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert @article.reload.bookmarked?
   end
 
+  test "double bookmark JSON is idempotent" do
+    post bookmark_article_path(@article), as: :json
+    assert_response :success
+
+    assert_no_difference "Bookmark.count" do
+      post bookmark_article_path(@article), as: :json
+    end
+
+    assert_response :success
+    assert JSON.parse(response.body)["bookmarked"]
+    assert_equal 1, Bookmark.where(article_id: @article.id).count
+  end
+
   test "unbookmark action should respond to JSON" do
     @article.create_bookmark
     assert @article.bookmarked?
@@ -212,6 +225,19 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     response_data = JSON.parse(response.body)
     assert_equal "dismissed", response_data["status"]
     assert_equal 15, response_data["timeout"]
+  end
+
+  test "double dismiss JSON is idempotent" do
+    post dismiss_article_path(@article), as: :json
+    assert_response :success
+
+    assert_no_difference "DismissedArticle.count" do
+      post dismiss_article_path(@article), as: :json
+    end
+
+    assert_response :success
+    assert_equal "dismissed", JSON.parse(response.body)["status"]
+    assert_equal 1, DismissedArticle.where(article_id: @article.id).count
   end
 
   test "should undismiss article" do
