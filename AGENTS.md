@@ -19,7 +19,19 @@ Guidance for AI coding agents working in this repository. Keep this file concise
 
 ## Verification
 
-Run the checks relevant to your change before opening a pull request:
+Prefer the CI-equivalent local wrapper before opening a pull request:
+
+```bash
+bin/validate
+```
+
+For quick iteration, use fast mode (skips Brakeman and Rails tests):
+
+```bash
+bin/validate --fast
+```
+
+Or run the checks relevant to your change individually:
 
 ```bash
 bin/rails test
