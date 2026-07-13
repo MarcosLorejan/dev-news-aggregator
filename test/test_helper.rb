@@ -11,22 +11,24 @@ if ENV["COVERAGE"] && ENV["COVERAGE"] != ""
     c.single_report_path = "coverage/lcov.info"
   end
 
-  SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new([
+  # SimpleCov 1.0: formatters= expects an Array (it wraps MultiFormatter itself).
+  # Passing MultiFormatter.new([...]) fails because that returns a Class, not an Array.
+  SimpleCov.formatters = [
     SimpleCov::Formatter::HTMLFormatter,
     SimpleCov::Formatter::LcovFormatter
-  ])
+  ]
 
   SimpleCov.start "rails" do
-    add_filter "/vendor/"
-    add_filter "/test/"
-    add_filter "/config/"
-    add_filter "/db/"
-    add_filter "/bin/"
-    add_filter "/lib/tasks/"
+    skip "/vendor/"
+    skip "/test/"
+    skip "/config/"
+    skip "/db/"
+    skip "/bin/"
+    skip "/lib/tasks/"
 
     minimum_coverage 55
 
-    track_files "{app,lib}/**/*.rb"
+    cover "{app,lib}/**/*.rb"
   end
 end
 
