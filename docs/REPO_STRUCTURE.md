@@ -2,7 +2,7 @@
 
 Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
 
-Last updated: 2026-07-10
+Last updated: 2026-07-13
 
 ## Maintenance
 
@@ -32,7 +32,7 @@ Rails 8 news aggregator with a React (Vite) frontend, PostgreSQL, and scheduled 
 ```
 dev-news-aggregator/
 ├── app/                    # Application code (MVC, services, jobs, frontend)
-├── bin/                    # Executables (rails, dev, jobs, rubocop, brakeman, …)
+├── bin/                    # Executables (rails, validate, dev, jobs, rubocop, brakeman, …)
 ├── config/                 # Rails and app configuration
 ├── db/                     # Migrations, schema, seeds
 ├── docs/                   # Project documentation
@@ -186,6 +186,7 @@ dev-news-aggregator/
 
 | File | Purpose |
 |------|---------|
+| `LICENSE` | MIT license |
 | `README.md` | Project overview and quick start |
 | `CONTRIBUTING.md` | Contributor entry point and PR workflow links |
 | `AGENTS.md` | AI-agent workflow and verification guardrails |
