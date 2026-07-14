@@ -7,6 +7,7 @@ class ReactShellTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "#root"
     assert_select "script[type='module'][src*='application']"
+    assert_select "link[rel='stylesheet'][href*='application']"
     assert_no_match(/entrypoints\/application\.ts["']/, response.body)
     assert_no_match(/cdn\.tailwindcss\.com/, response.body)
   end
@@ -19,14 +20,13 @@ class ReactShellTest < ActionDispatch::IntegrationTest
     assert manifest.key?("entrypoints/application.tsx")
   end
 
-  test "vite test manifest includes compiled tailwind css" do
+  test "vite test manifest includes compiled tailwind css entrypoint" do
     manifest_path = Rails.root.join("public/vite-test/.vite/manifest.json")
     skip "Run npm run build:test before this test" unless manifest_path.exist?
 
-    entry = JSON.parse(manifest_path.read).fetch("entrypoints/application.tsx")
-    css_assets = Array(entry["css"])
-
-    assert css_assets.any? { |path| path.include?("application") && path.end_with?(".css") }
+    entry = JSON.parse(manifest_path.read).fetch("entrypoints/application.css")
+    assert entry.fetch("file").end_with?(".css")
+    assert_includes entry.fetch("file"), "application"
   end
 
   test "vite test manifest lazy-loads route page chunks" do

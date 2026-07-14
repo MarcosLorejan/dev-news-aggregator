@@ -19,7 +19,7 @@ const OPTIONS: { value: ScoreFilterValue; label: string }[] = [
 export default function ScoreFilter({ activeScoreFilter, onScoreFilterChange }: ScoreFilterProps) {
   return (
     <Card tone="subtle" className="mb-8">
-      <h2 className="text-h3 text-gray-200 mb-4">Filter by score</h2>
+      <h2 className="text-h3 text-gray-100 mb-4">Filter by score</h2>
       <div className="flex flex-wrap gap-3">
         {OPTIONS.map((option) => (
           <Button

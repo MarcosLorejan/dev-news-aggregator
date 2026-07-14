@@ -8,7 +8,7 @@
   }
 
   body {
-    @apply text-body text-gray-300;
+    @apply text-body text-gray-200;
   }
 }
 
@@ -48,42 +48,42 @@
     border: 1px solid rgb(168 85 247 / 0.3);
   }
 
-  /* Layered surfaces — varied depth instead of identical glass panels */
+  /*
+   * Layered surfaces — opaque slate panels for WCAG-readable text.
+   * Avoid translucent "glass" fills that wash out to light-on-light when
+   * backdrop sampling fails (e.g. built assets / CSS load order).
+   */
   .surface-elevated {
-    backdrop-filter: blur(12px);
-    background: rgba(30, 41, 59, 0.88);
-    border: 1px solid rgb(51 65 85 / 0.85);
-    box-shadow: 0 4px 24px rgb(0 0 0 / 0.18);
+    background: #1e293b;
+    border: 1px solid #475569;
+    box-shadow: 0 4px 24px rgb(0 0 0 / 0.28);
   }
 
   .surface-card {
-    background: rgba(30, 41, 59, 0.5);
-    border: 1px solid rgb(51 65 85 / 0.75);
-    backdrop-filter: blur(6px);
+    background: #1e293b;
+    border: 1px solid #334155;
     transition: border-color 0.2s ease, background-color 0.2s ease;
   }
 
   .surface-card:hover {
-    border-color: rgb(71 85 105 / 0.9);
-    background: rgba(30, 41, 59, 0.58);
+    border-color: #64748b;
+    background: #243044;
   }
 
   .surface-subtle {
-    background: rgba(15, 23, 42, 0.35);
-    border: 1px solid rgb(51 65 85 / 0.45);
+    background: #172033;
+    border: 1px solid #334155;
   }
 
   .surface-panel {
-    background: rgba(30, 41, 59, 0.72);
-    border: 1px solid rgb(51 65 85 / 0.8);
-    backdrop-filter: blur(8px);
+    background: #1e293b;
+    border: 1px solid #475569;
   }
 
   /* Backward compatibility — maps to content card surface */
   .glass-effect {
-    background: rgba(30, 41, 59, 0.5);
-    border: 1px solid rgb(51 65 85 / 0.75);
-    backdrop-filter: blur(6px);
+    background: #1e293b;
+    border: 1px solid #334155;
     transition: border-color 0.2s ease, background-color 0.2s ease;
   }
 

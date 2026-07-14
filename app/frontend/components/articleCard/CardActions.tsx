@@ -19,7 +19,7 @@ export function DismissButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       className={cn(
-        'group/dismiss p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors duration-200 motion-sensitive',
+        'group/dismiss p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors duration-200 motion-sensitive',
         FOCUS_RING
       )}
       title="Dismiss article"
