@@ -71,19 +71,40 @@ class NewsFetchers::BaseFetcherTest < ActiveSupport::TestCase
   test "parse_http_response unwraps HTTParty responses" do
     fake_response = Object.new
     fake_response.define_singleton_method(:parsed_response) { %w[a b] }
+    fake_response.define_singleton_method(:success?) { true }
     fake_response.define_singleton_method(:is_a?) { |klass| klass == HTTParty::Response }
 
     result = NewsFetchers::BaseFetcher.send(:parse_http_response, fake_response)
     assert_equal %w[a b], result
   end
 
-  test "parse_http_response returns nil for invalid JSON bodies" do
+  test "parse_http_response raises FetchError for invalid JSON bodies" do
     fake_response = Object.new
     fake_response.define_singleton_method(:parsed_response) { raise JSON::ParserError, "unexpected character" }
+    fake_response.define_singleton_method(:success?) { true }
     fake_response.define_singleton_method(:is_a?) { |klass| klass == HTTParty::Response }
 
-    result = NewsFetchers::BaseFetcher.send(:parse_http_response, fake_response)
-    assert_nil result
+    error = assert_raises(NewsFetchers::BaseFetcher::FetchError) do
+      NewsFetchers::BaseFetcher.send(:parse_http_response, fake_response)
+    end
+    assert_match(/Invalid JSON response/, error.message)
+  end
+
+  test "parse_http_response raises FetchError for non-success HTTP responses" do
+    request = Object.new
+    request.define_singleton_method(:uri) { "https://example.com/api" }
+
+    fake_response = Object.new
+    fake_response.define_singleton_method(:success?) { false }
+    fake_response.define_singleton_method(:code) { 403 }
+    fake_response.define_singleton_method(:body) { "Blocked" }
+    fake_response.define_singleton_method(:request) { request }
+    fake_response.define_singleton_method(:is_a?) { |klass| klass == HTTParty::Response }
+
+    error = assert_raises(NewsFetchers::BaseFetcher::FetchError) do
+      NewsFetchers::BaseFetcher.send(:parse_http_response, fake_response)
+    end
+    assert_match(/HTTP 403/, error.message)
   end
 
   test "get retries transient network errors with backoff before succeeding" do

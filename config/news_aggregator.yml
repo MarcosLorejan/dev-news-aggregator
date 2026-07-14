@@ -30,8 +30,9 @@ development: &default
       articles_endpoint: "/articles"
       
     reddit:
+      # Public JSON listings return 403; fetchers use Atom RSS (.rss) instead.
       base_url: "https://www.reddit.com/r"
-      format: ".json"
+      format: ".rss"
       subreddits:
         - programming
         - webdev

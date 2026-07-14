@@ -52,12 +52,15 @@ class NewsFetchers::HackerNewsFetcherTest < ActiveSupport::TestCase
     end
   end
 
-  test "fetch_articles returns empty array when top stories request fails" do
+  test "fetch_articles raises when top stories request fails" do
     stub_request(:get, "https://hacker-news.firebaseio.com/v0/topstories.json")
       .to_return(status: 500, body: "error")
 
     assert_no_difference "Article.count" do
-      assert_empty @fetcher.fetch_articles
+      error = assert_raises(NewsFetchers::BaseFetcher::FetchError) do
+        @fetcher.fetch_articles
+      end
+      assert_match(/HTTP 500/, error.message)
     end
   end
 
