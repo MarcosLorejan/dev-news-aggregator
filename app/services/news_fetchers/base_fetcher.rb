@@ -1,6 +1,8 @@
 class NewsFetchers::BaseFetcher
   include HTTParty
 
+  class FetchError < StandardError; end
+
   RETRYABLE_ERRORS = [
     Net::OpenTimeout,
     Net::ReadTimeout,
@@ -32,9 +34,15 @@ class NewsFetchers::BaseFetcher
     def parse_http_response(response)
       return response unless response.is_a?(HTTParty::Response)
 
+      unless response.success?
+        body_preview = response.body.to_s.gsub(/\s+/, " ").strip[0, 200]
+        raise FetchError,
+              "HTTP #{response.code} for #{response.request&.uri}: #{body_preview.presence || '(empty body)'}"
+      end
+
       response.parsed_response
-    rescue JSON::ParserError
-      nil
+    rescue JSON::ParserError => e
+      raise FetchError, "Invalid JSON response: #{e.message}"
     end
   end
 

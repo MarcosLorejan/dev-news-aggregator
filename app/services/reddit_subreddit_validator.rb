@@ -1,5 +1,5 @@
 class RedditSubredditValidator
-  USER_AGENT = "DevNewsAggregator/1.0"
+  USER_AGENT = NewsFetchers::RedditFetcher::USER_AGENT
 
   def self.valid?(subreddit)
     normalized = normalize(subreddit)
@@ -9,15 +9,15 @@ class RedditSubredditValidator
     cached = Rails.cache.read(cache_key)
     return cached unless cached.nil?
 
+    NewsFetchers::RedditFetcher.throttle!
+
     response = HTTParty.get(
-      "https://www.reddit.com/r/#{normalized}/about.json",
+      "https://www.reddit.com/r/#{normalized}/.rss",
       headers: { "User-Agent" => USER_AGENT },
       timeout: 5
     )
 
-    valid = response.code == 200 &&
-            response.parsed_response.is_a?(Hash) &&
-            response.dig("data", "subreddit_type") != "banned"
+    valid = response.code == 200 && response.body.to_s.include?("<feed")
 
     Rails.cache.write(cache_key, valid, expires_in: 1.hour)
     valid
