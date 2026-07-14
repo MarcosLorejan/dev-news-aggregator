@@ -190,17 +190,28 @@ dev-news-aggregator/
 | `README.md` | Project overview and quick start |
 | `CONTRIBUTING.md` | Contributor entry point and PR workflow links |
 | `AGENTS.md` | AI-agent workflow and verification guardrails |
+| `.env.example` | Template for local env vars (Postgres, `SECRET_KEY_BASE`, optional API keys) |
 | `Gemfile` / `Gemfile.lock` | Ruby gems |
 | `package.json` / `package-lock.json` | Node packages |
 | `bin/dev` | Rails-only server wrapper (`bin/rails server`); does **not** start Vite |
 | `dev.ps1` | Windows helper that starts Vite + Rails together (full stack) |
+| `setup-local-env.ps1` | Windows one-time/repeat setup (bundle, npm, Postgres, `db:prepare`) |
 | `docker-compose.yml` | Local PostgreSQL container |
 | `Dockerfile` | Production/container image |
 | `.overcommit.yml` | Git hook configuration |
 | `.rubocop.yml` | Ruby style rules |
 | `tsconfig.json` | TypeScript config for frontend |
 
-**Dev entry points:** `bin/dev` = Rails only. Full stack = `npm run dev` + Rails, or `.\dev.ps1` on Windows. See [DEVELOPMENT.md](DEVELOPMENT.md).
+**Dev entry points:** `bin/dev` = Rails only. Full stack = `npm run dev` + Rails, or `.\dev.ps1` on Windows (after `.\setup-local-env.ps1`). See [DEVELOPMENT.md](DEVELOPMENT.md) and [REACT_SETUP.md](REACT_SETUP.md).
+
+## Agent onboarding
+
+Agents should start here, then use this file as the navigation map:
+
+1. [AGENTS.md](../AGENTS.md) — work rules and verification (`bin/validate`)
+2. [CONTRIBUTING.md](../CONTRIBUTING.md) — PR workflow
+3. [DEVELOPMENT.md](DEVELOPMENT.md) — setup, commands, conventions
+4. This file — directory and entry-point map
 
 ## Routes (summary)
 
