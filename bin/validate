@@ -63,6 +63,7 @@ else
 fi
 
 run_check "TypeScript typecheck" npm run typecheck
+run_check "ESLint" npm run lint
 run_check "Frontend tests" npm test
 
 if "$fast"; then

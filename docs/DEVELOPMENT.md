@@ -93,6 +93,10 @@ React/Vite frontend checks (also see [AGENTS.md](../AGENTS.md#verification) and 
 | `npm test` | `vitest run` | Frontend unit tests | `frontend_test` |
 | `npm run test:watch` | `vitest` | Frontend tests in watch mode | — (local only) |
 | `npm run typecheck` | `tsc --noEmit` | TypeScript check | — (not in CI yet; run by `bin/validate`) |
+| `npm run lint` | `eslint .` | ESLint (TypeScript + React hooks) | `frontend_lint` |
+| `npm run lint:fix` | `eslint . --fix` | Auto-fix lint issues | — (local only) |
+| `npm run format` | `prettier --write ...` | Format frontend sources | — (not enforced in CI) |
+| `npm run format:check` | `prettier --check ...` | Report unformatted files | — (not enforced in CI) |
 | `npm run build:test` | `vite build --mode test` | Test-mode Vite build (assets for Rails/system tests) | `test`, `coverage` |
 | `npm run build` | `vite build` | Production frontend build | — (deploy / local) |
 | `npm run dev` | `vite` | Vite HMR dev server | — (local) |
@@ -116,9 +120,14 @@ bin/rubocop -a
 # Security audit (Ruby)
 bin/brakeman
 
+# Lint the frontend (matches CI frontend_lint)
+npm run lint
+
 # JS dependency audit (matches CI scan_js)
 npm audit --omit=dev --audit-level=moderate
 ```
+
+Prettier is configured (`.prettierrc.json`) but not enforced: most of the existing frontend predates it, so `npm run format` would rewrite ~30 files. Run it on files you are already touching, or reformat the tree in a dedicated commit — don't mix it into a feature PR.
 
 ### Local validation (`bin/validate`)
 
@@ -134,6 +143,7 @@ bin/validate --fast   # skips Brakeman and Rails tests
 | RuboCop | yes | `lint` |
 | Brakeman | yes (skipped with `--fast`) | `scan_ruby` |
 | `npm run typecheck` | yes | — (local / validate only for now) |
+| `npm run lint` | yes | `frontend_lint` |
 | `npm test` | yes | `frontend_test` |
 | `bin/rails test` | yes (skipped with `--fast`) | `test`, `coverage` |
 | `npm run build:test` | no — run before system tests if needed | `test`, `coverage` |
