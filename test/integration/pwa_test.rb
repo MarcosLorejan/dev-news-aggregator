@@ -23,9 +23,12 @@ class PwaTest < ActionDispatch::IntegrationTest
   end
 
   test "service worker registers a fetch handler so browsers offer the install prompt" do
-    get pwa_service_worker_path
+    # The route only has a JavaScript template, so ask for that format explicitly:
+    # a bare GET defaults to HTML and never reaches app/views/pwa/service-worker.js.
+    get pwa_service_worker_path(format: :js)
 
     assert_response :success
+    assert_match(%r{javascript}, response.media_type)
     assert_match(/addEventListener\("fetch"/, response.body)
   end
 end
