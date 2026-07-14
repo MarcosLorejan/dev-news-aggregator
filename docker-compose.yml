@@ -2,16 +2,16 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_DB: dev_news_aggregator_development
-      POSTGRES_USER: dev_news_user
-      POSTGRES_PASSWORD: dev_password
+      POSTGRES_DB: ${POSTGRES_DB:-dev_news_aggregator_development}
+      POSTGRES_USER: ${POSTGRES_USER:-dev_news_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dev_news_user -d dev_news_aggregator_development"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dev_news_user} -d ${POSTGRES_DB:-dev_news_aggregator_development}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,7 +27,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://dev_news_user:dev_password@db:5432/dev_news_aggregator_development
+      DATABASE_URL: postgresql://${POSTGRES_USER:-dev_news_user}:${POSTGRES_PASSWORD:-dev_password}@db:5432/${POSTGRES_DB:-dev_news_aggregator_development}
 
 volumes:
   postgres_data:
