@@ -74,7 +74,7 @@ bin/rails runner "NewsAggregatorService.fetch_all_news"
 ### Testing
 
 ```bash
-# Run all tests
+# Run all Rails tests
 bin/rails test
 
 # Run specific test file
@@ -82,6 +82,26 @@ bin/rails test test/models/article_test.rb
 
 # Run specific test
 bin/rails test test/controllers/articles_controller_test.rb -n test_index
+```
+
+### Frontend testing
+
+React/Vite frontend checks (also see [AGENTS.md](../AGENTS.md#verification) and `bin/validate`):
+
+| Script | Command | Purpose | CI job |
+|--------|---------|---------|--------|
+| `npm test` | `vitest run` | Frontend unit tests | `frontend_test` |
+| `npm run test:watch` | `vitest` | Frontend tests in watch mode | — (local only) |
+| `npm run typecheck` | `tsc --noEmit` | TypeScript check | — (not in CI yet; run by `bin/validate`) |
+| `npm run build:test` | `vite build --mode test` | Test-mode Vite build (assets for Rails/system tests) | `test`, `coverage` |
+| `npm run build` | `vite build` | Production frontend build | — (deploy / local) |
+| `npm run dev` | `vite` | Vite HMR dev server | — (local) |
+| `npm run preview` | `vite preview` | Preview production build | — (local) |
+
+```bash
+npm test
+npm run typecheck
+npm run build:test
 ```
 
 ### Code quality
@@ -93,9 +113,33 @@ bin/rubocop
 # Auto-fix RuboCop issues
 bin/rubocop -a
 
-# Security audit
+# Security audit (Ruby)
 bin/brakeman
+
+# JS dependency audit (matches CI scan_js)
+npm audit --omit=dev --audit-level=moderate
 ```
+
+### Local validation (`bin/validate`)
+
+Prefer the CI-oriented wrapper before opening a PR (documented in [AGENTS.md](../AGENTS.md#verification)):
+
+```bash
+bin/validate          # RuboCop, Brakeman, typecheck, npm test, rails test
+bin/validate --fast   # skips Brakeman and Rails tests
+```
+
+| Check | `bin/validate` | CI job(s) |
+|-------|----------------|-----------|
+| RuboCop | yes | `lint` |
+| Brakeman | yes (skipped with `--fast`) | `scan_ruby` |
+| `npm run typecheck` | yes | — (local / validate only for now) |
+| `npm test` | yes | `frontend_test` |
+| `bin/rails test` | yes (skipped with `--fast`) | `test`, `coverage` |
+| `npm run build:test` | no — run before system tests if needed | `test`, `coverage` |
+| `rails test:system` | no | `test`, `coverage` |
+| `npm audit` | no | `scan_js` |
+| `bundle-audit` | no | `scan_dependencies` |
 
 ### Cron jobs
 
