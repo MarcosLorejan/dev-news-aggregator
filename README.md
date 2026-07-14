@@ -15,6 +15,9 @@ A Rails application that aggregates developer news from Hacker News, Dev.to, and
 # Install dependencies
 bundle install
 
+# Copy the environment template (holds the local database credentials)
+cp .env.example .env
+
 # Start PostgreSQL container
 sudo docker-compose up -d
 

@@ -223,10 +223,12 @@ Articles table uses generic fields to accommodate all news sources:
 
 ### Environment configuration
 
-Uses Docker Compose for PostgreSQL with environment variables:
-- `POSTGRES_USER`: devnews
-- `POSTGRES_PASSWORD`: password
-- `POSTGRES_DB`: dev_news_aggregator
+Copy `.env.example` to `.env` before starting the stack. Docker Compose reads it to create the PostgreSQL container:
+- `POSTGRES_USER`: dev_news_user
+- `POSTGRES_PASSWORD`: dev_password
+- `POSTGRES_DB`: dev_news_aggregator_development
+
+`config/database.yml` falls back to those same credentials (`DB_USERNAME`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`), so Rails connects to the container with no extra setup. Rails does not load `.env` itself — export `DB_*` in your shell only when pointing Rails at a different database. Windows setup (`setup-local-env.ps1`) uses the same credentials.
 
 ### Key features
 
