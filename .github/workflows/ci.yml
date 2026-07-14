@@ -19,14 +19,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
-          bundler-cache: false
-
-      - name: Clean and install dependencies
-        run: |
-          rm -rf vendor/bundle
-          bundle config set --local path 'vendor/bundle'
-          bundle config set --local deployment false
-          bundle install --jobs 4 --retry 3
+          bundler-cache: true
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bundle exec brakeman --no-pager --no-exit-on-warn
@@ -41,14 +34,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
-          bundler-cache: false
-
-      - name: Clean and install dependencies
-        run: |
-          rm -rf vendor/bundle
-          bundle config set --local path 'vendor/bundle'
-          bundle config set --local deployment false
-          bundle install --jobs 4 --retry 3
+          bundler-cache: true
 
       - name: Update bundler-audit database
         run: bundle exec bundle-audit update
@@ -84,14 +70,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
-          bundler-cache: false
-
-      - name: Clean and install dependencies
-        run: |
-          rm -rf vendor/bundle
-          bundle config set --local path 'vendor/bundle'
-          bundle config set --local deployment false
-          bundle install --jobs 4 --retry 3
+          bundler-cache: true
 
       - name: Lint code for consistent style
         run: bundle exec rubocop -f github
@@ -150,14 +129,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
-          bundler-cache: false
-
-      - name: Clean and install dependencies
-        run: |
-          rm -rf vendor/bundle
-          bundle config set --local path 'vendor/bundle'
-          bundle config set --local deployment false
-          bundle install --jobs 4 --retry 3
+          bundler-cache: true
 
       - name: Build Vite assets for tests
         run: npm run build:test
@@ -226,14 +198,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
-          bundler-cache: false
-
-      - name: Clean and install dependencies
-        run: |
-          rm -rf vendor/bundle
-          bundle config set --local path 'vendor/bundle'
-          bundle config set --local deployment false
-          bundle install --jobs 4 --retry 3
+          bundler-cache: true
 
       - name: Build Vite assets for tests
         run: npm run build:test
