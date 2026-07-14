@@ -21,7 +21,7 @@ export default function PageHeading({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
         <div>
           <h1 className={`text-h1 font-bold mb-2 ${titleClassName}`}>{title}</h1>
-          {subtitle && <p className="text-body-lg text-gray-400">{subtitle}</p>}
+          {subtitle && <p className="text-body-lg text-gray-300">{subtitle}</p>}
         </div>
         {(actions || meta) && (
           <div className="flex flex-wrap items-center gap-3 md:gap-4">

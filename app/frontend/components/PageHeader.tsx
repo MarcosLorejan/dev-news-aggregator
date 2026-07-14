@@ -38,7 +38,7 @@ export default function PageHeader({
           <h1 className="text-h1 md:text-display font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent mb-2">
             Developer News Aggregator
           </h1>
-          <p className="text-body-lg text-gray-400">Stay updated with the latest in tech and development</p>
+          <p className="text-body-lg text-gray-300">Stay updated with the latest in tech and development</p>
           {fetchMessage && (
             <p className="text-sm text-primary-300 mt-2" data-testid="fetch-message">{fetchMessage}</p>
           )}
@@ -62,7 +62,7 @@ export default function PageHeader({
             Sources
           </NavLink>
           {onShowReadChange && (
-            <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
               <input
                 type="checkbox"
                 className="rounded border-dark-600 bg-dark-800 text-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
@@ -73,15 +73,15 @@ export default function PageHeader({
               Show read articles
             </label>
           )}
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-gray-300">
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 bg-primary-500 rounded-full animate-pulse" />
               <span>
-                Total: <span className="text-primary-400 font-semibold">{totalCount}</span> articles
+                Total: <span className="text-primary-300 font-semibold">{totalCount}</span> articles
               </span>
             </div>
             {lastUpdated && (
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-gray-400 mt-1">
                 Updated {formatLastUpdated(lastUpdated)}
               </div>
             )}

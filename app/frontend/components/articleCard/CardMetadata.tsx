@@ -10,7 +10,7 @@ interface CardMetadataProps {
 
 export default function CardMetadata({ article, styles, extra }: CardMetadataProps) {
   return (
-    <div className="flex items-center space-x-6 text-gray-400">
+    <div className="flex items-center space-x-6 text-gray-300">
       <span className="flex items-center">
         <svg
           className={`w-4 h-4 mr-1.5 ${styles.dateAccent}`}

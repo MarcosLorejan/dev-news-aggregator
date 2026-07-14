@@ -84,7 +84,7 @@ export function buttonClassName({
   if (variant === 'ghost') {
     return cn(
       base,
-      'p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg',
+      'p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg',
       className
     )
   }
@@ -117,7 +117,7 @@ export function buttonClassName({
     return cn(
       base,
       filterSize,
-      'filter-btn border border-dark-700 bg-transparent text-gray-400 hover:text-gray-200 hover:border-dark-500 hover:bg-dark-800/50',
+      'filter-btn border border-dark-500 bg-dark-800 text-gray-200 hover:text-white hover:border-dark-400 hover:bg-dark-700',
       className
     )
   }

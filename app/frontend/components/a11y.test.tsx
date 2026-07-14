@@ -41,7 +41,11 @@ describe('accessibility audits', () => {
       />
     )
 
-    const results = await axe(container)
+    const results = await axe(container, {
+      rules: {
+        'color-contrast': { enabled: true },
+      },
+    })
     expect(results).toHaveNoViolations()
   })
 

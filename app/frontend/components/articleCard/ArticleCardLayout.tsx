@@ -78,12 +78,12 @@ export default function ArticleCardLayout({
       />
 
       {article.description && (
-        <p className="text-body text-gray-300 mb-6 line-clamp-3 leading-relaxed max-w-prose">
+        <p className="text-body text-gray-200 mb-6 line-clamp-3 leading-relaxed max-w-prose">
           {truncate(article.description, 280)}
         </p>
       )}
 
-      <div className="flex justify-between items-center text-caption text-gray-400 border-t border-dark-700/80 pt-4">
+      <div className="flex justify-between items-center text-caption text-gray-300 border-t border-dark-600 pt-4">
         <CardMetadata article={article} styles={styles} extra={extraMetadata} />
         <div className="flex items-center space-x-3">
           {actions}

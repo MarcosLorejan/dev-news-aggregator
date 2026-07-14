@@ -335,7 +335,7 @@ export default function ArticlesIndexPage() {
             </svg>
           </div>
           <h2 className="text-h2 text-gray-100 mb-4">No articles found</h2>
-          <p className="text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">
+          <p className="text-gray-300 mb-8 max-w-md mx-auto leading-relaxed">
             Your feed is empty. Click Fetch News to pull the latest articles from your configured sources.
           </p>
           <button

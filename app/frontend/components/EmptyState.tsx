@@ -34,7 +34,7 @@ export default function EmptyState({
         {icon}
       </div>
       <h2 className="text-h2 text-gray-100 mb-4">{title}</h2>
-      <p className="text-body text-gray-400 mb-8 max-w-prose mx-auto leading-relaxed">{description}</p>
+      <p className="text-body text-gray-300 mb-8 max-w-prose mx-auto leading-relaxed">{description}</p>
       {actions.length > 0 && (
         <div
           className={
