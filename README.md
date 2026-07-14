@@ -25,11 +25,18 @@ bin/rails db:seed
 # Fetch initial news
 bin/rails runner "NewsAggregatorService.fetch_all_news"
 
-# Start server
-bin/rails server
+# Full stack: Vite (HMR) + Rails — two terminals
+npm install
+npm run dev          # terminal 1, port 3036
+bin/rails server     # terminal 2, port 3000
+
+# Windows alternative (starts both):
+# .\dev.ps1
 ```
 
-Visit http://localhost:3000
+Visit http://localhost:3000.
+
+`bin/dev` and bare `bin/rails server` start **Rails only** (no Vite). For React hot reload you need `npm run dev` as well, or `.\dev.ps1` on Windows. See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) and [docs/REACT_SETUP.md](docs/REACT_SETUP.md).
 
 ## Tech Stack
 
