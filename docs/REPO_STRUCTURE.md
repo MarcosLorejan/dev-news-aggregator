@@ -2,7 +2,7 @@
 
 Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
 
-Last updated: 2026-07-13
+Last updated: 2026-07-14
 
 ## Maintenance
 
@@ -192,11 +192,15 @@ dev-news-aggregator/
 | `AGENTS.md` | AI-agent workflow and verification guardrails |
 | `Gemfile` / `Gemfile.lock` | Ruby gems |
 | `package.json` / `package-lock.json` | Node packages |
+| `bin/dev` | Rails-only server wrapper (`bin/rails server`); does **not** start Vite |
+| `dev.ps1` | Windows helper that starts Vite + Rails together (full stack) |
 | `docker-compose.yml` | Local PostgreSQL container |
 | `Dockerfile` | Production/container image |
 | `.overcommit.yml` | Git hook configuration |
 | `.rubocop.yml` | Ruby style rules |
 | `tsconfig.json` | TypeScript config for frontend |
+
+**Dev entry points:** `bin/dev` = Rails only. Full stack = `npm run dev` + Rails, or `.\dev.ps1` on Windows. See [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## Routes (summary)
 

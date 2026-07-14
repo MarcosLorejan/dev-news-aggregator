@@ -25,18 +25,32 @@ bin/rails runner "NewsAggregatorService.fetch_all_news"
 
 ### Running the application
 
+Full-stack development needs **both** Vite (HMR on port 3036) and Rails (port 3000). Prefer this two-process setup (or `.\dev.ps1` on Windows):
+
 ```bash
-# Start Rails server (with Solid Queue supervisor in Puma for background jobs)
+# Terminal 1: Vite
+npm run dev
+
+# Terminal 2: Rails (with Solid Queue supervisor in Puma for background jobs)
 SOLID_QUEUE_IN_PUMA=1 bin/rails server
+```
 
-# Or run job workers in a separate process
-bin/jobs
+```powershell
+# Windows: starts Vite + Rails together
+.\dev.ps1
+```
 
-# Run in development mode
+`bin/dev` is a thin wrapper that runs **`bin/rails server` only** — it does **not** start Vite. Use it when you only need the Rails process (for example jobs already covered elsewhere); for React HMR, always use `npm run dev` + Rails, or `.\dev.ps1`.
+
+```bash
+# Rails-only (no Vite / no HMR)
 bin/dev
 
-# Access application at http://localhost:3000
+# Or run job workers in a separate process instead of SOLID_QUEUE_IN_PUMA
+bin/jobs
 ```
+
+Access the app at http://localhost:3000. See [REACT_SETUP.md](REACT_SETUP.md) for frontend details.
 
 ### News operations
 

@@ -17,6 +17,12 @@ Guidance for AI coding agents working in this repository. Keep this file concise
 - Do not commit credentials, API tokens, database dumps, private customer data, or local machine paths.
 - When adding or moving files, update `docs/REPO_STRUCTURE.md` if the structure map changes.
 
+## Local full-stack server
+
+- `bin/dev` starts **Rails only** (`bin/rails server`). It does **not** start Vite.
+- Full stack (Rails + Vite HMR): `npm run dev` in one terminal and `bin/rails server` (or `SOLID_QUEUE_IN_PUMA=1 bin/rails server`) in another; on Windows use `.\dev.ps1`.
+- Details: `docs/DEVELOPMENT.md` and `docs/REACT_SETUP.md`.
+
 ## Verification
 
 Prefer the CI-equivalent local wrapper before opening a pull request:

@@ -1,2 +1,5 @@
 #!/usr/bin/env ruby
+# Rails-only: runs `bin/rails server`. Does not start Vite.
+# Full stack: `npm run dev` + Rails, or `.\dev.ps1` on Windows.
+# See docs/DEVELOPMENT.md and AGENTS.md.
 exec "./bin/rails", "server", *ARGV

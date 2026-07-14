@@ -21,7 +21,7 @@ npm install
 
 ## Development
 
-To run the application in development mode with hot module replacement:
+To run the application in development mode with hot module replacement you need **both** Vite and Rails. `bin/dev` starts Rails only and will not give you HMR.
 
 ```bash
 # Terminal 1: Start Vite dev server (port 3036)
@@ -29,6 +29,7 @@ npm run dev
 
 # Terminal 2: Start Rails server (port 3000)
 bundle exec rails server
+# or: bin/rails server / bin/dev (Rails-only; still need terminal 1 for Vite)
 ```
 
 ### Windows
@@ -40,7 +41,8 @@ On Windows, `bin/rails` does not run directly in CMD/PowerShell. Use one of:
 .\setup-local-env.ps1
 .\dev.ps1
 
-# Or manually:
+# Or manually (two terminals):
+npm run dev
 bundle exec rails server
 # or
 bin\rails.bat server
