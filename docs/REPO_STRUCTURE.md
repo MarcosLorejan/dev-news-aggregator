@@ -180,7 +180,8 @@ dev-news-aggregator/
 | `workflows/ci.yml` | CI pipeline (tests, lint, security) |
 | `workflows/dependabot-auto-merge.yml` | Auto-merge for patch/minor Dependabot PRs |
 | `dependabot.yml` | Dependency update schedule |
-| `ISSUE_TEMPLATE/` | GitHub issue templates |
+| `pull_request_template.md` | Default PR body checklist |
+| `ISSUE_TEMPLATE/` | Issue chooser templates (bug, feature, docs, CI/CD) |
 
 ## Key root files
 

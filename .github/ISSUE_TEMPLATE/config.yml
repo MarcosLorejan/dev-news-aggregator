@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Development guide
+    url: https://github.com/MarcosLorejan/dev-news-aggregator/blob/master/docs/DEVELOPMENT.md
+    about: Setup, commands, and project conventions
+  - name: Agent guidelines
+    url: https://github.com/MarcosLorejan/dev-news-aggregator/blob/master/AGENTS.md
+    about: How coding agents should work in this repo
