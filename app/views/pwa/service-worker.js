@@ -1,3 +1,9 @@
+// Browsers only offer the install prompt when the service worker registers a
+// fetch handler, so this listener must exist even though it adds no behavior:
+// requests fall through to the network untouched. Add a caching strategy here
+// if the app ever needs to work offline.
+self.addEventListener("fetch", () => {})
+
 // Add a service worker for processing Web Push notifications:
 //
 // self.addEventListener("push", async (event) => {

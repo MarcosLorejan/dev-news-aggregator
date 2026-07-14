@@ -2,6 +2,9 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import '@fontsource/inter/latin.css'
 import App from '../components/App'
+import { registerServiceWorker } from '../utils/registerServiceWorker'
+
+registerServiceWorker()
 
 const rootElement = document.getElementById('root')
 
