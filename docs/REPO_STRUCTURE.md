@@ -201,6 +201,8 @@ dev-news-aggregator/
 | `Dockerfile` | Production/container image |
 | `.overcommit.yml` | Git hook configuration |
 | `.rubocop.yml` | Ruby style rules |
+| `eslint.config.js` | Frontend lint rules (TypeScript, React hooks) |
+| `.prettierrc.json` / `.prettierignore` | Frontend formatting rules |
 | `tsconfig.json` | TypeScript config for frontend |
 
 **Dev entry points:** `bin/dev` = Rails only. Full stack = `npm run dev` + Rails, or `.\dev.ps1` on Windows (after `.\setup-local-env.ps1`). See [DEVELOPMENT.md](DEVELOPMENT.md) and [REACT_SETUP.md](REACT_SETUP.md).

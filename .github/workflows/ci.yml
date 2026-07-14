@@ -79,6 +79,24 @@ jobs:
       - name: Lint code for consistent style
         run: bundle exec rubocop -f github
 
+  frontend_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Lint frontend code
+        run: npm run lint
+
   frontend_test:
     runs-on: ubuntu-latest
     steps:
@@ -248,12 +266,12 @@ jobs:
   quality_gate:
     runs-on: ubuntu-latest
     permissions: {}
-    needs: [scan_ruby, scan_dependencies, scan_js, lint, frontend_test, test, coverage]
+    needs: [scan_ruby, scan_dependencies, scan_js, lint, frontend_lint, frontend_test, test, coverage]
     if: always()
     steps:
       - name: Check all jobs status
         run: |
-          if [[ "${{ needs.scan_ruby.result }}" == "failure" || "${{ needs.scan_dependencies.result }}" == "failure" || "${{ needs.scan_js.result }}" == "failure" || "${{ needs.lint.result }}" == "failure" || "${{ needs.frontend_test.result }}" == "failure" || "${{ needs.test.result }}" == "failure" || "${{ needs.coverage.result }}" == "failure" ]]; then
+          if [[ "${{ needs.scan_ruby.result }}" == "failure" || "${{ needs.scan_dependencies.result }}" == "failure" || "${{ needs.scan_js.result }}" == "failure" || "${{ needs.lint.result }}" == "failure" || "${{ needs.frontend_lint.result }}" == "failure" || "${{ needs.frontend_test.result }}" == "failure" || "${{ needs.test.result }}" == "failure" || "${{ needs.coverage.result }}" == "failure" ]]; then
             echo "One or more jobs failed"
             exit 1
           fi
