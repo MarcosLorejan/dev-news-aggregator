@@ -108,8 +108,10 @@ class NewsFetchers::RedditFetcher < NewsFetchers::BaseFetcher
   end
 
   def reddit_host?(url)
-    host = URI.parse(url).host
-    host&.end_with?("reddit.com")
+    host = URI.parse(url).host&.downcase
+    return false if host.blank?
+
+    host == "reddit.com" || host.end_with?(".reddit.com")
   rescue URI::InvalidURIError
     false
   end
@@ -117,6 +119,7 @@ class NewsFetchers::RedditFetcher < NewsFetchers::BaseFetcher
   def create_article_from_entry(entry)
     published_at = Time.iso8601(entry[:published_at])
     description = Nokogiri::HTML.fragment(CGI.unescapeHTML(entry[:content_html])).text.squish
+    source_type = "reddit_#{@subreddit}"
 
     article_attributes = {
       title: entry[:title],
@@ -124,10 +127,14 @@ class NewsFetchers::RedditFetcher < NewsFetchers::BaseFetcher
       published_at: published_at,
       description: description,
       external_id: entry[:external_id],
-      source_type: "reddit_#{@subreddit}",
-      score: 0,
-      comment_count: 0
+      source_type: source_type
     }
+
+    # Atom feeds do not include score/comments — only seed defaults on create.
+    unless Article.exists?(external_id: entry[:external_id], source_type: source_type)
+      article_attributes[:score] = 0
+      article_attributes[:comment_count] = 0
+    end
 
     article = create_or_update_article(article_attributes)
     @articles << article if article.persisted?

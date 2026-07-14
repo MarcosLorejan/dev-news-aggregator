@@ -76,6 +76,48 @@ class NewsFetchers::RedditFetcherTest < ActiveSupport::TestCase
     end
   end
 
+  test "fetch_articles preserves existing score and comment_count on update" do
+    Article.create!(
+      title: "Old Title",
+      url: "https://example.com/old",
+      published_at: 1.day.ago,
+      description: "old",
+      external_id: "abc123",
+      source_type: "reddit_programming",
+      score: 42,
+      comment_count: 7
+    )
+
+    stub_reddit_feed(<<~ATOM)
+      <feed xmlns="http://www.w3.org/2005/Atom">
+        <entry>
+          <id>t3_abc123</id>
+          <title>Updated Title</title>
+          <link href="https://www.reddit.com/r/programming/comments/abc123/reddit_link/" />
+          <published>2023-11-14T22:13:20+00:00</published>
+          <content type="html">&lt;a href="https://example.com/article"&gt;[link]&lt;/a&gt;</content>
+        </entry>
+      </feed>
+    ATOM
+
+    assert_no_difference "Article.count" do
+      article = @fetcher.fetch_articles.first
+      assert_equal "Updated Title", article.title
+      assert_equal "https://example.com/article", article.url
+      assert_equal 42, article.score
+      assert_equal 7, article.comment_count
+    end
+  end
+
+  test "extract_article_url keeps external hosts that contain reddit.com as a substring" do
+    url = @fetcher.send(
+      :extract_article_url,
+      %(<a href="https://notreddit.com/post">[link]</a>),
+      "https://www.reddit.com/r/programming/comments/x/title/"
+    )
+    assert_equal "https://notreddit.com/post", url
+  end
+
   private
 
   def stub_reddit_feed(body)
