@@ -179,7 +179,7 @@ dev-news-aggregator/
 | Path | Purpose |
 |------|---------|
 | `workflows/ci.yml` | CI pipeline (tests, lint, security) |
-| `workflows/dependabot-auto-merge.yml` | Auto-merge for patch/minor Dependabot PRs |
+| `workflows/dependabot-auto-merge.yml` | Auto-merge patch/minor Dependabot PRs only after green `quality_gate` |
 | `dependabot.yml` | Dependency update schedule |
 | `pull_request_template.md` | Default PR body checklist |
 | `ISSUE_TEMPLATE/` | Issue chooser templates (bug, feature, docs, CI/CD) |
