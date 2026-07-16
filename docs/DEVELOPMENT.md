@@ -97,7 +97,7 @@ React/Vite frontend checks (also see [AGENTS.md](../AGENTS.md#verification) and 
 | `npm run lint:fix` | `eslint . --fix` | Auto-fix lint issues | — (local only) |
 | `npm run format` | `prettier --write ...` | Format frontend sources | — (not enforced in CI) |
 | `npm run format:check` | `prettier --check ...` | Report unformatted files | — (not enforced in CI) |
-| `npm run build:test` | `vite build --mode test` | Test-mode Vite build (assets for Rails/system tests) | `test`, `coverage` |
+| `npm run build:test` | `vite build --mode test` | Test-mode Vite build (assets for Rails/system tests) | `test` |
 | `npm run build` | `vite build` | Production frontend build | — (deploy / local) |
 | `npm run dev` | `vite` | Vite HMR dev server | — (local) |
 | `npm run preview` | `vite preview` | Preview production build | — (local) |
@@ -145,9 +145,9 @@ bin/validate --fast   # skips Brakeman and Rails tests
 | `npm run typecheck` | yes | `typecheck` |
 | `npm run lint` | yes | `frontend_lint` |
 | `npm test` | yes | `frontend_test` |
-| `bin/rails test` | yes (skipped with `--fast`) | `test`, `coverage` |
-| `npm run build:test` | no — run before system tests if needed | `test`, `coverage` |
-| `rails test:system` | no | `test`, `coverage` |
+| `bin/rails test` | yes (skipped with `--fast`) | `test` (with `COVERAGE=true`) |
+| `npm run build:test` | no — run before system tests if needed | `test` |
+| `rails test:system` | no | `test` |
 | `npm audit` | no | `scan_js` |
 | `bundle-audit` | no | `scan_dependencies` |
 

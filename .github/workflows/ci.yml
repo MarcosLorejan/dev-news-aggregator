@@ -183,75 +183,6 @@ jobs:
           DB_PASSWORD: postgres
         run: bundle exec rails db:test:prepare
 
-      - name: Run tests
-        env:
-          RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dev_news_aggregator_test
-          DB_HOST: localhost
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
-        run: |
-          bundle exec rails test
-          bundle exec rails test:system
-
-      - name: Keep screenshots from failed system tests
-        uses: actions/upload-artifact@v7
-        if: failure()
-        with:
-          name: screenshots
-          path: ${{ github.workspace }}/tmp/screenshots
-          if-no-files-found: ignore
-
-  coverage:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: write
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: dev_news_aggregator_test
-        ports:
-          - 5432:5432
-        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
-
-    steps:
-      - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config google-chrome-stable
-
-      - name: Checkout code
-        uses: actions/checkout@v7
-
-      - name: Set up Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install JavaScript dependencies
-        run: npm ci
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
-          bundler-cache: true
-
-      - name: Build Vite assets for tests
-        run: npm run build:test
-
-      - name: Prepare test database
-        env:
-          RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dev_news_aggregator_test
-          DB_HOST: localhost
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
-        run: bundle exec rails db:test:prepare
-
       - name: Run tests with coverage
         env:
           RAILS_ENV: test
@@ -261,10 +192,9 @@ jobs:
           DB_USERNAME: postgres
           DB_PASSWORD: postgres
         run: |
-          # Run unit tests first and save coverage
+          # Unit tests gate on SimpleCov minimum_coverage 55 (test/test_helper.rb).
           bundle exec rails test
-          # System tests have different coverage expectations, so we only check unit test coverage
-          # Run system tests without coverage to verify they work
+          # System tests exercise the browser; keep them out of the coverage gate.
           COVERAGE="" bundle exec rails test:system
 
       - name: Upload coverage reports to Codecov
@@ -281,15 +211,23 @@ jobs:
           name: coverage-report
           path: coverage/
 
+      - name: Keep screenshots from failed system tests
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: screenshots
+          path: ${{ github.workspace }}/tmp/screenshots
+          if-no-files-found: ignore
+
   quality_gate:
     runs-on: ubuntu-latest
     permissions: {}
-    needs: [scan_ruby, scan_dependencies, scan_js, lint, frontend_lint, typecheck, frontend_test, test, coverage]
+    needs: [scan_ruby, scan_dependencies, scan_js, lint, frontend_lint, typecheck, frontend_test, test]
     if: always()
     steps:
       - name: Check all jobs status
         run: |
-          if [[ "${{ needs.scan_ruby.result }}" == "failure" || "${{ needs.scan_dependencies.result }}" == "failure" || "${{ needs.scan_js.result }}" == "failure" || "${{ needs.lint.result }}" == "failure" || "${{ needs.frontend_lint.result }}" == "failure" || "${{ needs.typecheck.result }}" == "failure" || "${{ needs.frontend_test.result }}" == "failure" || "${{ needs.test.result }}" == "failure" || "${{ needs.coverage.result }}" == "failure" ]]; then
+          if [[ "${{ needs.scan_ruby.result }}" == "failure" || "${{ needs.scan_dependencies.result }}" == "failure" || "${{ needs.scan_js.result }}" == "failure" || "${{ needs.lint.result }}" == "failure" || "${{ needs.frontend_lint.result }}" == "failure" || "${{ needs.typecheck.result }}" == "failure" || "${{ needs.frontend_test.result }}" == "failure" || "${{ needs.test.result }}" == "failure" ]]; then
             echo "One or more jobs failed"
             exit 1
           fi
