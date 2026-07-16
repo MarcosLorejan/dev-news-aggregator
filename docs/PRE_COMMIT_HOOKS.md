@@ -6,6 +6,7 @@ This project uses [Overcommit](https://github.com/sds/overcommit) to manage Git 
 
 ### Pre-commit Checks
 - **RuboCop**: Lints Ruby code for style violations
+- **Brakeman**: Fails on new Rails security warnings (see `config/brakeman.ignore` for baselined findings)
 - **Bundle Audit**: Checks for vulnerable gem dependencies
 - **Bundle Check**: Verifies Gemfile dependencies are satisfied
 - **YAML Syntax**: Validates YAML file syntax
