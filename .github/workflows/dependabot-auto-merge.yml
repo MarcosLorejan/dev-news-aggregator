@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     # Only run on Dependabot PRs
     if: github.actor == 'dependabot[bot]'
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -24,30 +24,31 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Wait for CI checks
+      - name: Wait for CI quality_gate
+        id: wait-ci
         uses: lewagon/wait-on-check-action@v1.8.1
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           check-name: 'quality_gate'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 30
-        continue-on-error: true
+          allowed-conclusions: success
+          running-workflow-name: Dependabot Auto-Merge
 
       - name: Enable auto-merge for patch and minor updates
-        # Only auto-merge patch and minor updates
+        # Only auto-merge patch and minor updates after quality_gate succeeds
         if: |
-          steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
-          steps.metadata.outputs.update-type == 'version-update:semver-minor'
+          steps.wait-ci.outcome == 'success' &&
+          (steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
+           steps.metadata.outputs.update-type == 'version-update:semver-minor')
         run: |
           echo "Auto-merging ${{ steps.metadata.outputs.dependency-names }} from ${{ steps.metadata.outputs.previous-version }} to ${{ steps.metadata.outputs.new-version }}"
-          
-          # Try to enable auto-merge, but handle failures gracefully
-          if gh pr merge --auto --squash "$PR_URL" 2>&1; then
-            echo "✅ Auto-merge enabled successfully"
+
+          if gh pr merge --auto --squash "$PR_URL"; then
+            echo "Auto-merge enabled successfully"
           else
-            echo "⚠️ Could not enable auto-merge (PR may be in unstable state)"
-            echo "The PR will need to be merged manually once all checks pass"
-            exit 0
+            echo "::error::Could not enable auto-merge for $PR_URL"
+            exit 1
           fi
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
@@ -55,7 +56,9 @@ jobs:
 
       - name: Notify about major updates
         # Notify about major updates that require manual review
-        if: steps.metadata.outputs.update-type == 'version-update:semver-major'
+        if: |
+          steps.wait-ci.outcome == 'success' &&
+          steps.metadata.outputs.update-type == 'version-update:semver-major'
         run: |
           echo "::notice title=Major Update Detected::${{ steps.metadata.outputs.dependency-names }} has a major version update from ${{ steps.metadata.outputs.previous-version }} to ${{ steps.metadata.outputs.new-version }}. Manual review required."
           gh pr comment "$PR_URL" --body "⚠️ **Major version update detected** - This PR requires manual review before merging.
@@ -72,4 +75,4 @@ jobs:
       - name: Handle errors
         if: failure()
         run: |
-          echo "::error title=Auto-merge Failed::Failed to auto-merge Dependabot PR. Please check the logs and merge manually if needed."
+          echo "::error title=Auto-merge Failed::quality_gate did not succeed or auto-merge could not be enabled. Merge manually only after CI is green."
