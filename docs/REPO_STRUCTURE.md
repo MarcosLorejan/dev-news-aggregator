@@ -120,6 +120,7 @@ dev-news-aggregator/
 | `queue.yml` | Solid Queue worker and dispatcher settings |
 | `recurring.yml` | Solid Queue recurring task schedule |
 | `deploy.yml` | Kamal deployment |
+| `brakeman.ignore` | Baselined Brakeman findings (new warnings still fail CI) |
 | `vite.json` | Vite-Rails integration |
 | `environments/` | Per-env Rails settings (development, test, production) |
 | `initializers/` | Boot-time Ruby configuration |

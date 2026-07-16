@@ -29,6 +29,13 @@ PreCommit:
     command: ['bundle', 'exec', 'rubocop']
     on_warn: fail
 
+  Brakeman:
+    enabled: true
+    description: 'Scan for Rails security warnings'
+    required: true
+    command: ['bundle', 'exec', 'brakeman', '--no-pager', '--quiet']
+    on_warn: fail
+
   BundleCheck:
     enabled: true
     description: 'Check Gemfile dependencies'
