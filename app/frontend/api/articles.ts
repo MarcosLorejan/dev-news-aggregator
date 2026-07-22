@@ -20,10 +20,8 @@ export function fetchArticles(params?: {
 }
 
 export interface FetchNewsResponse {
-  articles_count: number
-  duration: number
-  sources: string[]
-  timestamp: string
+  status: string
+  job_id: string
 }
 
 export function fetchNews() {

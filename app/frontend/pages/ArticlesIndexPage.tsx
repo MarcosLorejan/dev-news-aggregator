@@ -219,8 +219,8 @@ export default function ArticlesIndexPage() {
     setFetchMessage(null)
     setError(null)
     try {
-      const result = await fetchNews()
-      setFetchMessage(`Fetched ${result.articles_count} articles in ${result.duration}s`)
+      await fetchNews()
+      setFetchMessage('News fetch queued. New articles will appear shortly.')
       patchSearchParams((params) => {
         params.delete('page')
       })
