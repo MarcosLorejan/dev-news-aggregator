@@ -12,9 +12,12 @@ import EmptyState from '../components/EmptyState'
 import { useAsyncResource } from '../hooks/useAsyncResource'
 
 export default function DismissedArticlesIndexPage() {
-  const { data, loading, error, reload, setData, setError } = useAsyncResource(fetchDismissedArticles, {
-    errorMessage: 'Failed to load dismissed articles. Please try again.',
-  })
+  const { data, loading, error, reload, setData, setError } = useAsyncResource(
+    (signal) => fetchDismissedArticles({ signal }),
+    {
+      errorMessage: 'Failed to load dismissed articles. Please try again.',
+    }
+  )
 
   const articles = data?.articles ?? []
   const totalCount = data?.pagination.total_count ?? 0

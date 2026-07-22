@@ -17,9 +17,12 @@ import { useAsyncResource } from '../hooks/useAsyncResource'
 import { useSearchParam } from '../hooks/useSearchParamState'
 
 export default function BookmarksIndexPage() {
-  const { data, loading, error, reload, setData, setError } = useAsyncResource(fetchBookmarks, {
-    errorMessage: 'Failed to load reading list. Please try again.',
-  })
+  const { data, loading, error, reload, setData, setError } = useAsyncResource(
+    (signal) => fetchBookmarks({ signal }),
+    {
+      errorMessage: 'Failed to load reading list. Please try again.',
+    }
+  )
   const [activeSource, setActiveSource] = useSearchParam('source', 'all')
 
   const articles = data?.articles ?? []

@@ -13,9 +13,12 @@ import { useAsyncResource } from '../hooks/useAsyncResource'
 import { useSearchParam } from '../hooks/useSearchParamState'
 
 export default function ReadArticlesIndexPage() {
-  const { data, loading, error, reload, setData, setError } = useAsyncResource(fetchReadArticles, {
-    errorMessage: 'Failed to load read articles. Please try again.',
-  })
+  const { data, loading, error, reload, setData, setError } = useAsyncResource(
+    (signal) => fetchReadArticles({ signal }),
+    {
+      errorMessage: 'Failed to load read articles. Please try again.',
+    }
+  )
   const [activeSource, setActiveSource] = useSearchParam('source', 'all')
 
   const articles = data?.articles ?? []

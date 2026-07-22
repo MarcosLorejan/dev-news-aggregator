@@ -7,6 +7,7 @@ export function fetchArticles(params?: {
   show_read?: boolean
   min_score?: number
   top_percent?: number
+  signal?: AbortSignal
 }) {
   const search = new URLSearchParams()
   if (params?.page) search.set('page', String(params.page))
@@ -16,7 +17,9 @@ export function fetchArticles(params?: {
   if (params?.top_percent) search.set('top_percent', String(params.top_percent))
 
   const query = search.toString()
-  return apiRequest<ArticlesIndexResponse>(`/articles.json${query ? `?${query}` : ''}`)
+  return apiRequest<ArticlesIndexResponse>(`/articles.json${query ? `?${query}` : ''}`, {
+    signal: params?.signal,
+  })
 }
 
 export interface FetchNewsResponse {

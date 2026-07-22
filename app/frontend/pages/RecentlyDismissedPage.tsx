@@ -12,9 +12,12 @@ import EmptyState from '../components/EmptyState'
 import { useAsyncResource } from '../hooks/useAsyncResource'
 
 export default function RecentlyDismissedPage() {
-  const { data, loading, error, reload, setData, setError } = useAsyncResource(fetchRecentlyDismissed, {
-    errorMessage: 'Failed to load recently dismissed articles. Please try again.',
-  })
+  const { data, loading, error, reload, setData, setError } = useAsyncResource(
+    (signal) => fetchRecentlyDismissed({ signal }),
+    {
+      errorMessage: 'Failed to load recently dismissed articles. Please try again.',
+    }
+  )
 
   const articles = data?.articles ?? []
 
