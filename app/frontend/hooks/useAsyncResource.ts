@@ -23,6 +23,8 @@ export function useAsyncResource<T>(
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const abortRef = useRef<AbortController | null>(null)
+  const loaderRef = useRef(loader)
+  loaderRef.current = loader
 
   const load = useCallback(async () => {
     abortRef.current?.abort()
@@ -33,7 +35,7 @@ export function useAsyncResource<T>(
     setLoading(true)
     setError(null)
     try {
-      const result = await loader(signal)
+      const result = await loaderRef.current(signal)
       if (signal.aborted) return
       setData(result)
     } catch (err) {
@@ -42,7 +44,7 @@ export function useAsyncResource<T>(
     } finally {
       if (!signal.aborted) setLoading(false)
     }
-  }, [loader, errorMessage])
+  }, [errorMessage])
 
   useEffect(() => {
     void load()

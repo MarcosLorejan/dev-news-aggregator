@@ -62,47 +62,30 @@ describe('useAsyncResource', () => {
     expect(result.current.data).toBeNull()
   })
 
-  it('aborts in-flight request when loader identity changes and keeps newer data', async () => {
-    const first = deferred<string>()
-    const second = deferred<string>()
-    let call = 0
-
-    type Loader = (signal: AbortSignal) => Promise<string>
-    const initialLoader: Loader = async (signal) => {
-      call += 1
-      if (call === 1) {
-        signal.addEventListener('abort', () => {
-          first.reject(new DOMException('Aborted', 'AbortError'))
-        })
-        return first.promise
-      }
-      return second.promise
-    }
+  it('does not restart load when only the loader function identity changes', async () => {
+    const pending = deferred<string>()
+    const loader = vi.fn(async (_signal: AbortSignal) => pending.promise)
 
     const { result, rerender } = renderHook(
-      ({ loader }: { loader: Loader }) => useAsyncResource(loader),
-      { initialProps: { loader: initialLoader } }
+      ({ loader: current }: { loader: typeof loader }) => useAsyncResource(current),
+      { initialProps: { loader } }
     )
 
-    expect(result.current.loading).toBe(true)
+    expect(loader).toHaveBeenCalledTimes(1)
 
-    const nextLoader: Loader = async () => second.promise
-    rerender({ loader: nextLoader })
+    // Inline-style identity churn must not abort/restart the in-flight request.
+    rerender({ loader: vi.fn(async (_signal: AbortSignal) => pending.promise) })
+    rerender({ loader: vi.fn(async (_signal: AbortSignal) => pending.promise) })
 
-    await act(async () => {
-      second.resolve('fresh')
-    })
-
-    await waitFor(() => expect(result.current.data).toBe('fresh'))
-    expect(result.current.error).toBeNull()
-    expect(result.current.loading).toBe(false)
+    expect(loader).toHaveBeenCalledTimes(1)
 
     await act(async () => {
-      first.resolve('stale')
+      pending.resolve('stable')
     })
 
-    expect(result.current.data).toBe('fresh')
+    await waitFor(() => expect(result.current.data).toBe('stable'))
     expect(result.current.error).toBeNull()
+    expect(loader).toHaveBeenCalledTimes(1)
   })
 
   it('aborts previous request on reload', async () => {
