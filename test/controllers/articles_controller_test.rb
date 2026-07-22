@@ -113,6 +113,44 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "fetch rate limit uses atomic unless_exist write" do
+    original_cache = Rails.cache
+    store = ActiveSupport::Cache::MemoryStore.new
+    Rails.cache = store
+    writes = []
+    store.singleton_class.alias_method :original_write, :write
+    store.define_singleton_method(:write) do |name, value, options = nil|
+      writes << { name: name, options: options }
+      original_write(name, value, options)
+    end
+
+    payload = { articles_count: 1, duration: 1.0, sources: [], timestamp: Time.current }
+    original = NewsAggregatorService.method(:fetch_all_news)
+    NewsAggregatorService.define_singleton_method(:fetch_all_news) { payload }
+    begin
+      post fetch_articles_url, as: :json
+      assert_response :success
+
+      claim = writes.find { |entry| entry[:name].to_s.start_with?("articles_fetch:") }
+      assert claim
+      assert_equal true, claim[:options][:unless_exist]
+
+      # A concurrent claim for the same key must fail while the window is held.
+      assert_not store.write(
+        claim[:name],
+        Time.current,
+        expires_in: ArticlesController::FETCH_RATE_LIMIT,
+        unless_exist: true
+      )
+
+      post fetch_articles_url, as: :json
+      assert_response :too_many_requests
+    ensure
+      NewsAggregatorService.define_singleton_method(:fetch_all_news, original)
+      Rails.cache = original_cache
+    end
+  end
+
   test "should get show" do
     get article_url(@article)
     assert_response :success
