@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ArticlesIndexPage from '../pages/ArticlesIndexPage'
 import * as articlesApi from '../api/articles'
-import { buildArticlesIndexResponse } from '../test/fixtures'
+import { buildArticle, buildArticlesIndexResponse } from '../test/fixtures'
 
 vi.mock('../api/articles', () => ({
   fetchArticles: vi.fn(),
@@ -72,16 +72,38 @@ describe('ArticlesIndexPage dismiss flow', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
-  it('filters articles when category changes in the URL', async () => {
+  it('requests filtered articles when category is in the URL', async () => {
+    const filtered = buildArticlesIndexResponse({
+      articles: [buildArticle()],
+      articles_by_category: { 'Programming Languages': [1] },
+      category_counts: { 'Programming Languages': 1, Frameworks: 1 },
+      pagination: {
+        current_page: 1,
+        per_page: 20,
+        total_count: 1,
+        total_pages: 1,
+      },
+    })
+    vi.mocked(articlesApi.fetchArticles).mockResolvedValue(filtered)
+
     const user = userEvent.setup()
     renderPage(['/articles?category=programming-languages'])
 
     await waitForArticlesFeed()
+    expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+      expect.objectContaining({ category: 'programming-languages' })
+    )
     expect(screen.getByText('Rust 2024 Edition Highlights')).toBeInTheDocument()
     expect(screen.queryByText('Ruby 3.3 Performance Tips')).not.toBeInTheDocument()
 
+    vi.mocked(articlesApi.fetchArticles).mockResolvedValue(buildArticlesIndexResponse())
     await user.click(screen.getByRole('button', { name: /All Articles/ }))
 
+    await waitFor(() => {
+      expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+        expect.objectContaining({ category: undefined })
+      )
+    })
     await waitFor(() => {
       expect(screen.getByText('Ruby 3.3 Performance Tips')).toBeInTheDocument()
     })

@@ -74,4 +74,30 @@ class ArticlesHelperTest < ActionView::TestCase
 
     assert_equal 3, grouped["Programming Languages"].length
   end
+
+  test "category_slug matches frontend parameterization" do
+    assert_equal "programming-languages", category_slug("Programming Languages")
+    assert_equal "ai-&-machine-learning", category_slug("AI & Machine Learning")
+  end
+
+  test "source_types_for_category_slug resolves known categories" do
+    assert_equal %w[reddit_ruby reddit_rust reddit_javascript],
+                 source_types_for_category_slug("programming-languages")
+    assert_equal :other, source_types_for_category_slug("other")
+    assert_nil source_types_for_category_slug("all")
+    assert_nil source_types_for_category_slug("unknown")
+  end
+
+  test "apply_category_filter restricts to matching source types" do
+    scope = apply_category_filter(Article.all, "programming-languages")
+    assert_includes scope, articles(:reddit_rust_article)
+    assert_not_includes scope, articles(:hacker_news_article)
+  end
+
+  test "category_counts_for_scope aggregates across the full relation" do
+    counts = category_counts_for_scope(Article.all)
+
+    assert_equal 2, counts["Programming Languages"]
+    assert_equal 2, counts["General Tech"]
+  end
 end

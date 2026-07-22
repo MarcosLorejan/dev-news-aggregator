@@ -7,8 +7,11 @@ class ArticlesController < ApplicationController
     @show_read = params[:show_read] == "true"
     page, per_page = pagination_params
 
+    count_scope = article_index_scope(apply_category: false)
+    @category_counts = helpers.category_counts_for_scope(count_scope)
+
     base_scope = article_index_scope
-    @total_count = base_scope.count
+    @total_count = base_scope.unscope(:includes, :order, :select).count
     @articles = base_scope.limit(per_page).offset((page - 1) * per_page)
 
     @articles_by_source = @articles.group_by(&:source_type)
@@ -21,7 +24,8 @@ class ArticlesController < ApplicationController
         render json: {
           articles: @articles.map { |article| ArticleSerializer.as_json(article) },
           articles_by_category: @articles_by_category.transform_values { |articles| articles.map(&:id) },
-          categories: @articles_by_category.keys.map { |name| { name: name, icon: helpers.category_icon(name) } },
+          category_counts: @category_counts,
+          categories: @category_counts.keys.map { |name| { name: name, icon: helpers.category_icon(name) } },
           pagination: {
             current_page: page,
             per_page: per_page,
@@ -101,7 +105,7 @@ class ArticlesController < ApplicationController
 
   private
 
-  def article_index_scope
+  def article_index_scope(apply_category: true)
     scope = if @show_read
               Article.not_dismissed
     else
@@ -109,6 +113,7 @@ class ArticlesController < ApplicationController
     end
 
     scope = apply_score_filter(scope)
+    scope = helpers.apply_category_filter(scope, params[:category]) if apply_category
     scope.includes(:bookmark, :read_article, :dismissed_article)
          .order(published_at: :desc)
   end

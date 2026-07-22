@@ -37,6 +37,10 @@ export function buildArticlesIndexResponse(
       'Programming Languages': [first.id],
       Frameworks: [second.id],
     },
+    category_counts: {
+      'Programming Languages': 1,
+      Frameworks: 1,
+    },
     categories: [
       { name: 'Programming Languages', icon: '🔨' },
       { name: 'Frameworks', icon: '🧱' },

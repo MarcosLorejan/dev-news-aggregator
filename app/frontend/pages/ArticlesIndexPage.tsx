@@ -77,6 +77,7 @@ export default function ArticlesIndexPage() {
       const response = await fetchArticles({
         page,
         show_read: showRead,
+        category: activeFilter !== 'all' ? activeFilter : undefined,
         ...scoreFilterParams(activeScoreFilter),
         signal,
       })
@@ -95,7 +96,7 @@ export default function ArticlesIndexPage() {
     } finally {
       if (!signal.aborted) setLoading(false)
     }
-  }, [showRead, activeScoreFilter, currentPage, patchSearchParams])
+  }, [showRead, activeScoreFilter, activeFilter, currentPage, patchSearchParams])
 
   useEffect(() => {
     void loadArticles()
@@ -109,12 +110,12 @@ export default function ArticlesIndexPage() {
     [data]
   )
 
-  const categoryCounts = useMemo(() => {
-    if (!data) return {}
-    return Object.fromEntries(
-      Object.entries(data.articles_by_category).map(([name, ids]) => [name, ids.length])
-    )
-  }, [data])
+  const categoryCounts = useMemo(() => data?.category_counts ?? {}, [data])
+
+  const allArticlesCount = useMemo(
+    () => Object.values(categoryCounts).reduce((sum, count) => sum + count, 0),
+    [categoryCounts]
+  )
 
   const articles = useMemo(
     () => data?.articles.filter((article) => !removedIds.has(article.id)) ?? [],
@@ -327,7 +328,7 @@ export default function ArticlesIndexPage() {
     )
   }
 
-  const showEmptyFeed = !data || ((data.pagination.total_count ?? 0) === 0 && articles.length === 0)
+  const showEmptyFeed = !data || (allArticlesCount === 0 && articles.length === 0)
 
   if (showEmptyFeed) {
     return (
@@ -389,7 +390,7 @@ export default function ArticlesIndexPage() {
       <CategoryFilter
         categories={data.categories}
         categoryCounts={categoryCounts}
-        totalCount={articles.length}
+        totalCount={allArticlesCount}
         activeFilter={activeFilter}
         onFilterChange={handleFilterChange}
       />
@@ -397,7 +398,6 @@ export default function ArticlesIndexPage() {
       <ArticleList
         articles={articles}
         articleCategories={articleCategories}
-        activeFilter={activeFilter}
         dismissingIds={dismissingIds}
         onDismiss={handleDismiss}
         onUndoDismiss={handleUndoDismiss}
