@@ -5,6 +5,7 @@ export function fetchArticles(params?: {
   page?: number
   per_page?: number
   show_read?: boolean
+  category?: string
   min_score?: number
   top_percent?: number
 }) {
@@ -12,6 +13,7 @@ export function fetchArticles(params?: {
   if (params?.page) search.set('page', String(params.page))
   if (params?.per_page) search.set('per_page', String(params.per_page))
   if (params?.show_read) search.set('show_read', 'true')
+  if (params?.category && params.category !== 'all') search.set('category', params.category)
   if (params?.min_score) search.set('min_score', String(params.min_score))
   if (params?.top_percent) search.set('top_percent', String(params.top_percent))
 

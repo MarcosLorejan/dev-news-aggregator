@@ -320,11 +320,72 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert json_response.key?("pagination")
     assert json_response.key?("categories")
     assert json_response.key?("articles_by_category")
+    assert json_response.key?("category_counts")
     assert json_response.key?("last_updated")
 
     assert json_response["articles"].is_a?(Array)
     assert json_response["pagination"]["current_page"] == 1
     assert json_response["pagination"]["per_page"] == 50
+  end
+
+  test "index JSON should filter by category and keep full category counts" do
+    get articles_url(category: "programming-languages"), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    source_types = body["articles"].map { |article| article["source_type"] }
+    assert source_types.all? { |source_type| %w[reddit_rust reddit_ruby reddit_javascript].include?(source_type) }
+    assert_includes source_types, @rust_article.source_type
+    assert_not_includes source_types, @article.source_type
+
+    assert body["category_counts"]["Programming Languages"] >= 2
+    assert body["category_counts"]["General Tech"] >= 2
+    assert_equal body["articles"].size, body["pagination"]["total_count"]
+    assert body["pagination"]["total_count"] < body["category_counts"].values.sum
+  end
+
+  test "index JSON category filter paginates across the filtered dataset" do
+    5.times do |i|
+      Article.create!(
+        title: "Extra Rust #{i}",
+        url: "https://example.com/rust-#{i}",
+        external_id: "rust-extra-#{i}",
+        source_type: "reddit_rust",
+        published_at: i.hours.ago,
+        score: 10,
+        comment_count: 0
+      )
+    end
+
+    get articles_url(category: "programming-languages", page: 1, per_page: 2), as: :json
+    assert_response :success
+    page_one = JSON.parse(response.body)
+
+    get articles_url(category: "programming-languages", page: 2, per_page: 2), as: :json
+    assert_response :success
+    page_two = JSON.parse(response.body)
+
+    assert_equal 2, page_one["articles"].size
+    assert_operator page_two["articles"].size, :>=, 1
+    assert_equal page_one["pagination"]["total_count"], page_two["pagination"]["total_count"]
+    assert_operator page_one["pagination"]["total_pages"], :>=, 2
+
+    page_one_ids = page_one["articles"].map { |article| article["id"] }
+    page_two_ids = page_two["articles"].map { |article| article["id"] }
+    assert_empty page_one_ids & page_two_ids
+
+    assert_equal page_one["category_counts"], page_two["category_counts"]
+    assert_equal page_one["category_counts"]["Programming Languages"], page_one["pagination"]["total_count"]
+  end
+
+  test "index JSON should return empty results for unknown category" do
+    get articles_url(category: "not-a-real-category"), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    assert_empty body["articles"]
+    assert_equal 0, body["pagination"]["total_count"]
+    assert body["category_counts"].values.sum.positive?
   end
 
   test "index JSON should clamp invalid pagination params" do

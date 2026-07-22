@@ -31,6 +31,7 @@ export interface Pagination {
 export interface ArticlesIndexResponse {
   articles: Article[]
   articles_by_category: Record<string, number[]>
+  category_counts: Record<string, number>
   categories: Category[]
   pagination: Pagination
   last_updated: string | null

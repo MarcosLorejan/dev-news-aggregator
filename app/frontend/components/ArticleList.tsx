@@ -4,7 +4,6 @@ import ArticleCard from './ArticleCard'
 interface ArticleListProps {
   articles: Article[]
   articleCategories: Record<number, string>
-  activeFilter: string
   dismissingIds: Set<number>
   onDismiss: (article: Article) => void
   onUndoDismiss: (article: Article) => void
@@ -15,22 +14,15 @@ interface ArticleListProps {
 export default function ArticleList({
   articles,
   articleCategories,
-  activeFilter,
   dismissingIds,
   onDismiss,
   onUndoDismiss,
   onBookmarkToggle,
   onReadToggle,
 }: ArticleListProps) {
-  const visibleArticles = articles.filter((article) => {
-    if (activeFilter === 'all') return true
-    const categorySlug = articleCategories[article.id] ?? 'other'
-    return categorySlug === activeFilter
-  })
-
   return (
     <div className="grid gap-5 md:gap-6 motion-safe:animate-scale-in motion-sensitive">
-      {visibleArticles.map((article, index) => (
+      {articles.map((article, index) => (
         <ArticleCard
           key={article.id}
           variant="feed"

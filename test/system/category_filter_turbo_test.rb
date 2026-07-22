@@ -93,4 +93,37 @@ class CategoryFilterTurboTest < ApplicationSystemTestCase
       skip "No articles found"
     end
   end
+
+  test "category filter paginates server-side across matching articles" do
+    55.times do |i|
+      Article.create!(
+        title: "Paged Rust #{i}",
+        url: "https://example.com/paged-rust-#{i}",
+        external_id: "paged-rust-#{i}",
+        source_type: "reddit_rust",
+        published_at: i.hours.ago,
+        score: 10,
+        comment_count: 0
+      )
+    end
+
+    visit articles_path(category: "programming-languages")
+    assert_selector "[data-testid='articles-page']", wait: 10
+    assert_selector "article.article-card[data-category='programming-languages']", visible: true, minimum: 1
+    assert_no_selector "article.article-card[data-category='general-tech']"
+    assert_match(/category=programming-languages/, page.current_url)
+
+    assert_selector "[data-testid='articles-pagination']", wait: 5
+    page_one_titles = all("article.article-card").map { |card| card.text }
+
+    find("[data-testid='pagination-next']").click
+
+    assert_match(/page=2/, page.current_url)
+    assert_match(/category=programming-languages/, page.current_url)
+    assert_selector "article.article-card[data-category='programming-languages']", visible: true, minimum: 1
+    assert_no_selector "article.article-card[data-category='general-tech']"
+
+    page_two_titles = all("article.article-card").map { |card| card.text }
+    assert_empty page_one_titles & page_two_titles
+  end
 end
