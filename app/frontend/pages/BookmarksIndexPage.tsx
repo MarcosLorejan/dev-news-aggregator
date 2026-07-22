@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { fetchBookmarks } from '../api/bookmarks'
 import {
   markArticleAsRead,
@@ -36,7 +36,7 @@ export default function BookmarksIndexPage() {
     [articlesBySource, sources]
   )
 
-  const handleRemoveBookmark = async (article: BookmarkArticle) => {
+  const handleRemoveBookmark = useCallback(async (article: BookmarkArticle) => {
     try {
       await unbookmarkArticle(article.id)
       setData((current) => {
@@ -60,9 +60,9 @@ export default function BookmarksIndexPage() {
     } catch {
       setError('Failed to remove bookmark.')
     }
-  }
+  }, [setData, setError])
 
-  const handleReadToggle = async (article: BookmarkArticle) => {
+  const handleReadToggle = useCallback(async (article: BookmarkArticle) => {
     try {
       if (article.read) {
         await unmarkArticleAsRead(article.id)
@@ -92,7 +92,7 @@ export default function BookmarksIndexPage() {
     } catch {
       setError('Failed to update read status.')
     }
-  }
+  }, [setData, setError])
 
   return (
     <PageShell

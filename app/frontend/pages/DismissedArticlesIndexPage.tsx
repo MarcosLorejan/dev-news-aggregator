@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { undismissArticle } from '../api/articles'
 import { fetchDismissedArticles } from '../api/dismissedArticles'
 import type { DismissedArticle } from '../types/dismissedArticle'
@@ -22,7 +23,7 @@ export default function DismissedArticlesIndexPage() {
   const articles = data?.articles ?? []
   const totalCount = data?.pagination.total_count ?? 0
 
-  const handleRestore = async (article: DismissedArticle) => {
+  const handleRestore = useCallback(async (article: DismissedArticle) => {
     try {
       await undismissArticle(article.id)
       setData((current) =>
@@ -40,7 +41,7 @@ export default function DismissedArticlesIndexPage() {
     } catch {
       setError('Failed to restore article.')
     }
-  }
+  }, [setData, setError])
 
   return (
     <PageShell

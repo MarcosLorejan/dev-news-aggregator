@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { undismissArticle } from '../api/articles'
 import { fetchRecentlyDismissed } from '../api/dismissedArticles'
 import type { DismissedArticle } from '../types/dismissedArticle'
@@ -21,7 +22,7 @@ export default function RecentlyDismissedPage() {
 
   const articles = data?.articles ?? []
 
-  const handleRestore = async (article: DismissedArticle) => {
+  const handleRestore = useCallback(async (article: DismissedArticle) => {
     try {
       await undismissArticle(article.id)
       setData((current) =>
@@ -35,7 +36,7 @@ export default function RecentlyDismissedPage() {
     } catch {
       setError('Failed to restore article.')
     }
-  }
+  }, [setData, setError])
 
   return (
     <PageShell

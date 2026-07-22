@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import ArticleCard from './ArticleCard'
+import type { Article } from '../types/article'
 
 const baseArticle = {
   id: 1,
@@ -14,22 +15,28 @@ const baseArticle = {
   published_at: '2024-01-15T10:00:00Z',
 }
 
+const feedArticle: Article = {
+  ...baseArticle,
+  external_id: 'hn-1',
+  created_at: '2024-01-15T10:00:00Z',
+  updated_at: '2024-01-15T10:00:00Z',
+  bookmarked: false,
+  read: false,
+  dismissed: false,
+  pending_dismissal: false,
+}
+
 describe('ArticleCard', () => {
+  it('is wrapped in React.memo', () => {
+    expect(ArticleCard).toHaveProperty('$$typeof', Symbol.for('react.memo'))
+  })
+
   it('renders feed variant with dismiss and bookmark controls', () => {
     render(
       <MemoryRouter>
         <ArticleCard
           variant="feed"
-          article={{
-            ...baseArticle,
-            external_id: 'hn-1',
-            created_at: '2024-01-15T10:00:00Z',
-            updated_at: '2024-01-15T10:00:00Z',
-            bookmarked: false,
-            read: false,
-            dismissed: false,
-            pending_dismissal: false,
-          }}
+          article={feedArticle}
           categorySlug="programming"
           index={0}
           isDismissing={false}

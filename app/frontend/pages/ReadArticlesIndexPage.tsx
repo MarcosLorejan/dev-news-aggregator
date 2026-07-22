@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { unmarkArticleAsRead } from '../api/articles'
 import { fetchReadArticles } from '../api/readArticles'
 import type { ReadArticle } from '../types/readArticle'
@@ -32,7 +32,7 @@ export default function ReadArticlesIndexPage() {
     [articlesBySource, sources]
   )
 
-  const handleUnmarkRead = async (article: ReadArticle) => {
+  const handleUnmarkRead = useCallback(async (article: ReadArticle) => {
     try {
       await unmarkArticleAsRead(article.id)
       setData((current) => {
@@ -56,7 +56,7 @@ export default function ReadArticlesIndexPage() {
     } catch {
       setError('Failed to mark article as unread.')
     }
-  }
+  }, [setData, setError])
 
   return (
     <PageShell

@@ -63,6 +63,8 @@ export default function ArticlesIndexPage() {
   const countdownRef = useRef<number | null>(null)
   const pendingDismissRef = useRef<{ articleId: number; title: string } | null>(null)
   const abortRef = useRef<AbortController | null>(null)
+  const toastRef = useRef(toast)
+  toastRef.current = toast
 
   const loadArticles = useCallback(async (options?: { page?: number }) => {
     abortRef.current?.abort()
@@ -142,7 +144,7 @@ export default function ArticlesIndexPage() {
   }, [])
 
   const handleUndoDismiss = useCallback(async (article?: Article) => {
-    const articleId = article?.id ?? toast?.articleId
+    const articleId = article?.id ?? toastRef.current?.articleId
     if (!articleId) return
 
     try {
@@ -158,11 +160,11 @@ export default function ArticlesIndexPage() {
     } catch {
       setError('Failed to restore article.')
     }
-  }, [toast])
+  }, [])
 
   const handleDismiss = useCallback(async (article: Article) => {
-    if (toast) {
-      finalizeDismiss(toast.articleId)
+    if (toastRef.current) {
+      finalizeDismiss(toastRef.current.articleId)
     }
 
     setDismissingIds(new Set([article.id]))
@@ -195,7 +197,7 @@ export default function ArticlesIndexPage() {
       })
       setError('Failed to dismiss article.')
     }
-  }, [finalizeDismiss, toast])
+  }, [finalizeDismiss])
 
   const handleShowReadChange = (value: boolean) => {
     patchSearchParams((params) => {
@@ -260,7 +262,7 @@ export default function ArticlesIndexPage() {
 
   useEffect(() => () => clearDismissTimer(), [])
 
-  const updateArticle = (articleId: number, changes: Partial<Article>) => {
+  const updateArticle = useCallback((articleId: number, changes: Partial<Article>) => {
     setData((current) => {
       if (!current) return current
       return {
@@ -270,9 +272,9 @@ export default function ArticlesIndexPage() {
         ),
       }
     })
-  }
+  }, [])
 
-  const handleBookmarkToggle = async (article: Article) => {
+  const handleBookmarkToggle = useCallback(async (article: Article) => {
     try {
       if (article.bookmarked) {
         await unbookmarkArticle(article.id)
@@ -284,9 +286,9 @@ export default function ArticlesIndexPage() {
     } catch {
       setError('Failed to update bookmark.')
     }
-  }
+  }, [updateArticle])
 
-  const handleReadToggle = async (article: Article) => {
+  const handleReadToggle = useCallback(async (article: Article) => {
     try {
       if (article.read) {
         await unmarkArticleAsRead(article.id)
@@ -302,7 +304,7 @@ export default function ArticlesIndexPage() {
     } catch {
       setError('Failed to update read status.')
     }
-  }
+  }, [showRead, updateArticle])
 
   if (loading) {
     return (
