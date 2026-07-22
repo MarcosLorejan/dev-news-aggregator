@@ -2,10 +2,10 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { useAsyncResource } from './useAsyncResource'
 
-function deferred() {
-  let resolve
-  let reject
-  const promise = new Promise((res, rej) => {
+function deferred<T>() {
+  let resolve!: (value: T) => void
+  let reject!: (reason?: unknown) => void
+  const promise = new Promise<T>((res, rej) => {
     resolve = res
     reject = rej
   })
@@ -14,7 +14,7 @@ function deferred() {
 
 describe('useAsyncResource', () => {
   it('loads data successfully', async () => {
-    const loader = vi.fn(async (_signal) => 'ok')
+    const loader = vi.fn(async (_signal: AbortSignal) => 'ok')
 
     const { result } = renderHook(() => useAsyncResource(loader))
 
@@ -26,7 +26,7 @@ describe('useAsyncResource', () => {
   })
 
   it('sets error state when loader fails', async () => {
-    const loader = vi.fn(async () => {
+    const loader = vi.fn(async (_signal: AbortSignal) => {
       throw new Error('boom')
     })
 
@@ -40,8 +40,8 @@ describe('useAsyncResource', () => {
   })
 
   it('does not treat AbortError as a failure', async () => {
-    const loader = vi.fn(async (signal) => {
-      await new Promise((_resolve, reject) => {
+    const loader = vi.fn(async (signal: AbortSignal) => {
+      await new Promise<void>((_resolve, reject) => {
         signal.addEventListener('abort', () => {
           reject(new DOMException('Aborted', 'AbortError'))
         })
@@ -63,31 +63,30 @@ describe('useAsyncResource', () => {
   })
 
   it('aborts in-flight request when loader identity changes and keeps newer data', async () => {
-    const first = deferred()
-    const second = deferred()
+    const first = deferred<string>()
+    const second = deferred<string>()
     let call = 0
 
-    const { result, rerender } = renderHook(
-      ({ loader }) => useAsyncResource(loader),
-      {
-        initialProps: {
-          loader: async (signal) => {
-            call += 1
-            if (call === 1) {
-              signal.addEventListener('abort', () => {
-                first.reject(new DOMException('Aborted', 'AbortError'))
-              })
-              return first.promise
-            }
-            return second.promise
-          },
-        },
+    type Loader = (signal: AbortSignal) => Promise<string>
+    const initialLoader: Loader = async (signal) => {
+      call += 1
+      if (call === 1) {
+        signal.addEventListener('abort', () => {
+          first.reject(new DOMException('Aborted', 'AbortError'))
+        })
+        return first.promise
       }
+      return second.promise
+    }
+
+    const { result, rerender } = renderHook(
+      ({ loader }: { loader: Loader }) => useAsyncResource(loader),
+      { initialProps: { loader: initialLoader } }
     )
 
     expect(result.current.loading).toBe(true)
 
-    const nextLoader = async (_signal) => second.promise
+    const nextLoader: Loader = async () => second.promise
     rerender({ loader: nextLoader })
 
     await act(async () => {
@@ -107,11 +106,11 @@ describe('useAsyncResource', () => {
   })
 
   it('aborts previous request on reload', async () => {
-    const signals = []
-    const pending = deferred()
+    const signals: AbortSignal[] = []
+    const pending = deferred<string>()
     let resolveCount = 0
 
-    const loader = vi.fn(async (signal) => {
+    const loader = vi.fn(async (signal: AbortSignal) => {
       signals.push(signal)
       if (signals.length === 1) {
         signal.addEventListener('abort', () => {
