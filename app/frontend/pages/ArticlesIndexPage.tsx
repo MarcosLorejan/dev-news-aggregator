@@ -11,6 +11,7 @@ import {
   unmarkArticleAsRead,
   type Article,
 } from '../api/articles'
+import { isAbortError } from '../api/client'
 import type { ArticlesIndexResponse } from '../types/article'
 import { parameterize, truncate } from '../utils/format'
 import ArticleList from '../components/ArticleList'
@@ -61,8 +62,14 @@ export default function ArticlesIndexPage() {
 
   const countdownRef = useRef<number | null>(null)
   const pendingDismissRef = useRef<{ articleId: number; title: string } | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
   const loadArticles = useCallback(async (options?: { page?: number }) => {
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+    const { signal } = controller
+
     const page = options?.page ?? currentPage
     setLoading(true)
     setError(null)
@@ -71,7 +78,9 @@ export default function ArticlesIndexPage() {
         page,
         show_read: showRead,
         ...scoreFilterParams(activeScoreFilter),
+        signal,
       })
+      if (signal.aborted) return
       setData(response)
       setRemovedIds(new Set())
       if (options?.page !== undefined && options.page !== currentPage) {
@@ -80,15 +89,19 @@ export default function ArticlesIndexPage() {
           else params.set('page', String(options.page))
         })
       }
-    } catch {
+    } catch (err) {
+      if (isAbortError(err) || signal.aborted) return
       setError('Failed to load articles. Please try again.')
     } finally {
-      setLoading(false)
+      if (!signal.aborted) setLoading(false)
     }
   }, [showRead, activeScoreFilter, currentPage, patchSearchParams])
 
   useEffect(() => {
-    loadArticles()
+    void loadArticles()
+    return () => {
+      abortRef.current?.abort()
+    }
   }, [loadArticles])
 
   const articleCategories = useMemo(
