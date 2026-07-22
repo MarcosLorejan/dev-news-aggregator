@@ -24,7 +24,10 @@ export function useAsyncResource<T>(
   const [error, setError] = useState<string | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const loaderRef = useRef(loader)
-  loaderRef.current = loader
+
+  useEffect(() => {
+    loaderRef.current = loader
+  }, [loader])
 
   const load = useCallback(async () => {
     abortRef.current?.abort()
