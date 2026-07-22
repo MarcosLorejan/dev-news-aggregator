@@ -132,10 +132,7 @@ class ArticlesController < ApplicationController
 
   def fetch_rate_limited?
     key = "articles_fetch:#{request.remote_ip}"
-    last_fetch = Rails.cache.read(key)
-    return true if last_fetch && last_fetch > FETCH_RATE_LIMIT.ago
-
-    Rails.cache.write(key, Time.current, expires_in: FETCH_RATE_LIMIT)
-    false
+    # Atomic claim: only the first writer in the window proceeds.
+    !Rails.cache.write(key, Time.current, expires_in: FETCH_RATE_LIMIT, unless_exist: true)
   end
 end
