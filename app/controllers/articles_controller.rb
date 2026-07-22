@@ -39,14 +39,12 @@ class ArticlesController < ApplicationController
       return render json: { error: "Please wait before fetching again" }, status: :too_many_requests
     end
 
-    result = NewsAggregatorService.fetch_all_news
+    job = FetchNewsJob.perform_later
 
     render json: {
-      articles_count: result[:articles_count],
-      duration: result[:duration],
-      sources: result[:sources],
-      timestamp: result[:timestamp]
-    }
+      status: "queued",
+      job_id: job.job_id
+    }, status: :accepted
   end
 
   def show

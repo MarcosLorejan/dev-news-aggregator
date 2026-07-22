@@ -1,6 +1,9 @@
 require "test_helper"
+require "active_job/test_helper"
 
 class ArticlesControllerTest < ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
+
   def setup
     @article = articles(:hacker_news_article)
     @dev_to_article = articles(:dev_to_article)
@@ -73,42 +76,27 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert body["pagination"]["total_count"] <= Article.not_read.not_dismissed.count
   end
 
-  test "fetch should trigger news aggregation" do
-    expected = {
-      articles_count: 3,
-      duration: 1.5,
-      sources: [ "HackerNewsFetcher" ],
-      timestamp: Time.current
-    }
-
-    original = NewsAggregatorService.method(:fetch_all_news)
-    NewsAggregatorService.define_singleton_method(:fetch_all_news) { expected }
-    begin
+  test "fetch should enqueue FetchNewsJob" do
+    assert_enqueued_with(job: FetchNewsJob) do
       post fetch_articles_url, as: :json
-      assert_response :success
-
-      json = JSON.parse(response.body)
-      assert_equal 3, json["articles_count"]
-      assert_equal 1.5, json["duration"]
-    ensure
-      NewsAggregatorService.define_singleton_method(:fetch_all_news, original)
     end
+
+    assert_response :accepted
+    json = JSON.parse(response.body)
+    assert_equal "queued", json["status"]
+    assert json["job_id"].present?
   end
 
   test "fetch should rate limit repeated requests" do
     original_cache = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
-    payload = { articles_count: 1, duration: 1.0, sources: [], timestamp: Time.current }
-    original = NewsAggregatorService.method(:fetch_all_news)
-    NewsAggregatorService.define_singleton_method(:fetch_all_news) { payload }
     begin
       post fetch_articles_url, as: :json
-      assert_response :success
+      assert_response :accepted
 
       post fetch_articles_url, as: :json
       assert_response :too_many_requests
     ensure
-      NewsAggregatorService.define_singleton_method(:fetch_all_news, original)
       Rails.cache = original_cache
     end
   end
@@ -124,12 +112,9 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
       original_write(name, value, options)
     end
 
-    payload = { articles_count: 1, duration: 1.0, sources: [], timestamp: Time.current }
-    original = NewsAggregatorService.method(:fetch_all_news)
-    NewsAggregatorService.define_singleton_method(:fetch_all_news) { payload }
     begin
       post fetch_articles_url, as: :json
-      assert_response :success
+      assert_response :accepted
 
       claim = writes.find { |entry| entry[:name].to_s.start_with?("articles_fetch:") }
       assert claim
@@ -146,7 +131,6 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
       post fetch_articles_url, as: :json
       assert_response :too_many_requests
     ensure
-      NewsAggregatorService.define_singleton_method(:fetch_all_news, original)
       Rails.cache = original_cache
     end
   end
