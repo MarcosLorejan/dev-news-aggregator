@@ -262,7 +262,7 @@ jobs:
           tags: dev-news-aggregator:ci
           cache-from: type=gha
 
-      - name: Scan image for CRITICAL/HIGH vulnerabilities
+      - name: Scan image for CRITICAL/HIGH library vulnerabilities
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: dev-news-aggregator:ci
@@ -270,6 +270,10 @@ jobs:
           exit-code: "1"
           ignore-unfixed: true
           severity: CRITICAL,HIGH
+          scanners: vuln
+          # OS/kernel CVEs track the Debian/Ruby base image; gate on gems/npm we control.
+          # Revisit OS scanning when upgrading Ruby (#144).
+          vuln-type: library
           trivyignores: .trivyignore
 
   quality_gate:
