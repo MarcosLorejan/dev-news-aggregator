@@ -49,4 +49,38 @@ class NewsRakeTest < ActiveSupport::TestCase
   ensure
     Rake::Task["news:clean"].reenable
   end
+
+  test "news:clean removes multiple old articles and all dependents in batches" do
+    retention_days = NewsAggregatorConfig.retention_days
+    cutoff = (retention_days + 1).days.ago
+
+    3.times do |i|
+      article = Article.create!(
+        title: "Old batch #{i}",
+        url: "https://example.com/old-batch-#{i}",
+        external_id: "old-batch-#{i}",
+        source_type: "hacker_news",
+        published_at: cutoff,
+        score: 1,
+        comment_count: 0
+      )
+      article.bookmark!
+      article.mark_as_read!
+    end
+
+    # setup already has one old bookmarked article; three more with bookmark + read.
+    assert_difference "Article.count", -4 do
+      assert_difference "Bookmark.count", -4 do
+        assert_difference "ReadArticle.count", -3 do
+          capture_io do
+            Rake::Task["news:clean"].invoke
+          end
+        end
+      end
+    end
+
+    assert_equal 0, Article.where("published_at < ?", retention_days.days.ago).count
+  ensure
+    Rake::Task["news:clean"].reenable
+  end
 end
