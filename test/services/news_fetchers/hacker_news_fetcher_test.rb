@@ -83,7 +83,7 @@ class NewsFetchers::HackerNewsFetcherTest < ActiveSupport::TestCase
 
       if (match = path.match(%r{\A/item/(\d+)\.json\z}))
         sleep 0.2
-        return stories.find { |story| story["id"] == match[1].to_i }
+        stories.find { |story| story["id"] == match[1].to_i }
       end
     }) do
       start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
