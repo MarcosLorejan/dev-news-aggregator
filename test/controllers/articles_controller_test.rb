@@ -67,6 +67,59 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes scores, @dev_to_article.score
   end
 
+  test "index JSON should filter by q on title and description" do
+    get articles_url(q: "Rust"), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    titles = body["articles"].map { |article| article["title"] }
+    assert_includes titles, @rust_article.title
+    assert_not_includes titles, @article.title
+    assert_equal body["articles"].size, body["pagination"]["total_count"]
+    assert body["pagination"]["total_count"].positive?
+  end
+
+  test "index JSON q filter paginates across the filtered dataset" do
+    5.times do |i|
+      Article.create!(
+        title: "Extra Rust #{i}",
+        url: "https://example.com/search-rust-#{i}",
+        external_id: "search-rust-#{i}",
+        source_type: "reddit_rust",
+        published_at: i.hours.ago,
+        score: 10,
+        comment_count: 0,
+        description: "Rust search fixture"
+      )
+    end
+
+    get articles_url(q: "Rust", page: 1, per_page: 2), as: :json
+    assert_response :success
+    page_one = JSON.parse(response.body)
+
+    get articles_url(q: "Rust", page: 2, per_page: 2), as: :json
+    assert_response :success
+    page_two = JSON.parse(response.body)
+
+    assert_equal 2, page_one["articles"].size
+    assert_operator page_two["articles"].size, :>=, 1
+    assert_equal page_one["pagination"]["total_count"], page_two["pagination"]["total_count"]
+    assert_operator page_one["pagination"]["total_pages"], :>=, 2
+
+    page_one_ids = page_one["articles"].map { |article| article["id"] }
+    page_two_ids = page_two["articles"].map { |article| article["id"] }
+    assert_empty page_one_ids & page_two_ids
+  end
+
+  test "index JSON returns empty results for unmatched q" do
+    get articles_url(q: "zzzz-no-such-article"), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    assert_empty body["articles"]
+    assert_equal 0, body["pagination"]["total_count"]
+  end
+
   test "index JSON should filter by top_percent" do
     get articles_url(top_percent: 50), as: :json
     assert_response :success

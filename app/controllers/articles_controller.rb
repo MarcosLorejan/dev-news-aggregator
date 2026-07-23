@@ -112,6 +112,7 @@ class ArticlesController < ApplicationController
     end
 
     scope = apply_score_filter(scope)
+    scope = scope.search(params[:q])
     scope = helpers.apply_category_filter(scope, params[:category]) if apply_category
     scope.includes(:bookmark, :read_article, :dismissed_article)
          .order(published_at: :desc)

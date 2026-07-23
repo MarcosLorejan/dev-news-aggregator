@@ -16,8 +16,10 @@ import type { ArticlesIndexResponse } from '../types/article'
 import { parameterize, truncate } from '../utils/format'
 import ArticleList from '../components/ArticleList'
 import ArticleListSkeleton from '../components/ArticleListSkeleton'
+import ArticleSearch from '../components/ArticleSearch'
 import CategoryFilter from '../components/CategoryFilter'
 import DismissToast from '../components/DismissToast'
+import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
 import PageHeaderSkeleton from '../components/PageHeaderSkeleton'
 import PageContainer from '../components/ui/PageContainer'
@@ -25,6 +27,8 @@ import Card from '../components/ui/Card'
 import PaginationControls from '../components/PaginationControls'
 import ScoreFilter, { parseScoreFilter, scoreFilterParams, type ScoreFilterValue } from '../components/ScoreFilter'
 import { usePatchSearchParams } from '../hooks/useSearchParamState'
+
+const SEARCH_DEBOUNCE_MS = 300
 
 const DISMISS_TIMEOUT_SECONDS = 15
 
@@ -50,7 +54,9 @@ export default function ArticlesIndexPage() {
   const activeFilter = searchParams.get('category') ?? 'all'
   const activeScoreFilter = parseScoreFilter(searchParams.get('score'))
   const showRead = searchParams.get('show_read') === 'true'
+  const searchQuery = (searchParams.get('q') ?? '').trim()
 
+  const [searchInput, setSearchInput] = useState(searchQuery)
   const [data, setData] = useState<ArticlesIndexResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -69,6 +75,25 @@ export default function ArticlesIndexPage() {
     toastRef.current = toast
   }, [toast])
 
+  useEffect(() => {
+    setSearchInput(searchQuery)
+  }, [searchQuery])
+
+  useEffect(() => {
+    const trimmed = searchInput.trim()
+    if (trimmed === searchQuery) return
+
+    const timeoutId = window.setTimeout(() => {
+      patchSearchParams((params) => {
+        if (trimmed) params.set('q', trimmed)
+        else params.delete('q')
+        params.delete('page')
+      })
+    }, SEARCH_DEBOUNCE_MS)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [searchInput, searchQuery, patchSearchParams])
+
   const loadArticles = useCallback(async (options?: { page?: number }) => {
     abortRef.current?.abort()
     const controller = new AbortController()
@@ -83,6 +108,7 @@ export default function ArticlesIndexPage() {
         page,
         show_read: showRead,
         category: activeFilter !== 'all' ? activeFilter : undefined,
+        q: searchQuery || undefined,
         ...scoreFilterParams(activeScoreFilter),
         signal,
       })
@@ -101,7 +127,7 @@ export default function ArticlesIndexPage() {
     } finally {
       if (!signal.aborted) setLoading(false)
     }
-  }, [showRead, activeScoreFilter, activeFilter, currentPage, patchSearchParams])
+  }, [showRead, activeScoreFilter, activeFilter, searchQuery, currentPage, patchSearchParams])
 
   useEffect(() => {
     void loadArticles()
@@ -333,7 +359,9 @@ export default function ArticlesIndexPage() {
     )
   }
 
-  const showEmptyFeed = !data || (allArticlesCount === 0 && articles.length === 0)
+  const showEmptyFeed = !data || (!searchQuery && allArticlesCount === 0 && articles.length === 0)
+  const showNoSearchResults =
+    Boolean(searchQuery) && articles.length === 0 && (data?.pagination.total_count ?? 0) === 0
 
   if (showEmptyFeed) {
     return (
@@ -387,6 +415,8 @@ export default function ArticlesIndexPage() {
         <div className="mb-4 text-sm text-red-400">{error}</div>
       )}
 
+      <ArticleSearch value={searchInput} onChange={setSearchInput} />
+
       <ScoreFilter
         activeScoreFilter={activeScoreFilter}
         onScoreFilterChange={handleScoreFilterChange}
@@ -400,23 +430,42 @@ export default function ArticlesIndexPage() {
         onFilterChange={handleFilterChange}
       />
 
-      <ArticleList
-        articles={articles}
-        articleCategories={articleCategories}
-        dismissingIds={dismissingIds}
-        onDismiss={handleDismiss}
-        onUndoDismiss={handleUndoDismiss}
-        onBookmarkToggle={handleBookmarkToggle}
-        onReadToggle={handleReadToggle}
-      />
+      {showNoSearchResults ? (
+        <EmptyState
+          icon={
+            <svg className="w-10 h-10 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          }
+          title="No articles match your search"
+          description={`Nothing matched “${searchQuery}”. Try a different term or clear the search.`}
+        />
+      ) : (
+        <>
+          <ArticleList
+            articles={articles}
+            articleCategories={articleCategories}
+            dismissingIds={dismissingIds}
+            onDismiss={handleDismiss}
+            onUndoDismiss={handleUndoDismiss}
+            onBookmarkToggle={handleBookmarkToggle}
+            onReadToggle={handleReadToggle}
+          />
 
-      <PaginationControls
-        currentPage={data.pagination.current_page}
-        totalPages={data.pagination.total_pages}
-        totalCount={data.pagination.total_count}
-        perPage={data.pagination.per_page}
-        onPageChange={handlePageChange}
-      />
+          <PaginationControls
+            currentPage={data.pagination.current_page}
+            totalPages={data.pagination.total_pages}
+            totalCount={data.pagination.total_count}
+            perPage={data.pagination.per_page}
+            onPageChange={handlePageChange}
+          />
+        </>
+      )}
 
       {toast && (
         <DismissToast
