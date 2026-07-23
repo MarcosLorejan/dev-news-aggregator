@@ -42,6 +42,13 @@ gem "httparty", "~> 0.24"
 # Cron job scheduling
 gem "whenever", "~> 1.1"
 
+# Patched default gems (container Trivy CRITICAL/HIGH advisories)
+gem "erb", ">= 4.0.4"
+gem "net-imap", ">= 0.5.14"
+gem "rexml", ">= 3.3.9"
+gem "uri", ">= 1.0.4"
+# zlib CVE-2026-27820 needs Ruby default-gem update; tracked via #144 / .trivyignore until then.
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
