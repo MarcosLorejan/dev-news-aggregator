@@ -151,7 +151,7 @@ bin/validate --fast   # skips Brakeman and Rails tests
 | `npm audit` | no | `scan_js` |
 | `bundle-audit` | no | `scan_dependencies` |
 | `docker build .` | no | `docker_build` |
-| Trivy image scan | no | `docker_scan` (CRITICAL/HIGH; see `.trivyignore`) |
+| Trivy image scan | no | `docker_scan` (CRITICAL/HIGH library vulns; see `.trivyignore`) |
 
 ### Cron jobs
 
