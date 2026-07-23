@@ -293,7 +293,7 @@ Copy `.env.example` to `.env` before starting the stack. Docker Compose reads it
 - All tests start with `should` (e.g., `test "should create bookmark when valid"`)
 - Do not use `send` in tests — test public interface only
 - Always prefer fixtures over `create` methods for consistency
-- Mock only when necessary (external APIs, slow operations) and use mocha gem for mocking
+- Mock only when necessary (external APIs, slow operations); prefer WebMock/stubs over heavy mocking frameworks
 - Do not use comments in tests — test names should be self-descriptive
 - Follow RuboCop conventions in test files
 - Apply SOLID and KISS principles to test code
