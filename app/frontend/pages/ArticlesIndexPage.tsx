@@ -26,6 +26,7 @@ import PageContainer from '../components/ui/PageContainer'
 import Card from '../components/ui/Card'
 import PaginationControls from '../components/PaginationControls'
 import ScoreFilter, { parseScoreFilter, scoreFilterParams, type ScoreFilterValue } from '../components/ScoreFilter'
+import SortControl, { parseSort, type SortValue } from '../components/SortControl'
 import { usePatchSearchParams } from '../hooks/useSearchParamState'
 
 const SEARCH_DEBOUNCE_MS = 300
@@ -53,6 +54,7 @@ export default function ArticlesIndexPage() {
   })()
   const activeFilter = searchParams.get('category') ?? 'all'
   const activeScoreFilter = parseScoreFilter(searchParams.get('score'))
+  const activeSort = parseSort(searchParams.get('sort'))
   const showRead = searchParams.get('show_read') === 'true'
   const searchQuery = (searchParams.get('q') ?? '').trim()
 
@@ -109,6 +111,7 @@ export default function ArticlesIndexPage() {
         show_read: showRead,
         category: activeFilter !== 'all' ? activeFilter : undefined,
         q: searchQuery || undefined,
+        sort: activeSort,
         ...scoreFilterParams(activeScoreFilter),
         signal,
       })
@@ -127,7 +130,7 @@ export default function ArticlesIndexPage() {
     } finally {
       if (!signal.aborted) setLoading(false)
     }
-  }, [showRead, activeScoreFilter, activeFilter, searchQuery, currentPage, patchSearchParams])
+  }, [showRead, activeScoreFilter, activeFilter, activeSort, searchQuery, currentPage, patchSearchParams])
 
   useEffect(() => {
     void loadArticles()
@@ -240,6 +243,14 @@ export default function ArticlesIndexPage() {
     patchSearchParams((params) => {
       if (value === 'all') params.delete('score')
       else params.set('score', value)
+      params.delete('page')
+    })
+  }
+
+  const handleSortChange = (value: SortValue) => {
+    patchSearchParams((params) => {
+      if (value === 'published_at') params.delete('sort')
+      else params.set('sort', value)
       params.delete('page')
     })
   }
@@ -420,6 +431,11 @@ export default function ArticlesIndexPage() {
       <ScoreFilter
         activeScoreFilter={activeScoreFilter}
         onScoreFilterChange={handleScoreFilterChange}
+      />
+
+      <SortControl
+        activeSort={activeSort}
+        onSortChange={handleSortChange}
       />
 
       <CategoryFilter

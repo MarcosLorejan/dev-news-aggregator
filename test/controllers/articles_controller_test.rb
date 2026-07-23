@@ -120,6 +120,49 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 0, body["pagination"]["total_count"]
   end
 
+  test "index JSON sorts by published_at desc by default" do
+    get articles_url, as: :json
+    assert_response :success
+
+    published_ats = JSON.parse(response.body)["articles"].map { |article| article["published_at"] }
+    assert_equal published_ats, published_ats.sort.reverse
+  end
+
+  test "index JSON sorts by score descending" do
+    get articles_url(sort: "score"), as: :json
+    assert_response :success
+
+    scores = JSON.parse(response.body)["articles"].map { |article| article["score"] }
+    assert_equal scores, scores.sort.reverse
+    assert_operator scores.first, :>=, @dev_to_article.score
+  end
+
+  test "index JSON sorts by comment_count descending" do
+    get articles_url(sort: "comment_count"), as: :json
+    assert_response :success
+
+    counts = JSON.parse(response.body)["articles"].map { |article| article["comment_count"] }
+    assert_equal counts, counts.sort.reverse
+  end
+
+  test "index JSON falls back to published_at for invalid sort" do
+    get articles_url(sort: "not_a_column"), as: :json
+    assert_response :success
+
+    published_ats = JSON.parse(response.body)["articles"].map { |article| article["published_at"] }
+    assert_equal published_ats, published_ats.sort.reverse
+  end
+
+  test "index JSON sort composes with q and pagination" do
+    get articles_url(sort: "score", q: "Rust", page: 1, per_page: 1), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    assert_equal 1, body["articles"].size
+    assert body["pagination"]["total_count"].positive?
+    assert_includes body["articles"].first["title"], "Rust"
+  end
+
   test "index JSON should filter by top_percent" do
     get articles_url(top_percent: 50), as: :json
     assert_response :success
