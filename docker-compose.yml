@@ -1,3 +1,6 @@
+# Local development: PostgreSQL only.
+# Rails and Vite run on the host (see README / docs/DEVELOPMENT.md).
+# The production Dockerfile is for Kamal / image builds, not this compose file.
 services:
   db:
     image: postgres:15
@@ -15,19 +18,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  web:
-    build: .
-    command: bundle exec rails server -b 0.0.0.0
-    volumes:
-      - .:/app
-    ports:
-      - "3000:3000"
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-dev_news_user}:${POSTGRES_PASSWORD:-dev_password}@db:5432/${POSTGRES_DB:-dev_news_aggregator_development}
 
 volumes:
   postgres_data:

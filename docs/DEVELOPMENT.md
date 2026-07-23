@@ -12,8 +12,8 @@ For the directory map, see [REPO_STRUCTURE.md](REPO_STRUCTURE.md). **Update that
 # Install dependencies
 bundle install
 
-# Start PostgreSQL container
-sudo docker-compose up -d
+# Start PostgreSQL only (compose has no app service; Rails runs on the host)
+docker compose up -d
 
 # Setup primary and queue databases
 bin/rails db:prepare

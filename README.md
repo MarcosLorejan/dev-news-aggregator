@@ -18,8 +18,8 @@ bundle install
 # Copy the environment template (holds the local database credentials)
 cp .env.example .env
 
-# Start PostgreSQL container
-sudo docker-compose up -d
+# Start PostgreSQL only (Rails/Vite run on the host; see below)
+docker compose up -d
 
 # Setup database
 bin/rails db:migrate
