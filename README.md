@@ -43,7 +43,7 @@ Visit http://localhost:3000.
 
 ## Tech Stack
 
-- **Backend**: Rails 8.1
+- **Backend**: Rails 8.1 on Ruby 3.3 (see `.ruby-version`)
 - **Database**: PostgreSQL (Docker)
 - **Frontend**: React + Vite; **Styling**: Tailwind CSS (CDN)  
 - **Scheduling**: Whenever gem with cron
