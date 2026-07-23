@@ -219,15 +219,36 @@ jobs:
           path: ${{ github.workspace }}/tmp/screenshots
           if-no-files-found: ignore
 
+  docker_build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build production Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: dev-news-aggregator:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   quality_gate:
     runs-on: ubuntu-latest
     permissions: {}
-    needs: [scan_ruby, scan_dependencies, scan_js, lint, frontend_lint, typecheck, frontend_test, test]
+    needs: [scan_ruby, scan_dependencies, scan_js, lint, frontend_lint, typecheck, frontend_test, test, docker_build]
     if: always()
     steps:
       - name: Check all jobs status
         run: |
-          if [[ "${{ needs.scan_ruby.result }}" == "failure" || "${{ needs.scan_dependencies.result }}" == "failure" || "${{ needs.scan_js.result }}" == "failure" || "${{ needs.lint.result }}" == "failure" || "${{ needs.frontend_lint.result }}" == "failure" || "${{ needs.typecheck.result }}" == "failure" || "${{ needs.frontend_test.result }}" == "failure" || "${{ needs.test.result }}" == "failure" ]]; then
+          if [[ "${{ needs.scan_ruby.result }}" == "failure" || "${{ needs.scan_dependencies.result }}" == "failure" || "${{ needs.scan_js.result }}" == "failure" || "${{ needs.lint.result }}" == "failure" || "${{ needs.frontend_lint.result }}" == "failure" || "${{ needs.typecheck.result }}" == "failure" || "${{ needs.frontend_test.result }}" == "failure" || "${{ needs.test.result }}" == "failure" || "${{ needs.docker_build.result }}" == "failure" ]]; then
             echo "One or more jobs failed"
             exit 1
           fi

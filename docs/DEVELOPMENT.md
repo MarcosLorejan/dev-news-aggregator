@@ -150,6 +150,7 @@ bin/validate --fast   # skips Brakeman and Rails tests
 | `rails test:system` | no | `test` |
 | `npm audit` | no | `scan_js` |
 | `bundle-audit` | no | `scan_dependencies` |
+| `docker build .` | no | `docker_build` |
 
 ### Cron jobs
 
