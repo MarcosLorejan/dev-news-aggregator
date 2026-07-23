@@ -18,7 +18,7 @@ function renderPage(path = '/articles/1') {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <Routes>
-        <Route path=/articles/:id element={<ArticleShowPage />} />
+        <Route path="/articles/:id" element={<ArticleShowPage />} />
       </Routes>
     </MemoryRouter>
   )

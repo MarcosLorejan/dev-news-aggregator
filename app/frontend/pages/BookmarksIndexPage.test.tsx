@@ -98,6 +98,8 @@ describe('BookmarksIndexPage', () => {
     await waitForBookmarksFeed()
 
     await user.click(screen.getAllByRole('button', { name: 'Remove from reading list' })[0])
+    expect(await screen.findByTestId('confirm-dialog')).toBeInTheDocument()
+    await user.click(screen.getByTestId('confirm-dialog-confirm'))
 
     await waitFor(() => {
       expect(articlesApi.unbookmarkArticle).toHaveBeenCalledWith(1)
