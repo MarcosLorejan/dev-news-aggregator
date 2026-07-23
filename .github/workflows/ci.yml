@@ -263,7 +263,7 @@ jobs:
           cache-from: type=gha
 
       - name: Scan image for CRITICAL/HIGH vulnerabilities
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: dev-news-aggregator:ci
           format: table
