@@ -272,6 +272,25 @@ Copy `.env.example` to `.env` before starting the stack. Docker Compose reads it
 3. Use consistent `source_type` naming pattern
 4. Update category grouping in `articles_helper.rb` if needed
 
+## Production security (CSP and hosts)
+
+### Content Security Policy
+
+`config/initializers/content_security_policy.rb` enables CSP in **production and test** (not development, so Vite HMR keeps working).
+
+| Directive | Value | Why |
+|-----------|--------|-----|
+| `script-src` | `'self'` | Vite ships external `type="module"` scripts under `/vite` |
+| `style-src` | `'self' 'unsafe-inline'` | Bundled CSS plus React `style={{}}` attributes |
+| `connect-src` | `'self'` | Same-origin JSON API (`fetch`) |
+| `worker-src` | `'self'` | PWA service worker |
+
+**Nonces are not required** for the current React shell: there are no inline `<script>` tags. Add `content_security_policy_nonce_generator` only if you introduce inline scripts, importmap, or Vite React Refresh tags under an enforcing CSP.
+
+### Host authorization
+
+Production sets `config.hosts` from `APP_HOSTS` (comma-separated; default `app.example.com`) and excludes `/up` from host checks. Kamal injects `APP_HOSTS` in `config/deploy.yml` — keep it aligned with `proxy.host`.
+
 ## Coding guidelines
 
 ### General principles
