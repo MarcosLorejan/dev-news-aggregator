@@ -308,13 +308,15 @@ Copy `.env.example` to `.env` before starting the stack. Docker Compose reads it
 ### Git commit guidelines
 
 - **Always run tests and RuboCop before committing** — run `bin/rails test` and `bin/rubocop`
-- Use conventional commit format (e.g., `feat:`, `fix:`, `test:`, `refactor:`)
+- Use conventional commit format (e.g., `feat:`, `fix:`, `test:`, `refactor:`) — enforced by Overcommit commit-msg (`MessageFormat`); see [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md)
+- Subject after `type:` must be lowercase (e.g. `feat: add bookmarks`, not `feat: Add bookmarks`)
 - One line commit messages only — no body or additional description
 - One commit per file (exceptions allowed for large PRs with same context)
 - No co-authored comments
 - Keep commit messages concise and descriptive
 - Commit frequently to save changes — don't wait until everything is perfect
 - Push commits regularly to avoid losing work
+- Install hooks via `bin/setup` / `.\setup-local-env.ps1`, or manually with `bundle exec overcommit --install` and `bundle exec overcommit --sign`
 
 ### GitHub issue and branch workflow
 

@@ -2,9 +2,10 @@
 # repository. Uncomment the hooks you want to enable.
 #
 # For more information, see: https://github.com/sds/overcommit
+# Setup and Conventional Commits: docs/PRE_COMMIT_HOOKS.md
 
-# Verify signatures for overcommit gem
-verify_signatures: false
+# Require signed hook/config verification (run: bundle exec overcommit --sign)
+verify_signatures: true
 
 # Loads Bundler context from a Gemfile
 gemfile: Gemfile
@@ -33,8 +34,21 @@ PreCommit:
     enabled: true
     description: 'Scan for Rails security warnings'
     required: true
+    required_executable: 'bundle'
     command: ['bundle', 'exec', 'brakeman', '--no-pager', '--quiet']
     on_warn: fail
+
+  Typecheck:
+    enabled: true
+    description: 'Run TypeScript compiler checks'
+    required: true
+    required_executable: 'npm'
+    command: ['npm', 'run', 'typecheck']
+    include:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - 'tsconfig.json'
+      - 'package.json'
 
   BundleCheck:
     enabled: true
@@ -51,9 +65,16 @@ CommitMsg:
     requires_files: false
     quiet: false
 
+  # Conflicts with Conventional Commits (lowercase subject after type:)
   CapitalizedSubject:
+    enabled: false
+
+  MessageFormat:
     enabled: true
-    description: 'Check subject capitalization'
+    description: 'Check Conventional Commits format'
+    pattern: '^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9][a-z0-9/_-]*\))?(!)?: [a-z0-9].+'
+    expected_pattern_message: '<type>(optional-scope)!: <lowercase subject>'
+    sample_message: 'feat(api): add article dismiss endpoint'
 
   EmptyMessage:
     enabled: true
