@@ -7,7 +7,7 @@ A Rails application that aggregates developer news from Hacker News, Dev.to, and
 - **Multi-source aggregation**: Fetches from 12+ sources including Hacker News, Dev.to, and programming subreddits
 - **Article bookmarking**: Save articles for later reading with category filtering  
 - **Automated updates**: Hourly fetching during business hours via cron jobs
-- **Responsive interface**: Clean web UI with source-based filtering
+- **Responsive interface**: React SPA with source-based filtering and Vite HMR in development
 
 ## Quick Start
 
@@ -43,9 +43,9 @@ Visit http://localhost:3000.
 
 ## Tech Stack
 
-- **Backend**: Rails 8.0.2
+- **Backend**: Rails 8.1
 - **Database**: PostgreSQL (Docker)
-- **Styling**: Tailwind CSS  
+- **Frontend**: React + Vite; **Styling**: Tailwind CSS (CDN)  
 - **Scheduling**: Whenever gem with cron
 - **HTTP**: HTTParty gem
 
@@ -65,7 +65,7 @@ bin/rails news:fetch
 # Show latest 10 articles
 bin/rails news:latest
 
-# Clean old articles (7+ days)
+# Clean old articles (retention from config/news_aggregator.yml)
 bin/rails news:clean
 
 # Setup cron jobs
