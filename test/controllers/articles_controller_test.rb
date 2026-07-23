@@ -76,6 +76,45 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert body["pagination"]["total_count"] <= Article.not_read.not_dismissed.count
   end
 
+  test "index JSON top_percent returns unfiltered scope when no scored articles" do
+    Article.update_all(score: nil)
+
+    get articles_url(top_percent: 50), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    assert_equal Article.not_read.not_dismissed.count, body["pagination"]["total_count"]
+  end
+
+  test "index JSON top_percent includes tied scores at the threshold" do
+    Article.find_each(&:mark_as_read!)
+    now = Time.current
+    [
+      [ "high-a", 100 ],
+      [ "high-b", 100 ],
+      [ "mid", 50 ],
+      [ "low", 10 ]
+    ].each_with_index do |(slug, score), i|
+      Article.create!(
+        title: "Tie #{slug}",
+        url: "https://example.com/#{slug}",
+        external_id: "tie-#{slug}",
+        source_type: "hacker_news",
+        published_at: now - i.hours,
+        score: score,
+        comment_count: 0
+      )
+    end
+
+    # 4 scored articles, top 50% → index 1 → threshold 100; both 100s included.
+    get articles_url(top_percent: 50), as: :json
+    assert_response :success
+
+    scores = JSON.parse(response.body)["articles"].map { |article| article["score"] }
+    assert_equal [ 100, 100 ], scores.sort.reverse
+    assert scores.all? { |score| score >= 100 }
+  end
+
   test "fetch should enqueue FetchNewsJob" do
     assert_enqueued_with(job: FetchNewsJob) do
       post fetch_articles_url, as: :json
