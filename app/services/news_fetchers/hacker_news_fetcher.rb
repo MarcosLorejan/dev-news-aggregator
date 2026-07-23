@@ -9,8 +9,12 @@ class NewsFetchers::HackerNewsFetcher < NewsFetchers::BaseFetcher
     top_story_ids = self.class.get("/topstories.json")
     return [] unless top_story_ids.is_a?(Array)
 
-    top_story_ids.first(NewsAggregatorConfig.max_articles_per_source).each do |story_id|
-      fetch_story(story_id)
+    story_ids = top_story_ids.first(NewsAggregatorConfig.max_articles_per_source)
+    story_payloads = fetch_story_payloads_in_parallel(story_ids)
+
+    story_payloads.each do |story_data|
+      article = persist_story(story_data)
+      @articles << article if article
     end
 
     Rails.logger.info "Fetched #{@articles.length} articles from Hacker News"
@@ -19,13 +23,43 @@ class NewsFetchers::HackerNewsFetcher < NewsFetchers::BaseFetcher
 
   private
 
-  def fetch_story(story_id)
+  # Parallelize only HTTP item fetches so ActiveRecord stays on the caller thread
+  # (NewsAggregatorService already holds a pool connection around fetch_articles).
+  def fetch_story_payloads_in_parallel(story_ids)
+    return [] if story_ids.empty?
+
+    mutex = Mutex.new
+    payloads = []
+    concurrency = [ NewsAggregatorConfig.hn_item_concurrency, story_ids.size ].min
+
+    story_ids.each_slice(concurrency) do |batch|
+      threads = batch.map do |story_id|
+        Thread.new do
+          story_data = fetch_story_payload(story_id)
+          mutex.synchronize { payloads << story_data } if story_data
+        end
+      end
+
+      threads.each(&:join)
+    end
+
+    payloads
+  end
+
+  def fetch_story_payload(story_id)
     story_data = self.class.get("/item/#{story_id}.json")
     return unless story_data && story_data["type"] == "story"
 
     # Skip stories without URLs (Ask HN, etc.)
     return unless story_data["url"]
 
+    story_data
+  rescue StandardError => e
+    Rails.logger.error "Error fetching HN story #{story_id}: #{e.message}"
+    nil
+  end
+
+  def persist_story(story_data)
     article_attributes = {
       title: story_data["title"],
       url: story_data["url"],
@@ -38,8 +72,9 @@ class NewsFetchers::HackerNewsFetcher < NewsFetchers::BaseFetcher
     }
 
     article = create_or_update_article(article_attributes)
-    @articles << article if article.persisted?
+    article if article.persisted?
   rescue StandardError => e
-    Rails.logger.error "Error fetching HN story #{story_id}: #{e.message}"
+    Rails.logger.error "Error persisting HN story #{story_data['id']}: #{e.message}"
+    nil
   end
 end

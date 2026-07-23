@@ -5,6 +5,7 @@ class NewsAggregatorConfigTest < ActiveSupport::TestCase
     assert_equal 5, NewsAggregatorConfig.max_articles_per_source
     assert_equal 10, NewsAggregatorConfig.request_timeout
     assert_equal 3, NewsAggregatorConfig.max_retries
+    assert_equal 3, NewsAggregatorConfig.hn_item_concurrency
   end
 
   test "loads retention days from news_aggregator.yml" do

@@ -9,6 +9,9 @@ development: &default
     
     # How often to retry failed requests
     max_retries: 3
+
+    # Max concurrent /item/{id} requests for Hacker News
+    hn_item_concurrency: 10
   
   # Data retention
   retention:
@@ -51,6 +54,7 @@ test:
   fetching:
     max_articles_per_source: 5
     request_timeout: 10
+    hn_item_concurrency: 3
   retention:
     article_retention_days: 7
 
@@ -60,5 +64,6 @@ production:
     max_articles_per_source: 50
     request_timeout: 60
     max_retries: 5
+    hn_item_concurrency: 10
   retention:
     article_retention_days: 60
