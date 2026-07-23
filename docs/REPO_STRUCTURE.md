@@ -2,7 +2,7 @@
 
 Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
 
-Last updated: 2026-07-14
+Last updated: 2026-07-22
 
 ## Maintenance
 
@@ -59,7 +59,6 @@ dev-news-aggregator/
 | `app/helpers/` | View helpers (categories, formatting) |
 | `app/views/` | ERB templates |
 | `app/frontend/` | React app (Vite entrypoint + components) |
-| `app/javascript/` | Stimulus controllers and legacy JS hooks |
 | `app/assets/stylesheets/` | CSS |
 | `app/mailers/` | Action Mailer base |
 
