@@ -11,6 +11,19 @@ bundle install
 Write-Host "==> Installing npm packages..." -ForegroundColor Cyan
 npm install
 
+Write-Host "==> Installing Overcommit Git hooks..." -ForegroundColor Cyan
+bundle exec overcommit --install
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Overcommit install failed. See docs/PRE_COMMIT_HOOKS.md" -ForegroundColor Red
+    exit 1
+}
+bundle exec overcommit --sign
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Overcommit sign failed. See docs/PRE_COMMIT_HOOKS.md" -ForegroundColor Red
+    exit 1
+}
+Write-Host "    Conventional Commits are enforced; see docs/PRE_COMMIT_HOOKS.md" -ForegroundColor DarkGray
+
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     Write-Host "==> Starting PostgreSQL via Docker..." -ForegroundColor Cyan
     # --wait blocks until the healthcheck passes (first boot can take 1-2 min)

@@ -20,6 +20,11 @@ FileUtils.chdir APP_ROOT do
   #   FileUtils.cp "config/database.yml.sample", "config/database.yml"
   # end
 
+  puts "\n== Installing Overcommit Git hooks =="
+  system! "bundle exec overcommit --install"
+  system! "bundle exec overcommit --sign"
+  puts "   Conventional Commits are enforced; see docs/PRE_COMMIT_HOOKS.md"
+
   puts "\n== Preparing database =="
   system! "bin/rails db:prepare"
 
