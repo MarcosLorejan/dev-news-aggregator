@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { Article } from '../types/article'
 import type { BookmarkArticle } from '../types/bookmark'
 import type { DismissedArticle } from '../types/dismissedArticle'
@@ -50,7 +51,7 @@ type DismissedCardProps = {
 
 export type ArticleCardProps = FeedCardProps | BookmarkCardProps | ReadCardProps | DismissedCardProps
 
-export default function ArticleCard(props: ArticleCardProps) {
+function ArticleCard(props: ArticleCardProps) {
   const { confirm, dialog } = useConfirmDialog()
   const { variant, article, index } = props
   const theme = variantTheme(variant)
@@ -217,5 +218,7 @@ export default function ArticleCard(props: ArticleCardProps) {
     </>
   )
 }
+
+export default memo(ArticleCard)
 
 export type { ArticleCardData } from './articleCard/cardThemes'
