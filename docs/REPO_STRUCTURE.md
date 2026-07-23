@@ -177,7 +177,7 @@ dev-news-aggregator/
 
 | Path | Purpose |
 |------|---------|
-| `workflows/ci.yml` | CI pipeline (tests, lint, security, Docker image build) |
+| `workflows/ci.yml` | CI pipeline (tests, lint, security, Docker build + Trivy scan) |
 | `workflows/dependabot-auto-merge.yml` | Auto-merge patch/minor Dependabot PRs only after green `quality_gate` |
 | `dependabot.yml` | Dependency update schedule |
 | `pull_request_template.md` | Default PR body checklist |
@@ -199,6 +199,7 @@ dev-news-aggregator/
 | `setup-local-env.ps1` | Windows one-time/repeat setup (bundle, npm, Postgres, `db:prepare`) |
 | `docker-compose.yml` | Local PostgreSQL container |
 | `Dockerfile` | Production/container image |
+| `.trivyignore` | Baselined Trivy CVEs for CI `docker_scan` |
 | `.overcommit.yml` | Git hook configuration |
 | `.rubocop.yml` | Ruby style rules |
 | `eslint.config.js` | Frontend lint rules (TypeScript, React hooks) |

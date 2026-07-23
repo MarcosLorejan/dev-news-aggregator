@@ -1,0 +1,4 @@
+# Baselined container CVEs for Trivy (CI `docker_scan`).
+# Add CVE IDs here only with a short reason and follow-up plan.
+# Example:
+# CVE-2024-0000  # waiting on upstream ruby slim rebuild
