@@ -28,6 +28,10 @@ module NewsAggregatorConfig
       fetching[:max_retries] || 3
     end
 
+    def hn_item_concurrency
+      fetching[:hn_item_concurrency] || 10
+    end
+
     def reddit_subreddits
       Array(config.dig(:apis, :reddit, :subreddits))
     end

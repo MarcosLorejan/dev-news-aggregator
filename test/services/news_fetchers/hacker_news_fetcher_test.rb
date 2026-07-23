@@ -64,6 +64,66 @@ class NewsFetchers::HackerNewsFetcherTest < ActiveSupport::TestCase
     end
   end
 
+  test "fetch_articles fetches story items concurrently" do
+    story_ids = [ 88_101, 88_102, 88_103 ]
+    stories = story_ids.map do |id|
+      {
+        "id" => id,
+        "type" => "story",
+        "title" => "HN Story #{id}",
+        "url" => "https://example.com/#{id}",
+        "time" => 1_700_000_000,
+        "score" => 1,
+        "descendants" => 0
+      }
+    end
+
+    with_stubbed_get(NewsFetchers::HackerNewsFetcher, lambda { |path, **_options|
+      return story_ids if path == "/topstories.json"
+
+      if (match = path.match(%r{\A/item/(\d+)\.json\z}))
+        sleep 0.2
+        stories.find { |story| story["id"] == match[1].to_i }
+      end
+    }) do
+      start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      articles = @fetcher.fetch_articles
+      elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
+
+      assert_equal 3, articles.length
+      assert_operator elapsed, :<, 0.5, "expected parallel item fetch (~0.2s), took #{elapsed.round(2)}s"
+    end
+  end
+
+  test "fetch_articles continues when one story item fails" do
+    good_story = {
+      "id" => 88_201,
+      "type" => "story",
+      "title" => "Good HN Story",
+      "url" => "https://example.com/good",
+      "time" => 1_700_000_000,
+      "score" => 5,
+      "descendants" => 1
+    }
+
+    with_stubbed_get(NewsFetchers::HackerNewsFetcher, lambda { |path, **_options|
+      case path
+      when "/topstories.json"
+        [ 88_201, 88_202 ]
+      when "/item/88201.json"
+        good_story
+      when "/item/88202.json"
+        raise NewsFetchers::BaseFetcher::FetchError, "HTTP 500 for item"
+      end
+    }) do
+      assert_difference "Article.count", 1 do
+        articles = @fetcher.fetch_articles
+        assert_equal 1, articles.length
+        assert_equal "Good HN Story", articles.first.title
+      end
+    end
+  end
+
   private
 
   def with_stubbed_get(fetcher_class, implementation)
