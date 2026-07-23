@@ -41,12 +41,11 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
     assert_not @bookmarked_article.reload.read?
   end
 
-  test "should mark article as read from article detail page" do
+  test "should auto-mark article as read when opening article detail page" do
     visit_article_show(@article)
 
-    click_button "Mark as Read"
-
-    sleep 0.5
+    assert_button "Mark as Unread", wait: 5
+    assert_no_button "Mark as Read"
     assert @article.reload.read?
   end
 
@@ -78,11 +77,12 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
     assert_no_button "Mark as Read"
   end
 
-  test "should show correct button state on article detail page for unread article" do
+  test "should show unread article as read after auto-mark on detail page" do
     visit_article_show(@article)
 
-    assert_button "Mark as Read"
-    assert_no_button "Mark as Unread"
+    assert_button "Mark as Unread", wait: 5
+    assert_no_button "Mark as Read"
+    assert_selector "span", text: "Already Read"
   end
 
   test "should show correct button state on bookmark page for read article" do
@@ -151,16 +151,14 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
     @article.unbookmark! if @article.bookmarked?
     @article.unmark_as_read! if @article.read?
 
-    # Visit article detail and bookmark it
+    # Visit article detail — auto-marks as read — then bookmark it
     visit_article_show(@article)
+    assert_button "Mark as Unread", wait: 5
+    assert @article.reload.read?
+
     click_button "Add to Reading List"
     sleep 0.5
     assert @article.reload.bookmarked?
-
-    # Mark as read from same page
-    click_button "Mark as Read"
-    sleep 0.5
-    assert @article.reload.read?
 
     # Refresh page to see updated status
     visit_article_show(@article)
@@ -171,14 +169,14 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
   end
 
   test "should handle multiple articles workflow" do
-    # Mark multiple articles as read
+    # Opening detail pages auto-marks articles as read
     visit_article_show(@article)
-    click_button "Mark as Read"
-    sleep 0.5
+    assert_button "Mark as Unread", wait: 5
+    assert @article.reload.read?
 
     visit_article_show(@bookmarked_article)
-    click_button "Mark as Read"
-    sleep 0.5
+    assert_button "Mark as Unread", wait: 5
+    assert @bookmarked_article.reload.read?
 
     # Visit already read section
     visit_read_articles_index
