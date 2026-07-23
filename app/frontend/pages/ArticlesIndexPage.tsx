@@ -64,7 +64,10 @@ export default function ArticlesIndexPage() {
   const pendingDismissRef = useRef<{ articleId: number; title: string } | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const toastRef = useRef(toast)
-  toastRef.current = toast
+
+  useEffect(() => {
+    toastRef.current = toast
+  }, [toast])
 
   const loadArticles = useCallback(async (options?: { page?: number }) => {
     abortRef.current?.abort()
