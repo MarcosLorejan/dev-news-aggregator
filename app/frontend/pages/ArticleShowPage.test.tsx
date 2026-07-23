@@ -58,6 +58,41 @@ describe('ArticleShowPage', () => {
     )
   })
 
+  it('auto-marks the article as read when opened if unread', async () => {
+    renderPage()
+    await waitForArticleShow()
+
+    await waitFor(() => {
+      expect(articlesApi.markArticleAsRead).toHaveBeenCalledWith(1)
+    })
+    expect(screen.getByText('Already Read')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mark as Unread' })).toBeInTheDocument()
+  })
+
+  it('does not auto-mark when the article is already read', async () => {
+    vi.mocked(articlesApi.fetchArticle).mockResolvedValue(buildArticle({ read: true }))
+
+    renderPage()
+    await waitForArticleShow()
+
+    expect(screen.getByText('Already Read')).toBeInTheDocument()
+    expect(articlesApi.markArticleAsRead).not.toHaveBeenCalled()
+  })
+
+  it('keeps the article visible when auto-mark as read fails', async () => {
+    vi.mocked(articlesApi.markArticleAsRead).mockRejectedValue(new Error('fail'))
+
+    renderPage()
+    await waitForArticleShow()
+
+    await waitFor(() => {
+      expect(articlesApi.markArticleAsRead).toHaveBeenCalledWith(1)
+    })
+    expect(screen.getByRole('heading', { name: 'Rust 2024 Edition Highlights' })).toBeInTheDocument()
+    expect(screen.queryByText('Already Read')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mark as Read' })).toBeInTheDocument()
+  })
+
   it('shows not found when the article cannot be loaded', async () => {
     vi.mocked(articlesApi.fetchArticle).mockRejectedValue(new Error('missing'))
 
@@ -73,12 +108,10 @@ describe('ArticleShowPage', () => {
     expect(articlesApi.fetchArticle).not.toHaveBeenCalled()
   })
 
-  it('marks the article as read and unread', async () => {
+  it('allows marking the article as unread after auto-mark', async () => {
     const user = userEvent.setup()
     renderPage()
     await waitForArticleShow()
-
-    await user.click(screen.getByRole('button', { name: 'Mark as Read' }))
 
     await waitFor(() => {
       expect(articlesApi.markArticleAsRead).toHaveBeenCalledWith(1)
