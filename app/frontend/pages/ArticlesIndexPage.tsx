@@ -428,15 +428,3 @@ export default function ArticlesIndexPage() {
     </div>
   )
 }
-
-declare global {
-  interface Window {
-    initializeCategoryFilter?: () => void
-  }
-}
-
-if (typeof window !== 'undefined') {
-  window.initializeCategoryFilter = () => {
-    // React manages filter state; no-op keeps legacy system tests from failing.
-  }
-}

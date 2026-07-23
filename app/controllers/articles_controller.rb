@@ -87,7 +87,6 @@ class ArticlesController < ApplicationController
     MakeDismissalPermanentJob.set(wait: 15.seconds).perform_later(dismissed.id)
 
     respond_to do |format|
-      format.turbo_stream
       format.json { render json: { status: "dismissed", timeout: 15 } }
       format.html { redirect_back(fallback_location: articles_path) }
     end

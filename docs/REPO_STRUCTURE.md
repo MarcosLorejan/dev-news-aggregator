@@ -1,8 +1,8 @@
-# Repository Structure
+﻿# Repository Structure
 
-Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
+Living map of this codebase. **Keep this file in sync with the repo** ÔÇö see [Maintenance](#maintenance) below.
 
-Last updated: 2026-07-14
+Last updated: 2026-07-22
 
 ## Maintenance
 
@@ -31,35 +31,34 @@ Rails 8 news aggregator with a React (Vite) frontend, PostgreSQL, and scheduled 
 
 ```
 dev-news-aggregator/
-├── app/                    # Application code (MVC, services, jobs, frontend)
-├── bin/                    # Executables (rails, validate, dev, jobs, rubocop, brakeman, …)
-├── config/                 # Rails and app configuration
-├── db/                     # Migrations, schema, seeds
-├── docs/                   # Project documentation
-├── lib/                    # Rake tasks and non-autoloaded code
-├── public/                 # Static assets and error pages
-├── test/                   # Minitest suite (models, controllers, system, integration)
-├── .github/                # CI/CD and Dependabot
-├── docker-compose.yml      # Local PostgreSQL
-├── Dockerfile              # Container build
-├── Gemfile                 # Ruby dependencies
-├── package.json            # Node dependencies (Vite, React)
-└── vite.config.ts          # Vite bundler config
+Ôö£ÔöÇÔöÇ app/                    # Application code (MVC, services, jobs, frontend)
+Ôö£ÔöÇÔöÇ bin/                    # Executables (rails, validate, dev, jobs, rubocop, brakeman, ÔÇª)
+Ôö£ÔöÇÔöÇ config/                 # Rails and app configuration
+Ôö£ÔöÇÔöÇ db/                     # Migrations, schema, seeds
+Ôö£ÔöÇÔöÇ docs/                   # Project documentation
+Ôö£ÔöÇÔöÇ lib/                    # Rake tasks and non-autoloaded code
+Ôö£ÔöÇÔöÇ public/                 # Static assets and error pages
+Ôö£ÔöÇÔöÇ test/                   # Minitest suite (models, controllers, system, integration)
+Ôö£ÔöÇÔöÇ .github/                # CI/CD and Dependabot
+Ôö£ÔöÇÔöÇ docker-compose.yml      # Local PostgreSQL
+Ôö£ÔöÇÔöÇ Dockerfile              # Container build
+Ôö£ÔöÇÔöÇ Gemfile                 # Ruby dependencies
+Ôö£ÔöÇÔöÇ package.json            # Node dependencies (Vite, React)
+ÔööÔöÇÔöÇ vite.config.ts          # Vite bundler config
 ```
 
 ## `app/`
 
 | Path | Purpose |
 |------|---------|
-| `app/controllers/` | HTTP layer — articles, bookmarks, read/dismissed lists |
+| `app/controllers/` | HTTP layer ÔÇö articles, bookmarks, read/dismissed lists |
 | `app/models/` | ActiveRecord models |
-| `app/services/` | Business logic — news aggregation orchestration |
+| `app/services/` | Business logic ÔÇö news aggregation orchestration |
 | `app/services/news_fetchers/` | Per-source API fetchers (HN, Dev.to, Reddit) |
 | `app/jobs/` | Background jobs (e.g. permanent dismissal) |
 | `app/helpers/` | View helpers (categories, formatting) |
 | `app/views/` | ERB templates |
 | `app/frontend/` | React app (Vite entrypoint + components) |
-| `app/javascript/` | Stimulus controllers and legacy JS hooks |
 | `app/assets/stylesheets/` | CSS |
 | `app/mailers/` | Action Mailer base |
 
@@ -81,7 +80,7 @@ dev-news-aggregator/
 | `read_article.rb` | `read_articles` | Article marked as read |
 | `dismissed_article.rb` | `dismissed_articles` | Article hidden from feed |
 | `news_source.rb` | `news_sources` | Optional DB-backed source registry; overrides YAML defaults when enabled |
-| `news_aggregator_config.rb` | — | Loads `config/news_aggregator.yml` (limits, retention, subreddits) |
+| `news_aggregator_config.rb` | ÔÇö | Loads `config/news_aggregator.yml` (limits, retention, subreddits) |
 | `fetch_run.rb` | `fetch_runs` | Latest per-source news fetch outcome (status, duration, errors) |
 
 ### Services
@@ -90,7 +89,7 @@ dev-news-aggregator/
 |------|---------|
 | `news_fetch_observability.rb` | Structured JSON logging for fetch outcomes |
 | `news_aggregator_service.rb` | Runs all fetchers, handles errors, aggregates results |
-| `news_fetchers/base_fetcher.rb` | Abstract fetcher — fetch, transform, upsert article |
+| `news_fetchers/base_fetcher.rb` | Abstract fetcher ÔÇö fetch, transform, upsert article |
 | `news_fetchers/hacker_news_fetcher.rb` | Hacker News Firebase API |
 | `news_fetchers/dev_to_fetcher.rb` | Dev.to REST API |
 | `news_fetchers/reddit_fetcher.rb` | Reddit API (one instance per subreddit) |
@@ -170,7 +169,7 @@ dev-news-aggregator/
 | File | Purpose |
 |------|---------|
 | `DEVELOPMENT.md` | Commands, architecture, coding and git conventions |
-| `REPO_STRUCTURE.md` | This file — directory map and maintenance rules |
+| `REPO_STRUCTURE.md` | This file ÔÇö directory map and maintenance rules |
 | `PRE_COMMIT_HOOKS.md` | Overcommit setup and usage |
 | `REACT_SETUP.md` | React/Vite frontend setup |
 
@@ -212,10 +211,10 @@ dev-news-aggregator/
 
 Agents should start here, then use this file as the navigation map:
 
-1. [AGENTS.md](../AGENTS.md) — work rules and verification (`bin/validate`)
-2. [CONTRIBUTING.md](../CONTRIBUTING.md) — PR workflow
-3. [DEVELOPMENT.md](DEVELOPMENT.md) — setup, commands, conventions
-4. This file — directory and entry-point map
+1. [AGENTS.md](../AGENTS.md) ÔÇö work rules and verification (`bin/validate`)
+2. [CONTRIBUTING.md](../CONTRIBUTING.md) ÔÇö PR workflow
+3. [DEVELOPMENT.md](DEVELOPMENT.md) ÔÇö setup, commands, conventions
+4. This file ÔÇö directory and entry-point map
 
 ## Routes (summary)
 
