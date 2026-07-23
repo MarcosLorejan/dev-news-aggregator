@@ -42,6 +42,16 @@ export default function ArticleShowPage() {
     try {
       const response = await fetchArticle(articleId)
       setArticle(response)
+
+      if (!response.read) {
+        void markArticleAsRead(response.id)
+          .then(() => {
+            setArticle((prev) =>
+              prev && prev.id === response.id ? { ...prev, read: true } : prev
+            )
+          })
+          .catch(() => {})
+      }
     } catch {
       setArticle(null)
       setError('Article not found.')
