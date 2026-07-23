@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_10_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_22_233009) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -27,6 +27,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_10_180000) do
     t.string "url"
     t.index ["external_id", "source_type"], name: "index_articles_on_external_id_and_source_type", unique: true
     t.index ["published_at"], name: "index_articles_on_published_at"
+    t.index ["score", "published_at"], name: "index_articles_on_score_and_published_at", order: { score: :desc, published_at: :desc }
     t.index ["source_type"], name: "index_articles_on_source_type"
   end
 
