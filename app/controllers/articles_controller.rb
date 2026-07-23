@@ -123,11 +123,14 @@ class ArticlesController < ApplicationController
       scope.where("score >= ?", params[:min_score].to_i)
     elsif params[:top_percent].present?
       percent = params[:top_percent].to_i.clamp(1, 100)
-      scores = scope.where.not(score: nil).order(score: :desc).pluck(:score)
-      return scope if scores.empty?
+      scored = scope.where.not(score: nil)
+      count = scored.count
+      return scope if count.zero?
 
-      index = [ (scores.size * percent / 100.0).ceil - 1, 0 ].max
-      scope.where("score >= ?", scores[index])
+      # Same discrete threshold as former pluck + index: top N scores by OFFSET.
+      index = [ (count * percent / 100.0).ceil - 1, 0 ].max
+      threshold = scored.order(score: :desc).offset(index).limit(1).pick(:score)
+      scope.where("score >= ?", threshold)
     else
       scope
     end
