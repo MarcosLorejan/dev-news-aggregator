@@ -32,6 +32,11 @@ class NewsSource < ApplicationRecord
     config["subreddit"]
   end
 
+  # Matches NewsFetchers::*#source_key used by FetchRun rows.
+  def source_key
+    source_type == "reddit" ? "reddit_#{subreddit}" : source_type
+  end
+
   def build_fetcher
     case source_type
     when "hacker_news"

@@ -59,16 +59,34 @@ class SourcesController < ApplicationController
   end
 
   def sources_json
-    NewsSource.order(:source_type, :name).map { |source| source_json(source) }
+    sources = NewsSource.order(:source_type, :name).to_a
+    runs_by_key = FetchRun.where(source_key: sources.map(&:source_key)).index_by(&:source_key)
+    sources.map { |source| source_json(source, runs_by_key[source.source_key]) }
   end
 
-  def source_json(source)
+  def source_json(source, fetch_run = nil)
+    fetch_run ||= FetchRun.find_by(source_key: source.source_key)
+
     {
       id: source.id,
       name: source.name,
       source_type: source.source_type,
       subreddit: source.subreddit,
-      active: source.active
+      active: source.active,
+      last_fetch: last_fetch_json(fetch_run)
+    }
+  end
+
+  def last_fetch_json(fetch_run)
+    return nil unless fetch_run
+
+    {
+      status: fetch_run.status,
+      finished_at: fetch_run.finished_at,
+      articles_count: fetch_run.articles_count,
+      duration_seconds: fetch_run.duration_seconds,
+      error_class: fetch_run.error_class,
+      error_message: fetch_run.error_message
     }
   end
 end

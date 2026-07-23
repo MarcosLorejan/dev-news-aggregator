@@ -66,6 +66,55 @@ describe('SourcesIndexPage', () => {
     expect(screen.getByTestId('source-toggle-dev_to')).not.toBeChecked()
   })
 
+  it('shows last fetch status badges and failure messages', async () => {
+    vi.mocked(sourcesApi.fetchSources).mockResolvedValue(
+      buildSourcesIndexResponse({
+        sources: [
+          buildNewsSource({
+            last_fetch: {
+              status: 'success',
+              finished_at: new Date(Date.now() - 5 * 60_000).toISOString(),
+              articles_count: 10,
+              duration_seconds: 1.2,
+              error_class: null,
+              error_message: null,
+            },
+          }),
+          buildNewsSource({
+            id: 2,
+            name: 'DEV.to',
+            source_type: 'dev_to',
+            active: false,
+            last_fetch: null,
+          }),
+          buildNewsSource({
+            id: 3,
+            name: 'rust',
+            source_type: 'reddit',
+            subreddit: 'rust',
+            active: true,
+            last_fetch: {
+              status: 'failure',
+              finished_at: new Date(Date.now() - 60_000).toISOString(),
+              articles_count: 0,
+              duration_seconds: 0.4,
+              error_class: 'StandardError',
+              error_message: 'rate limited',
+            },
+          }),
+        ],
+      })
+    )
+
+    renderPage()
+    await waitForSourcesPage()
+
+    expect(screen.getByText('Ok')).toBeInTheDocument()
+    expect(screen.getByText('Error')).toBeInTheDocument()
+    expect(screen.getByText('Never fetched')).toBeInTheDocument()
+    expect(screen.getByTestId('source-fetch-error')).toHaveTextContent('rate limited')
+  })
+
   it('shows an error when sources fail to load', async () => {
     vi.mocked(sourcesApi.fetchSources).mockRejectedValue(new Error('network'))
 
