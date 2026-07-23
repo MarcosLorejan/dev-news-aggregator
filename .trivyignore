@@ -1,4 +1,24 @@
 # Baselined container CVEs for Trivy (CI `docker_scan`).
-# Add CVE IDs here only with a short reason and follow-up plan.
-# Example:
-# CVE-2024-0000  # waiting on upstream ruby slim rebuild
+# Add CVE IDs only with a short reason and follow-up plan.
+#
+# These advisories hit default gems shipped inside ruby:3.2.3-slim.
+# Runtime uses newer versions from Gemfile.lock via Bundler; remove these
+# entries when upgrading Ruby (#144) and re-run docker_scan.
+
+# erb (default 4.0.2 in Ruby 3.2.3 image)
+CVE-2026-41316
+
+# net-imap (default 0.3.4.1 in Ruby 3.2.3 image)
+CVE-2026-42257
+CVE-2026-42245
+CVE-2026-42246
+CVE-2026-42258
+
+# rexml (default 3.2.5 in Ruby 3.2.3 image)
+CVE-2024-49761
+
+# uri (default 0.12.2 in Ruby 3.2.3 image)
+CVE-2025-61594
+
+# zlib (default 3.0.0 in Ruby 3.2.3 image)
+CVE-2026-27820
