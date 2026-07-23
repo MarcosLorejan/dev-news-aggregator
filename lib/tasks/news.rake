@@ -48,7 +48,10 @@ namespace :news do
     cutoff = retention_days.days.ago
     old_articles = Article.where("published_at < ?", cutoff)
     count = old_articles.count
-    old_articles.destroy_all
+    # Destroy in batches so dependents run callbacks without loading the full set.
+    old_articles.in_batches(of: 500) do |batch|
+      batch.destroy_all
+    end
     puts "Removed #{count} articles older than #{retention_days} days (before #{cutoff.to_date})"
   end
 end
