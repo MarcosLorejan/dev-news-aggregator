@@ -7,6 +7,7 @@ export function fetchArticles(params?: {
   show_read?: boolean
   category?: string
   q?: string
+  sort?: string
   min_score?: number
   top_percent?: number
   signal?: AbortSignal
@@ -17,6 +18,7 @@ export function fetchArticles(params?: {
   if (params?.show_read) search.set('show_read', 'true')
   if (params?.category && params.category !== 'all') search.set('category', params.category)
   if (params?.q?.trim()) search.set('q', params.q.trim())
+  if (params?.sort && params.sort !== 'published_at') search.set('sort', params.sort)
   if (params?.min_score) search.set('min_score', String(params.min_score))
   if (params?.top_percent) search.set('top_percent', String(params.top_percent))
 

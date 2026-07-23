@@ -3,6 +3,12 @@ class ArticlesController < ApplicationController
 
   FETCH_RATE_LIMIT = 2.minutes
 
+  ALLOWED_SORTS = {
+    "published_at" => { published_at: :desc },
+    "score" => Arel.sql("score DESC NULLS LAST, published_at DESC"),
+    "comment_count" => Arel.sql("comment_count DESC NULLS LAST, published_at DESC")
+  }.freeze
+
   def index
     @show_read = params[:show_read] == "true"
     page, per_page = pagination_params
@@ -114,8 +120,12 @@ class ArticlesController < ApplicationController
     scope = apply_score_filter(scope)
     scope = scope.search(params[:q])
     scope = helpers.apply_category_filter(scope, params[:category]) if apply_category
-    scope.includes(:bookmark, :read_article, :dismissed_article)
-         .order(published_at: :desc)
+    apply_sort(scope.includes(:bookmark, :read_article, :dismissed_article))
+  end
+
+  def apply_sort(scope)
+    key = params[:sort].presence_in(ALLOWED_SORTS.keys) || "published_at"
+    scope.order(ALLOWED_SORTS[key])
   end
 
   def apply_score_filter(scope)

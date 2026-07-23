@@ -132,6 +132,30 @@ describe('ArticlesIndexPage dismiss flow', () => {
     expect(screen.getByTestId('article-search-input')).toHaveValue('Rust')
   })
 
+  it('requests sorted articles when sort is in the URL', async () => {
+    renderPage(['/articles?sort=score'])
+
+    await waitForArticlesFeed()
+    expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+      expect.objectContaining({ sort: 'score' })
+    )
+    expect(screen.getByRole('button', { name: 'Highest score' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('updates sort via the sort control', async () => {
+    const user = userEvent.setup()
+    renderPage()
+
+    await waitForArticlesFeed()
+    await user.click(screen.getByRole('button', { name: 'Most comments' }))
+
+    await waitFor(() => {
+      expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+        expect.objectContaining({ sort: 'comment_count' })
+      )
+    })
+  })
+
   it('shows an empty search state when no articles match', async () => {
     vi.mocked(articlesApi.fetchArticles).mockResolvedValue(
       buildArticlesIndexResponse({
