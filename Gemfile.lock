@@ -419,5 +419,8 @@ DEPENDENCIES
   webmock
   whenever (~> 1.1)
 
+RUBY VERSION
+   ruby 3.3.12p0
+
 BUNDLED WITH
    2.4.19

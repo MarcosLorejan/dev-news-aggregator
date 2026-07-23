@@ -6,6 +6,12 @@ For the directory map, see [REPO_STRUCTURE.md](REPO_STRUCTURE.md). **Update that
 
 ## Development commands
 
+### Prerequisites
+
+- Ruby matching `.ruby-version` (currently 3.3.12) and Bundler
+- Node.js 20+ and npm
+- Docker Compose (PostgreSQL) or a local Postgres 15 instance
+
 ### Setup & database
 
 ```bash

@@ -4,8 +4,9 @@ This project now uses React with Vite for the frontend.
 
 ## Prerequisites
 
-- Node.js 18+ and npm
-- Ruby and Bundler
+- Ruby 3.3.x (see `.ruby-version`) and Bundler
+- Node.js 20+ and npm
+- Docker (for local PostgreSQL) or PostgreSQL 15+
 
 ## Installation
 

@@ -271,8 +271,7 @@ jobs:
           ignore-unfixed: true
           severity: CRITICAL,HIGH
           scanners: vuln
-          # OS/kernel CVEs track the Debian/Ruby base image; gate on gems/npm we control.
-          # Revisit OS scanning when upgrading Ruby (#144).
+          # OS/kernel CVEs track the Debian base image; gate on gems/npm we control.
           vuln-type: library
           trivyignores: .trivyignore
 

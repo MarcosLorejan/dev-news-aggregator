@@ -1,9 +1,4 @@
 {
-  "ignored_warnings": [
-    {
-      "fingerprint": "edf687f759ec9765bd5db185dbc615c80af77d6e7e19386fc42934e7a80307af",
-      "note": "Tracked in #144 (Ruby upgrade from EOL 3.2.3). Keep baselined until that lands."
-    }
-  ],
+  "ignored_warnings": [],
   "brakeman_version": "8.0.5"
 }

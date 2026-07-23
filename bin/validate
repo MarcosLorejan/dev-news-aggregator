@@ -59,7 +59,7 @@ run_check "RuboCop" bundle exec rubocop -f github
 if "$fast"; then
   skip_check "Brakeman"
 else
-  run_check "Brakeman" bundle exec brakeman --no-pager --no-exit-on-warn
+  run_check "Brakeman" bundle exec brakeman --no-pager
 fi
 
 run_check "TypeScript typecheck" npm run typecheck
