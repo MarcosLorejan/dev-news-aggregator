@@ -14,6 +14,15 @@ class Article < ApplicationRecord
   scope :not_dismissed, -> { left_joins(:dismissed_article).where("dismissed_articles.id IS NULL OR dismissed_articles.permanent = false") }
   scope :dismissed, -> { joins(:dismissed_article).where(dismissed_articles: { permanent: true }) }
   scope :pending_dismissal, -> { joins(:dismissed_article).where(dismissed_articles: { permanent: false }) }
+  scope :search, ->(query) {
+    q = query.to_s.strip
+    if q.blank?
+      all
+    else
+      pattern = "%#{sanitize_sql_like(q)}%"
+      where("title ILIKE :q OR COALESCE(description, '') ILIKE :q", q: pattern)
+    end
+  }
 
   def bookmarked?
     bookmark.present?

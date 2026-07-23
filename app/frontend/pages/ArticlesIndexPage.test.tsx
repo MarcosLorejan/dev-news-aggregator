@@ -109,6 +109,57 @@ describe('ArticlesIndexPage dismiss flow', () => {
     })
   })
 
+  it('requests search results when q is in the URL', async () => {
+    const filtered = buildArticlesIndexResponse({
+      articles: [buildArticle()],
+      articles_by_category: { 'Programming Languages': [1] },
+      category_counts: { 'Programming Languages': 1 },
+      pagination: {
+        current_page: 1,
+        per_page: 20,
+        total_count: 1,
+        total_pages: 1,
+      },
+    })
+    vi.mocked(articlesApi.fetchArticles).mockResolvedValue(filtered)
+
+    renderPage(['/articles?q=Rust'])
+
+    await waitForArticlesFeed()
+    expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+      expect.objectContaining({ q: 'Rust' })
+    )
+    expect(screen.getByTestId('article-search-input')).toHaveValue('Rust')
+  })
+
+  it('shows an empty search state when no articles match', async () => {
+    vi.mocked(articlesApi.fetchArticles).mockResolvedValue(
+      buildArticlesIndexResponse({
+        articles: [],
+        articles_by_category: {},
+        category_counts: {},
+        pagination: {
+          current_page: 1,
+          per_page: 20,
+          total_count: 0,
+          total_pages: 0,
+        },
+      })
+    )
+
+    renderPage(['/articles?q=zzzz-no-match'])
+
+    await screen.findByTestId('articles-page')
+    await waitFor(() => {
+      expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+        expect.objectContaining({ q: 'zzzz-no-match' })
+      )
+    })
+    expect(screen.getByText('No articles match your search')).toBeInTheDocument()
+    expect(screen.queryByText('Your feed is empty')).not.toBeInTheDocument()
+    expect(screen.getByTestId('article-search-input')).toHaveValue('zzzz-no-match')
+  })
+
   it('counts down dismiss toast and removes article after timeout', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true })
     const user = userEvent.setup()

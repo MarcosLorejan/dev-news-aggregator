@@ -331,4 +331,34 @@ class ArticleTest < ActiveSupport::TestCase
     assert_not article.valid?
     assert_includes article.errors[:url], "is invalid"
   end
+
+  test "search returns all articles when query is blank" do
+    assert_equal Article.count, Article.search("").count
+    assert_equal Article.count, Article.search("   ").count
+    assert_equal Article.count, Article.search(nil).count
+  end
+
+  test "search matches title and description case-insensitively" do
+    titles = Article.search("rust").pluck(:title)
+    assert_includes titles, articles(:reddit_rust_article).title
+    assert_not_includes titles, articles(:hacker_news_article).title
+
+    titles = Article.search("cleaner").pluck(:title)
+    assert_includes titles, articles(:dev_to_article).title
+  end
+
+  test "search escapes LIKE wildcards in the query" do
+    Article.create!(
+      title: "100% coverage tips",
+      url: "https://example.com/coverage",
+      external_id: "coverage-percent",
+      source_type: "hacker_news",
+      published_at: Time.current,
+      description: "literal percent"
+    )
+
+    titles = Article.search("100%").pluck(:title)
+    assert_includes titles, "100% coverage tips"
+    assert_equal 1, titles.size
+  end
 end
