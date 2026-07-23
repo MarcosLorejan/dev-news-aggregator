@@ -5,8 +5,10 @@ import {
   removeSource,
   updateSource,
   type NewsSource,
+  type SourceLastFetch,
 } from '../api/sources'
 import { useConfirmDialog } from '../hooks/useConfirmDialog'
+import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import PageContainer from '../components/ui/PageContainer'
@@ -14,12 +16,43 @@ import Breadcrumbs from '../components/Breadcrumbs'
 import { sourcesBreadcrumbs } from '../components/breadcrumbTrails'
 import SourcesIndexSkeleton from '../components/SourcesIndexSkeleton'
 import PageHeading from '../components/ui/PageHeading'
+import { formatTimeAgo } from '../utils/format'
 
 function sourceLabel(source: NewsSource): string {
   if (source.source_type === 'reddit') {
     return `r/${source.subreddit ?? source.name}`
   }
   return source.name
+}
+
+function SourceFetchStatus({ lastFetch }: { lastFetch: SourceLastFetch | null }) {
+  if (!lastFetch) {
+    return (
+      <p className="text-caption text-gray-500 mt-1" data-testid="source-fetch-status">
+        Never fetched
+      </p>
+    )
+  }
+
+  const ok = lastFetch.status === 'success'
+
+  return (
+    <div className="mt-1 space-y-1" data-testid="source-fetch-status">
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge variant={ok ? 'green' : 'red'} size="sm">
+          {ok ? 'Ok' : 'Error'}
+        </Badge>
+        <span className="text-caption text-gray-500">
+          Last fetch {formatTimeAgo(lastFetch.finished_at)}
+        </span>
+      </div>
+      {!ok && lastFetch.error_message && (
+        <p className="text-caption text-red-400" data-testid="source-fetch-error">
+          {lastFetch.error_message}
+        </p>
+      )}
+    </div>
+  )
 }
 
 export default function SourcesIndexPage() {
@@ -116,9 +149,12 @@ export default function SourcesIndexPage() {
         <h2 className="text-h3 text-gray-200 mb-4">Built-in sources</h2>
         <div className="space-y-3">
           {fixedSources.map((source) => (
-            <div key={source.id} className="flex items-center justify-between py-3 border-b border-dark-700 last:border-0">
-              <span className="text-gray-200 font-medium">{sourceLabel(source)}</span>
-              <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
+            <div key={source.id} className="flex items-center justify-between gap-4 py-3 border-b border-dark-700 last:border-0">
+              <div className="min-w-0">
+                <span className="text-gray-200 font-medium">{sourceLabel(source)}</span>
+                <SourceFetchStatus lastFetch={source.last_fetch} />
+              </div>
+              <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer shrink-0">
                 <input
                   type="checkbox"
                   className="rounded border-dark-600 bg-dark-800 text-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
@@ -156,9 +192,12 @@ export default function SourcesIndexPage() {
 
         <div className="space-y-3">
           {redditSources.map((source) => (
-            <div key={source.id} className="flex items-center justify-between py-3 border-b border-dark-700 last:border-0">
-              <span className="text-gray-200">r/{source.subreddit ?? source.name}</span>
-              <div className="flex items-center gap-4">
+            <div key={source.id} className="flex items-center justify-between gap-4 py-3 border-b border-dark-700 last:border-0">
+              <div className="min-w-0">
+                <span className="text-gray-200">r/{source.subreddit ?? source.name}</span>
+                <SourceFetchStatus lastFetch={source.last_fetch} />
+              </div>
+              <div className="flex items-center gap-4 shrink-0">
                 <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
                   <input
                     type="checkbox"

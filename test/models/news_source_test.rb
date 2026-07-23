@@ -24,6 +24,12 @@ class NewsSourceTest < ActiveSupport::TestCase
     assert_equal "rust", fetcher.instance_variable_get(:@subreddit)
   end
 
+  test "source_key matches fetcher keys" do
+    assert_equal "hacker_news", news_sources(:hacker_news).source_key
+    assert_equal "dev_to", news_sources(:dev_to).source_key
+    assert_equal "reddit_rust", news_sources(:reddit_rust).source_key
+  end
+
   test "bootstrap_defaults creates default sources" do
     NewsSource.delete_all
     NewsSource.bootstrap_defaults!

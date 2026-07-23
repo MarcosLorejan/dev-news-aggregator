@@ -1,11 +1,21 @@
 import { apiRequest } from './client'
 
+export interface SourceLastFetch {
+  status: 'success' | 'failure'
+  finished_at: string
+  articles_count: number
+  duration_seconds: number | null
+  error_class: string | null
+  error_message: string | null
+}
+
 export interface NewsSource {
   id: number
   name: string
   source_type: 'hacker_news' | 'dev_to' | 'reddit'
   subreddit: string | null
   active: boolean
+  last_fetch: SourceLastFetch | null
 }
 
 export interface SourcesIndexResponse {

@@ -108,6 +108,7 @@ export function buildNewsSource(overrides: Partial<NewsSource> = {}): NewsSource
     source_type: 'hacker_news',
     subreddit: null,
     active: true,
+    last_fetch: null,
     ...overrides,
   }
 }

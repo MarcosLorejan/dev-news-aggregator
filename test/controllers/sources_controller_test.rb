@@ -14,6 +14,40 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
     assert json["sources"].any? { |source| source["source_type"] == "hacker_news" }
   end
 
+  test "index JSON includes last_fetch for sources with FetchRun" do
+    FetchRun.record_outcome(
+      source_key: "hacker_news",
+      status: "success",
+      articles_count: 12,
+      duration_seconds: 1.5
+    )
+
+    FetchRun.record_outcome(
+      source_key: "reddit_rust",
+      status: "failure",
+      articles_count: 0,
+      error: StandardError.new("rate limited")
+    )
+
+    get sources_url, as: :json
+    assert_response :success
+
+    sources = JSON.parse(response.body)["sources"]
+    hn = sources.find { |source| source["source_type"] == "hacker_news" }
+    rust = sources.find { |source| source["subreddit"] == "rust" }
+    never_fetched = sources.find { |source| source["source_type"] == "dev_to" }
+
+    assert_equal "success", hn["last_fetch"]["status"]
+    assert_equal 12, hn["last_fetch"]["articles_count"]
+    assert_not_nil hn["last_fetch"]["finished_at"]
+
+    assert_equal "failure", rust["last_fetch"]["status"]
+    assert_equal "rate limited", rust["last_fetch"]["error_message"]
+    assert_equal "StandardError", rust["last_fetch"]["error_class"]
+
+    assert_nil never_fetched["last_fetch"]
+  end
+
   test "should toggle source active state" do
     patch source_url(@reddit_source), params: { active: false }, as: :json
     assert_response :success
