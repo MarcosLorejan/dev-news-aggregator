@@ -176,6 +176,30 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal counts, counts.sort.reverse
   end
 
+  test "index JSON for_you boosts bookmarked source types" do
+    get articles_url(sort: "for_you"), as: :json
+    assert_response :success
+
+    ids = JSON.parse(response.body)["articles"].map { |article| article["id"] }
+    rust_index = ids.index(@rust_article.id)
+    hn_index = ids.index(@article.id)
+
+    assert rust_index, "expected rust fixture in for_you results"
+    assert hn_index, "expected hn fixture in for_you results"
+    assert_operator rust_index, :<, hn_index
+  end
+
+  test "index JSON for_you cold start falls back to published_at" do
+    Bookmark.delete_all
+    DismissedArticle.delete_all
+
+    get articles_url(sort: "for_you"), as: :json
+    assert_response :success
+
+    published_ats = JSON.parse(response.body)["articles"].map { |article| article["published_at"] }
+    assert_equal published_ats, published_ats.sort.reverse
+  end
+
   test "index JSON falls back to published_at for invalid sort" do
     get articles_url(sort: "not_a_column"), as: :json
     assert_response :success

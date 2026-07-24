@@ -2,7 +2,7 @@
 
 Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
 
-Last updated: 2026-07-22
+Last updated: 2026-07-24
 
 ## Maintenance
 
@@ -94,6 +94,7 @@ dev-news-aggregator/
 | `news_fetchers/hacker_news_fetcher.rb` | Hacker News Firebase API |
 | `news_fetchers/dev_to_fetcher.rb` | Dev.to REST API |
 | `news_fetchers/reddit_fetcher.rb` | Reddit API (one instance per subreddit) |
+| `personal_feed_ranker.rb` | For you sort — source affinity from bookmarks/dismissals |
 
 ### Jobs
 
