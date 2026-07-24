@@ -1,5 +1,6 @@
 class ArticlesController < ApplicationController
   include Pagination
+  include MutatingAuthentication
 
   FETCH_RATE_LIMIT = 2.minutes
 
@@ -8,6 +9,8 @@ class ArticlesController < ApplicationController
     "score" => Arel.sql("score DESC NULLS LAST, published_at DESC"),
     "comment_count" => Arel.sql("comment_count DESC NULLS LAST, published_at DESC")
   }.freeze
+
+  before_action :authenticate_mutation!, only: %i[fetch bookmark unbookmark dismiss undismiss]
 
   def index
     @show_read = params[:show_read] == "true"

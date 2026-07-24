@@ -1,4 +1,7 @@
 class SourcesController < ApplicationController
+  include MutatingAuthentication
+
+  before_action :authenticate_mutation!, only: %i[create update destroy]
   before_action :set_source, only: [ :update, :destroy ]
 
   def index
