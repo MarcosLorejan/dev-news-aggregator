@@ -272,7 +272,7 @@ Copy `.env.example` to `.env` before starting the stack. Docker Compose reads it
 3. Use consistent `source_type` naming pattern
 4. Update category grouping in `articles_helper.rb` if needed
 
-## Production security (CSP and hosts)
+## Production security (CSP, hosts, and rate limiting)
 
 ### Content Security Policy
 
@@ -290,6 +290,19 @@ Copy `.env.example` to `.env` before starting the stack. Docker Compose reads it
 ### Host authorization
 
 Production sets `config.hosts` from `APP_HOSTS` (comma-separated; default `app.example.com`) and excludes `/up` from host checks. Kamal injects `APP_HOSTS` in `config/deploy.yml` — keep it aligned with `proxy.host`.
+
+### Rate limiting (Rack::Attack)
+
+`config/initializers/rack_attack.rb` enables throttles in **production and test** (disabled in development). Defaults:
+
+| Rule | Scope | Limit | Notes |
+|------|--------|-------|--------|
+| Health check | `GET /up` | unlimited | Safelisted for load balancers |
+| Global | all requests / IP | 300 / 5 minutes | Soft DoS ceiling |
+| Mutations | `POST`/`PATCH`/`PUT`/`DELETE` / IP | 60 / minute | bookmark, dismiss, read, sources |
+| Fetch news | `POST /articles/fetch` | 1 / 2 minutes | Separate controller limit (unchanged) |
+
+Exceeded limits return `429` with JSON `{ "error": "Rate limit exceeded. Please try again later." }` and a `Retry-After` header. Override limits with `RACK_ATTACK_GLOBAL_LIMIT`, `RACK_ATTACK_GLOBAL_PERIOD`, `RACK_ATTACK_MUTATE_LIMIT`, and `RACK_ATTACK_MUTATE_PERIOD` (seconds).
 
 ## Coding guidelines
 

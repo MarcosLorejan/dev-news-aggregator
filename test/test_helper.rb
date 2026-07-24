@@ -57,5 +57,10 @@ module ActiveSupport
 
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
+
+    setup do
+      store = Rack::Attack.cache.store
+      store.clear if store.respond_to?(:clear)
+    end
   end
 end

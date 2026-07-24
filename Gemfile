@@ -41,6 +41,9 @@ gem "thruster", require: false
 # HTTP client for API requests
 gem "httparty", "~> 0.24"
 
+# Request throttling for public deployments
+gem "rack-attack"
+
 # Cron job scheduling
 gem "whenever", "~> 1.1"
 
