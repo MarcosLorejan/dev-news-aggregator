@@ -8,6 +8,9 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%= auto_discovery_link_tag :atom, articles_url(format: :atom), title: "Articles" %>
+    <%= auto_discovery_link_tag :atom, bookmarks_url(format: :atom), title: "Reading List" %>
+
     <%= yield :head %>
 
     <%# Enable PWA manifest for installable apps (routes are defined in config/routes.rb) %>

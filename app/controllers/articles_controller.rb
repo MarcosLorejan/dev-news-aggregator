@@ -44,6 +44,7 @@ class ArticlesController < ApplicationController
           last_updated: @last_updated
         }
       end
+      format.atom
     end
   end
 

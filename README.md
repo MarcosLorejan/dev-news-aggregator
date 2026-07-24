@@ -6,6 +6,7 @@ A Rails application that aggregates developer news from Hacker News, Dev.to, and
 
 - **Multi-source aggregation**: Fetches from 12+ sources including Hacker News, Dev.to, and programming subreddits
 - **Article bookmarking**: Save articles for later reading with category filtering  
+- **Atom feeds**: Subscribe to `/articles.atom` (main feed) and `/bookmarks.atom` (reading list)
 - **Automated updates**: Hourly fetching during business hours via cron jobs
 - **Responsive interface**: React SPA with source-based filtering and Vite HMR in development
 
