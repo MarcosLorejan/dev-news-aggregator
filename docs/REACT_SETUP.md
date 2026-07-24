@@ -41,6 +41,7 @@ On Windows, `bin/rails` does not run directly in CMD/PowerShell. Use one of:
 # Recommended: setup once, then start both servers
 .\setup-local-env.ps1
 .\dev.ps1
+# Or double-click start-app.bat
 
 # Or manually (two terminals):
 npm run dev

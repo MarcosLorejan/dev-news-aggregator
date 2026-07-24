@@ -42,11 +42,13 @@ SOLID_QUEUE_IN_PUMA=1 bin/rails server
 ```
 
 ```powershell
-# Windows: starts Vite + Rails together
+# Windows: starts Postgres (if needed), Vite + Rails, opens the browser
 .\dev.ps1
+
+# Or double-click start-app.bat in Explorer (same thing)
 ```
 
-`bin/dev` is a thin wrapper that runs **`bin/rails server` only** — it does **not** start Vite. Use it when you only need the Rails process (for example jobs already covered elsewhere); for React HMR, always use `npm run dev` + Rails, or `.\dev.ps1`.
+`bin/dev` is a thin wrapper that runs **`bin/rails server` only** — it does **not** start Vite. Use it when you only need the Rails process (for example jobs already covered elsewhere); for React HMR, always use `npm run dev` + Rails, or `.\dev.ps1` / `start-app.bat`.
 
 ```bash
 # Rails-only (no Vite / no HMR)
