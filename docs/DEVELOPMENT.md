@@ -317,6 +317,44 @@ Protected actions: article fetch/bookmark/dismiss, mark/unmark read, source crea
 
 The React client sends `Authorization: Basic …` from `sessionStorage` when set, and prompts once on a mutating `401`. For public deploys, set both env vars in Kamal secrets (`config/deploy.yml`). Alternative: terminate auth at a reverse proxy and leave app env unset.
 
+## Deployment (Kamal)
+
+CD is implemented as `.github/workflows/deploy.yml` (manual `workflow_dispatch`). The job is a no-op until you opt in — it only runs when the repository variable `KAMAL_DEPLOY_ENABLED` is `true`.
+
+### Prerequisites
+
+1. Set real values in `config/deploy.yml`: `servers.web`, `proxy.host`, and `APP_HOSTS` (must match).
+2. Server accepts SSH from the deploy key and can pull from GHCR / run Docker.
+3. Configure GitHub:
+
+| Kind | Name | Purpose |
+|------|------|---------|
+| Variable | `KAMAL_DEPLOY_ENABLED` | Set to `true` to allow the Deploy workflow |
+| Variable | `KAMAL_SERVER_HOST` | Host/IP for `ssh-keyscan` (same as `servers.web`) |
+| Secret | `SSH_PRIVATE_KEY` | Private key for the deploy user |
+| Secret | `RAILS_MASTER_KEY` | Production credentials key |
+| Secret | `MUTATING_AUTH_USERNAME` / `MUTATING_AUTH_PASSWORD` | Optional; enable mutating Basic auth |
+
+Images push to `ghcr.io/marcoslorejan/dev-news-aggregator` using `GITHUB_TOKEN`. Use a GitHub Environment named `production` for optional approval gates.
+
+### Run a deploy
+
+1. Ensure CI is green on the commit you intend to ship.
+2. Actions → **Deploy** → **Run workflow**.
+3. Locally: export registry/SSH-related env vars, then `bundle exec kamal deploy`.
+
+### Rollback
+
+```bash
+# List recent app versions on the server
+bundle exec kamal app containers
+
+# Roll back to a previous version tag
+bundle exec kamal rollback <VERSION>
+```
+
+After a bad deploy from Actions, re-run Deploy on a known-good commit, or SSH/local Kamal rollback as above.
+
 ## Coding guidelines
 
 ### General principles
