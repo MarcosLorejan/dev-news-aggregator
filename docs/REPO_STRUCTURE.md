@@ -222,8 +222,10 @@ Agents should start here, then use this file as the navigation map:
 | Path | Controller#action |
 |------|-------------------|
 | `/` | `articles#index` |
+| `/articles.atom` | `articles#index` (Atom feed; honors `q`, `category`, `sort`, score filters) |
 | `/articles/:id` | `articles#show` |
 | `/bookmarks` | `bookmarks#index` |
+| `/bookmarks.atom` | `bookmarks#index` (Atom feed) |
 | `/read` | `read_articles#index` |
 | `/dismissed` | `dismissed_articles#index` |
 | `/recently_dismissed` | `dismissed_articles#recently_dismissed` |

@@ -26,6 +26,7 @@ class BookmarksController < ApplicationController
           }
         }
       end
+      format.atom
     end
   end
 end

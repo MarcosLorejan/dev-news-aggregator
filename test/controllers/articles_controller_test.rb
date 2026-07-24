@@ -25,6 +25,37 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "#root"
     assert_select "script[type='module'][src*='application']"
+    assert_select "link[rel='alternate'][type='application/atom+xml'][href=?]", articles_url(format: :atom)
+    assert_select "link[rel='alternate'][type='application/atom+xml'][href=?]", bookmarks_url(format: :atom)
+  end
+
+  test "index Atom should return a feed of unread articles" do
+    @article.mark_as_read!
+
+    get articles_url(format: :atom)
+    assert_response :success
+    assert_includes response.media_type, "atom"
+
+    assert_select "feed"
+    assert_select "feed>title", text: "Dev News Aggregator"
+    assert_select "entry" do |entries|
+      titles = entries.map { |entry| entry.at_css("title").text }
+      assert_includes titles, @dev_to_article.title
+      assert_not_includes titles, @article.title
+    end
+    assert_select "entry>id", text: article_url(@dev_to_article)
+    assert_select "entry>link[href=?]", @dev_to_article.url
+  end
+
+  test "index Atom should respect q filter" do
+    get articles_url(format: :atom, q: "Rust")
+    assert_response :success
+
+    assert_select "entry" do |entries|
+      titles = entries.map { |entry| entry.at_css("title").text }
+      assert_includes titles, @rust_article.title
+      assert_not_includes titles, @article.title
+    end
   end
 
   test "index should expose categories in JSON" do

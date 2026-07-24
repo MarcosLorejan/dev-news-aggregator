@@ -66,4 +66,28 @@ class BookmarksControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, json_response["pagination"]["current_page"]
     assert_equal 5, json_response["pagination"]["per_page"]
   end
+
+  test "index Atom should return bookmarked articles only" do
+    get bookmarks_url(format: :atom)
+    assert_response :success
+    assert_includes response.media_type, "atom"
+
+    assert_select "feed>title", text: "Dev News Aggregator — Reading List"
+    assert_select "entry" do |entries|
+      titles = entries.map { |entry| entry.at_css("title").text }
+      assert_includes titles, @bookmarked_article.title
+      assert_not_includes titles, @unbookmarked_article.title
+    end
+    assert_select "entry>link[href=?]", @bookmarked_article.url
+  end
+
+  test "index Atom should return an empty feed when no bookmarks exist" do
+    Bookmark.destroy_all
+
+    get bookmarks_url(format: :atom)
+    assert_response :success
+
+    assert_select "feed"
+    assert_select "entry", count: 0
+  end
 end
