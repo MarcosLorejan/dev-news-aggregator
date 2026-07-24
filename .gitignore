@@ -46,6 +46,7 @@ yarn-debug.log*
 /public/vite*
 /public/builds
 node_modules
+app/frontend/.vite
 
 # Ignore .env files
 .env
