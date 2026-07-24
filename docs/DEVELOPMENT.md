@@ -304,6 +304,19 @@ Production sets `config.hosts` from `APP_HOSTS` (comma-separated; default `app.e
 
 Exceeded limits return `429` with JSON `{ "error": "Rate limit exceeded. Please try again later." }` and a `Retry-After` header. Override limits with `RACK_ATTACK_GLOBAL_LIMIT`, `RACK_ATTACK_GLOBAL_PERIOD`, `RACK_ATTACK_MUTATE_LIMIT`, and `RACK_ATTACK_MUTATE_PERIOD` (seconds).
 
+### Mutating API authentication
+
+**Decision:** ENV-gated HTTP Basic on mutating actions only. Read endpoints (`GET` articles, bookmarks, sources, etc.) stay public. No multi-user accounts.
+
+| Mode | Behavior |
+|------|----------|
+| `MUTATING_AUTH_USERNAME` + `MUTATING_AUTH_PASSWORD` unset | Mutations open (local/dev default) |
+| Both set | Mutations require HTTP Basic; missing/invalid creds → `401` JSON `{ "error": "Unauthorized" }` |
+
+Protected actions: article fetch/bookmark/dismiss, mark/unmark read, source create/update/destroy.
+
+The React client sends `Authorization: Basic …` from `sessionStorage` when set, and prompts once on a mutating `401`. For public deploys, set both env vars in Kamal secrets (`config/deploy.yml`). Alternative: terminate auth at a reverse proxy and leave app env unset.
+
 ## Coding guidelines
 
 ### General principles

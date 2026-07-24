@@ -1,5 +1,8 @@
 class ReadArticlesController < ApplicationController
   include Pagination
+  include MutatingAuthentication
+
+  before_action :authenticate_mutation!, only: %i[create destroy]
 
   def index
     page, per_page = pagination_params

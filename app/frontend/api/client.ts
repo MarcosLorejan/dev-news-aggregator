@@ -2,6 +2,8 @@ function csrfToken(): string {
   return document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? ''
 }
 
+const MUTATING_AUTH_STORAGE_KEY = 'mutatingAuthBasic'
+
 export function isAbortError(error: unknown): boolean {
   return (
     (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'AbortError') ||
@@ -9,9 +11,43 @@ export function isAbortError(error: unknown): boolean {
   )
 }
 
+export function setMutatingAuthCredentials(username: string, password: string): void {
+  sessionStorage.setItem(MUTATING_AUTH_STORAGE_KEY, btoa(`${username}:${password}`))
+}
+
+export function clearMutatingAuthCredentials(): void {
+  sessionStorage.removeItem(MUTATING_AUTH_STORAGE_KEY)
+}
+
+function mutatingAuthHeader(): string | null {
+  try {
+    return sessionStorage.getItem(MUTATING_AUTH_STORAGE_KEY)
+  } catch {
+    return null
+  }
+}
+
+function isMutatingMethod(method?: string): boolean {
+  const normalized = (method ?? 'GET').toUpperCase()
+  return normalized === 'POST' || normalized === 'PATCH' || normalized === 'PUT' || normalized === 'DELETE'
+}
+
+function promptMutatingAuth(): boolean {
+  if (typeof window === 'undefined' || typeof window.prompt !== 'function') return false
+
+  const username = window.prompt('Username required for this action:')
+  if (!username) return false
+  const password = window.prompt('Password:')
+  if (password === null) return false
+
+  setMutatingAuthCredentials(username, password)
+  return true
+}
+
 export async function apiRequest<T>(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  retryOnUnauthorized = true
 ): Promise<T> {
   const headers = new Headers(options.headers)
   headers.set('Accept', 'application/json')
@@ -21,7 +57,21 @@ export async function apiRequest<T>(
     headers.set('Content-Type', 'application/json')
   }
 
+  const basic = mutatingAuthHeader()
+  if (basic) {
+    headers.set('Authorization', `Basic ${basic}`)
+  }
+
   const response = await fetch(path, { ...options, headers })
+
+  if (
+    response.status === 401 &&
+    retryOnUnauthorized &&
+    isMutatingMethod(options.method) &&
+    promptMutatingAuth()
+  ) {
+    return apiRequest(path, options, false)
+  }
 
   if (!response.ok) {
     let message = `Request failed: ${response.status}`

@@ -1,8 +1,18 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { apiRequest, isAbortError } from './client'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  apiRequest,
+  clearMutatingAuthCredentials,
+  isAbortError,
+  setMutatingAuthCredentials,
+} from './client'
 
 describe('apiRequest', () => {
+  beforeEach(() => {
+    clearMutatingAuthCredentials()
+  })
+
   afterEach(() => {
+    clearMutatingAuthCredentials()
     vi.unstubAllGlobals()
     vi.restoreAllMocks()
   })
@@ -20,6 +30,51 @@ describe('apiRequest', () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1)
     expect(fetchMock.mock.calls[0][1].signal).toBe(controller.signal)
+  })
+
+  it('sends Basic Authorization when mutating credentials are stored', async () => {
+    setMutatingAuthCredentials('admin', 'secret')
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ bookmarked: true }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await apiRequest('/articles/1/bookmark', { method: 'POST' })
+
+    const headers = fetchMock.mock.calls[0][1].headers as Headers
+    expect(headers.get('Authorization')).toBe(`Basic ${btoa('admin:secret')}`)
+  })
+
+  it('prompts and retries once on mutating 401', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: async () => ({ error: 'Unauthorized' }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ bookmarked: true }),
+      })
+    vi.stubGlobal('fetch', fetchMock)
+    vi.stubGlobal(
+      'prompt',
+      vi
+        .fn()
+        .mockReturnValueOnce('admin')
+        .mockReturnValueOnce('secret')
+    )
+
+    await expect(apiRequest('/articles/1/bookmark', { method: 'POST' })).resolves.toEqual({
+      bookmarked: true,
+    })
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    const retryHeaders = fetchMock.mock.calls[1][1].headers as Headers
+    expect(retryHeaders.get('Authorization')).toBe(`Basic ${btoa('admin:secret')}`)
   })
 
   it('isAbortError detects AbortError', () => {
