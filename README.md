@@ -100,6 +100,10 @@ No manual intervention needed for routine security patches and minor updates!
 
 For public deployments, enable mutating API HTTP Basic via `MUTATING_AUTH_USERNAME` / `MUTATING_AUTH_PASSWORD`, plus CSP, `APP_HOSTS`, and Rack::Attack throttles. Reads stay public; mutations return `401` without credentials. Details: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#production-security-csp-hosts-and-rate-limiting).
 
+## Deploy
+
+Production deploys use Kamal via the **Deploy** GitHub Actions workflow (manual). See [Deployment (Kamal)](docs/DEVELOPMENT.md#deployment-kamal) for secrets, enable flag, and rollback.
+
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the contributor entry point, [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for development guidelines, and [docs/REPO_STRUCTURE.md](docs/REPO_STRUCTURE.md) for the repository map (keep it updated when structure changes).

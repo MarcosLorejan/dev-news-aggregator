@@ -1,0 +1,51 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: kamal-deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy:
+    name: kamal_deploy
+    runs-on: ubuntu-latest
+    environment: production
+    if: ${{ vars.KAMAL_DEPLOY_ENABLED == 'true' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Start SSH agent
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Trust deploy host
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H "${{ vars.KAMAL_SERVER_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy with Kamal
+        env:
+          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          MUTATING_AUTH_USERNAME: ${{ secrets.MUTATING_AUTH_USERNAME }}
+          MUTATING_AUTH_PASSWORD: ${{ secrets.MUTATING_AUTH_PASSWORD }}
+        run: bundle exec kamal deploy
