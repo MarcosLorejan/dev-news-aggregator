@@ -197,7 +197,8 @@ dev-news-aggregator/
 | `Gemfile` / `Gemfile.lock` | Ruby gems |
 | `package.json` / `package-lock.json` | Node packages |
 | `bin/dev` | Rails-only server wrapper (`bin/rails server`); does **not** start Vite |
-| `dev.ps1` | Windows helper that starts Vite + Rails together (full stack) |
+| `dev.ps1` | Windows helper that starts Postgres (if needed), Vite + Rails, and opens the browser |
+| `start-app.bat` | Double-click launcher for `dev.ps1` (full stack) |
 | `setup-local-env.ps1` | Windows one-time/repeat setup (bundle, npm, Postgres, `db:prepare`) |
 | `docker-compose.yml` | Local PostgreSQL container |
 | `Dockerfile` | Production/container image |
@@ -208,7 +209,7 @@ dev-news-aggregator/
 | `.prettierrc.json` / `.prettierignore` | Frontend formatting rules |
 | `tsconfig.json` | TypeScript config for frontend |
 
-**Dev entry points:** `bin/dev` = Rails only. Full stack = `npm run dev` + Rails, or `.\dev.ps1` on Windows (after `.\setup-local-env.ps1`). See [DEVELOPMENT.md](DEVELOPMENT.md) and [REACT_SETUP.md](REACT_SETUP.md).
+**Dev entry points:** `bin/dev` = Rails only. Full stack = `npm run dev` + Rails, or double-click `start-app.bat` / `.\dev.ps1` on Windows (after `.\setup-local-env.ps1`). See [DEVELOPMENT.md](DEVELOPMENT.md) and [REACT_SETUP.md](REACT_SETUP.md).
 
 ## Agent onboarding
 

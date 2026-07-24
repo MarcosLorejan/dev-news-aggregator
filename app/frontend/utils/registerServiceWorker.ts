@@ -6,8 +6,23 @@ function register(): void {
   })
 }
 
+function unregisterAll(): void {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations.forEach((registration) => {
+      registration.unregister().catch(() => {})
+    })
+  })
+}
+
 export function registerServiceWorker(): void {
   if (!('serviceWorker' in navigator)) {
+    return
+  }
+
+  // Skip (and clear) service workers in Vite/Rails development. A leftover SW
+  // from a previous session can leave a blank page while HMR assets change.
+  if (import.meta.env.DEV) {
+    unregisterAll()
     return
   }
 

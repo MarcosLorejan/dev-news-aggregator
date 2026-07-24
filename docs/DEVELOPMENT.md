@@ -42,11 +42,17 @@ SOLID_QUEUE_IN_PUMA=1 bin/rails server
 ```
 
 ```powershell
-# Windows: starts Vite + Rails together
+# Windows: starts Postgres (if needed), Vite + Rails, opens the browser
 .\dev.ps1
+
+# Or double-click start-app.bat in Explorer (same thing)
 ```
 
-`bin/dev` is a thin wrapper that runs **`bin/rails server` only** — it does **not** start Vite. Use it when you only need the Rails process (for example jobs already covered elsewhere); for React HMR, always use `npm run dev` + Rails, or `.\dev.ps1`.
+Note: on Windows, `SOLID_QUEUE_IN_PUMA` is **not** used — Solid Queue’s Puma plugin requires `fork()`, which Windows does not support. The web app still runs; background jobs (e.g. delayed dismissal cleanup) won’t process until you run workers on a Unix-like environment.
+
+Development uses `skipProxy: true` in `config/vite.json` so the browser loads Vite assets directly from port 3036. That avoids blank pages caused by Vite’s many module requests queueing behind a few Puma threads.
+
+`bin/dev` is a thin wrapper that runs **`bin/rails server` only** — it does **not** start Vite. Use it when you only need the Rails process (for example jobs already covered elsewhere); for React HMR, always use `npm run dev` + Rails, or `.\dev.ps1` / `start-app.bat`.
 
 ```bash
 # Rails-only (no Vite / no HMR)
