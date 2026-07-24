@@ -4,11 +4,13 @@ class ErrorReporting::SubscriberTest < ActiveSupport::TestCase
   setup do
     @previous_url = ENV["ERROR_WEBHOOK_URL"]
     ENV.delete("ERROR_WEBHOOK_URL")
-    Rails.cache.clear
+    @previous_cache = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
     @subscriber = ErrorReporting::Subscriber.new
   end
 
   teardown do
+    Rails.cache = @previous_cache
     if @previous_url
       ENV["ERROR_WEBHOOK_URL"] = @previous_url
     else
