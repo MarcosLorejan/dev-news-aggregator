@@ -99,6 +99,47 @@ class NewsAggregatorServiceTest < ActiveSupport::TestCase
     assert_equal "failure", FetchRun.find_by(source_key: "test_failing_fetcher").status
   end
 
+  test "fetch_all_news reports handled fetch failures to Rails.error" do
+    failing_fetcher = Object.new
+    def failing_fetcher.fetch_articles
+      raise StandardError, "API is down"
+    end
+    def failing_fetcher.source_key
+      "test_report_fetcher"
+    end
+    def failing_fetcher.class
+      OpenStruct.new(name: "TestReportFetcher")
+    end
+
+    @service.instance_variable_set(:@fetchers, [ failing_fetcher ])
+
+    recorder = Class.new do
+      attr_reader :reports
+
+      def initialize
+        @reports = []
+      end
+
+      def report(error, handled:, severity:, context:, source: nil)
+        @reports << { error: error, handled: handled, severity: severity, context: context, source: source }
+      end
+    end.new
+
+    Rails.error.subscribe(recorder)
+    begin
+      @service.fetch_all_news
+    ensure
+      Rails.error.unsubscribe(recorder)
+    end
+
+    assert_equal 1, recorder.reports.size
+    report = recorder.reports.first
+    assert_equal "news_fetch", report[:source]
+    assert_equal true, report[:handled]
+    assert_equal "test_report_fetcher", report[:context][:source_key]
+    assert_equal "API is down", report[:error].message
+  end
+
   test "class method fetch_all_news should work without live API calls" do
     mock_fetcher = Object.new
     def mock_fetcher.fetch_articles; []; end

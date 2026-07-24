@@ -54,6 +54,7 @@ dev-news-aggregator/
 | `app/controllers/` | HTTP layer — articles, bookmarks, read/dismissed lists |
 | `app/models/` | ActiveRecord models |
 | `app/services/` | Business logic — news aggregation orchestration |
+| `app/services/error_reporting/` | Rails.error subscriber + optional webhook alerts |
 | `app/services/news_fetchers/` | Per-source API fetchers (HN, Dev.to, Reddit) |
 | `app/jobs/` | Background jobs (e.g. permanent dismissal) |
 | `app/helpers/` | View helpers (categories, formatting) |

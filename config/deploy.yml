@@ -43,6 +43,9 @@ env:
     # Allowed Host headers (comma-separated). Must include proxy.host above.
     APP_HOSTS: app.example.com
 
+    # Optional error alert webhook (Slack/Discord/generic). See docs/DEVELOPMENT.md.
+    # ERROR_WEBHOOK_URL: https://hooks.example.com/services/...
+
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3
 
