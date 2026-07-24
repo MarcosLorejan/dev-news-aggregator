@@ -89,6 +89,13 @@ class NewsAggregatorService
       error: e
     )
 
+    Rails.error.report(
+      e,
+      handled: true,
+      severity: :error,
+      context: { source_key: source_key },
+      source: "news_fetch"
+    )
     Rails.logger.error e.backtrace.join("\n")
     []
   end

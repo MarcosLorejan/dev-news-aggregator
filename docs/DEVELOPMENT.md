@@ -355,6 +355,20 @@ bundle exec kamal rollback <VERSION>
 
 After a bad deploy from Actions, re-run Deploy on a known-good commit, or SSH/local Kamal rollback as above.
 
+### Error monitoring and fetch alerts
+
+Unhandled exceptions and explicit `Rails.error.report` calls are handled by `ErrorReporting::Subscriber` (`config/initializers/error_reporting.rb`):
+
+1. **Structured logs** — JSON lines with `event: "error.reported"` on stdout (visible via `bin/kamal app logs` / `kamal logs`).
+2. **Optional webhook** — set `ERROR_WEBHOOK_URL` to a Slack/Discord/generic HTTP endpoint. Posts JSON including a `text` field. Duplicate alerts for the same source + error class are suppressed for 30 minutes.
+3. **Fetch failures** — `NewsAggregatorService` reports rescued fetcher errors with `source: "news_fetch"` so they appear even though the job itself does not fail. Per-source status also remains on the Sources page (`FetchRun`).
+
+| ENV | Purpose |
+|-----|---------|
+| `ERROR_WEBHOOK_URL` | Optional alert webhook (leave unset for log-only) |
+
+No SaaS SDK is required; add Sentry later by installing the gem (it also subscribes to `Rails.error`) if you want a full dashboard.
+
 ## Coding guidelines
 
 ### General principles
