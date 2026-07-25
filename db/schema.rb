@@ -10,11 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_22_233009) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_25_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
+  create_table "article_tags", force: :cascade do |t|
+    t.bigint "article_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["article_id", "tag_id"], name: "index_article_tags_on_article_id_and_tag_id", unique: true
+    t.index ["article_id"], name: "index_article_tags_on_article_id"
+    t.index ["tag_id"], name: "index_article_tags_on_tag_id"
+  end
+
   create_table "articles", force: :cascade do |t|
+    t.string "canonical_url"
     t.integer "comment_count"
     t.datetime "created_at", null: false
     t.text "description"
@@ -25,9 +36,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_233009) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.string "url"
+    t.index ["canonical_url"], name: "index_articles_on_canonical_url"
     t.index ["external_id", "source_type"], name: "index_articles_on_external_id_and_source_type", unique: true
     t.index ["published_at"], name: "index_articles_on_published_at"
-    t.index ["score", "published_at"], name: "index_articles_on_score_and_published_at", order: { score: :desc, published_at: :desc }
+    t.index ["score", "published_at"], name: "index_articles_on_score_and_published_at", order: :desc
     t.index ["source_type"], name: "index_articles_on_source_type"
   end
 
@@ -65,6 +77,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_233009) do
     t.index ["status"], name: "index_fetch_runs_on_status"
   end
 
+  create_table "news_digests", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.string "period", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "window_end", null: false
+    t.datetime "window_start", null: false
+    t.index ["period", "window_start", "window_end"], name: "index_news_digests_on_period_and_window_start_and_window_end"
+  end
+
   create_table "news_sources", force: :cascade do |t|
     t.boolean "active", default: true
     t.string "api_url"
@@ -84,6 +106,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_233009) do
     t.index ["article_id"], name: "index_read_articles_on_article_id", unique: true
   end
 
+  create_table "tags", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_tags_on_slug", unique: true
+  end
+
+  add_foreign_key "article_tags", "articles"
+  add_foreign_key "article_tags", "tags"
   add_foreign_key "bookmarks", "articles"
   add_foreign_key "dismissed_articles", "articles"
   add_foreign_key "read_articles", "articles"
