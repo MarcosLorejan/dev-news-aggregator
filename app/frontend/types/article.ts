@@ -1,3 +1,8 @@
+export interface TopicTag {
+  slug: string
+  name: string
+}
+
 export interface Article {
   id: number
   title: string
@@ -14,6 +19,7 @@ export interface Article {
   read: boolean
   dismissed: boolean
   pending_dismissal: boolean
+  topic_tags?: TopicTag[]
 }
 
 export interface Category {
@@ -33,6 +39,7 @@ export interface ArticlesIndexResponse {
   articles_by_category: Record<string, number[]>
   category_counts: Record<string, number>
   categories: Category[]
+  topic_tags?: TopicTag[]
   pagination: Pagination
   last_updated: string | null
 }

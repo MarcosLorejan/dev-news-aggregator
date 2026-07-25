@@ -22,6 +22,7 @@ class ArticlesController < ApplicationController
     base_scope = article_index_scope
     @total_count = base_scope.unscope(:includes, :order, :select).count
     @articles = base_scope.limit(per_page).offset((page - 1) * per_page)
+    @topic_tags = Tag.order(:name).map { |tag| { slug: tag.slug, name: tag.name } }
 
     @articles_by_source = @articles.group_by(&:source_type)
     @articles_by_category = helpers.group_sources_by_category(@articles_by_source)
@@ -35,6 +36,7 @@ class ArticlesController < ApplicationController
           articles_by_category: @articles_by_category.transform_values { |articles| articles.map(&:id) },
           category_counts: @category_counts,
           categories: @category_counts.keys.map { |name| { name: name, icon: helpers.category_icon(name) } },
+          topic_tags: @topic_tags,
           pagination: {
             current_page: page,
             per_page: per_page,
@@ -123,8 +125,9 @@ class ArticlesController < ApplicationController
 
     scope = apply_score_filter(scope)
     scope = scope.search(params[:q])
+    scope = scope.with_topic_tag(params[:tag])
     scope = helpers.apply_category_filter(scope, params[:category]) if apply_category
-    apply_sort(scope.includes(:bookmark, :read_article, :dismissed_article))
+    apply_sort(scope.includes(:bookmark, :read_article, :dismissed_article, :tags))
   end
 
   def apply_sort(scope)

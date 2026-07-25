@@ -10,7 +10,8 @@ class ArticleSerializer
       bookmarked: article.bookmarked?,
       read: article.read?,
       dismissed: article.dismissed?,
-      pending_dismissal: article.pending_dismissal?
+      pending_dismissal: article.pending_dismissal?,
+      topic_tags: article.tags.map { |tag| { slug: tag.slug, name: tag.name } }
     )
   end
 

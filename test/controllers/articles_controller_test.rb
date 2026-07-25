@@ -176,6 +176,22 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal counts, counts.sort.reverse
   end
 
+  test "index JSON filters by topic tag" do
+    article = articles(:reddit_rust_article)
+    ArticleTopicClassifier.apply!(article)
+
+    get articles_url(tag: "rust"), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    ids = body["articles"].map { |row| row["id"] }
+    assert_includes ids, article.id
+    assert body["articles"].all? { |row|
+      row["topic_tags"].any? { |tag| tag["slug"] == "rust" }
+    }
+    assert body["topic_tags"].any? { |tag| tag["slug"] == "rust" }
+  end
+
   test "index JSON falls back to published_at for invalid sort" do
     get articles_url(sort: "not_a_column"), as: :json
     assert_response :success
