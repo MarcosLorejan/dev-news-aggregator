@@ -9,6 +9,13 @@ export interface ArticleCardData {
   score: number
   comment_count: number
   published_at: string
+  related_sources?: Array<{
+    id: number
+    source_type: string
+    url: string
+    title: string
+    score: number | null
+  }>
 }
 
 export type ArticleCardTheme = 'primary' | 'green' | 'red' | 'orange'

@@ -53,6 +53,37 @@ describe('ArticleCard', () => {
     expect(screen.getByRole('link', { name: /Details/i })).toHaveAttribute('href', '/articles/1')
   })
 
+  it('renders related source chips for clustered stories', () => {
+    render(
+      <MemoryRouter>
+        <ArticleCard
+          variant="feed"
+          article={{
+            ...feedArticle,
+            related_sources: [
+              {
+                id: 9,
+                source_type: 'dev_to',
+                url: 'https://example.com/rust',
+                title: 'Same story on Dev.to',
+                score: 12,
+              },
+            ],
+          }}
+          categorySlug="programming"
+          index={0}
+          isDismissing={false}
+          onDismiss={() => {}}
+          onBookmarkToggle={() => {}}
+          onReadToggle={() => {}}
+        />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByTestId('related-sources')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Dev To/i })).toHaveAttribute('href', '/articles/9')
+  })
+
   it('renders bookmark variant with bookmarked metadata', () => {
     render(
       <MemoryRouter>
