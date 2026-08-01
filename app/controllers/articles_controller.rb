@@ -63,10 +63,15 @@ class ArticlesController < ApplicationController
 
   def show
     @article = Article.includes(:bookmark, :read_article, :dismissed_article).find(params[:id])
+    @similar_articles = Article.similar_to(@article).includes(:bookmark, :read_article, :dismissed_article)
 
     respond_to do |format|
       format.html
-      format.json { render json: ArticleSerializer.as_json(@article) }
+      format.json {
+        render json: ArticleSerializer.as_json(@article).merge(
+          similar_articles: @similar_articles.map { |article| ArticleSerializer.as_json(article) }
+        )
+      }
     end
   end
 
@@ -128,6 +133,21 @@ class ArticlesController < ApplicationController
   end
 
   def apply_sort(scope)
+    if params[:q].present? && params[:sort].blank?
+      q = params[:q].to_s.strip
+      return scope.order(
+        Arel.sql(
+          Article.sanitize_sql_array(
+            [
+              "GREATEST(similarity(articles.title, ?), similarity(COALESCE(articles.description, ''), ?)) DESC, articles.published_at DESC",
+              q,
+              q
+            ]
+          )
+        )
+      )
+    end
+
     key = params[:sort].presence_in(ALLOWED_SORTS.keys) || "published_at"
     scope.order(ALLOWED_SORTS[key])
   end

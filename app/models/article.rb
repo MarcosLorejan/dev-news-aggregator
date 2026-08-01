@@ -20,9 +20,24 @@ class Article < ApplicationRecord
       all
     else
       pattern = "%#{sanitize_sql_like(q)}%"
-      where("title ILIKE :q OR COALESCE(description, '') ILIKE :q", q: pattern)
+      where(
+        "title ILIKE :pattern OR COALESCE(description, '') ILIKE :pattern OR " \
+        "similarity(title, :q) > 0.12 OR similarity(COALESCE(description, ''), :q) > 0.1",
+        pattern: pattern,
+        q: q
+      )
     end
   }
+
+  def self.similar_to(article, limit: 5)
+    title = article.title.to_s.strip
+    return none if title.blank?
+
+    where.not(id: article.id)
+      .where("similarity(title, ?) > 0.15", title)
+      .order(Arel.sql(sanitize_sql_array([ "similarity(title, ?) DESC, published_at DESC", title ])))
+      .limit(limit)
+  end
 
   def bookmarked?
     bookmark.present?

@@ -260,6 +260,28 @@ export default function ArticleShowPage() {
           </div>
         </div>
       </article>
+
+      {article.similar_articles && article.similar_articles.length > 0 && (
+        <section className="mt-10" data-testid="more-like-this">
+          <h2 className="text-h2 text-gray-100 mb-4">More like this</h2>
+          <ul className="space-y-3">
+            {article.similar_articles.map((similar) => (
+              <li key={similar.id} className="surface-card rounded-2xl p-4">
+                <a
+                  href={`/articles/${similar.id}`}
+                  className="text-gray-50 hover:text-primary-300 font-medium"
+                >
+                  {similar.title}
+                </a>
+                <p className="text-caption text-gray-400 mt-1">
+                  {humanizeSourceType(similar.source_type)}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {dialog}
     </div>
   )

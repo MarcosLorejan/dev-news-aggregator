@@ -14,6 +14,7 @@ export interface Article {
   read: boolean
   dismissed: boolean
   pending_dismissal: boolean
+  similar_articles?: Article[]
 }
 
 export interface Category {

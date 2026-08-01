@@ -318,6 +318,20 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal @article.title, json_response["title"]
     assert json_response.key?("bookmarked")
     assert json_response.key?("read")
+    assert json_response.key?("similar_articles")
+  end
+
+  test "show JSON includes similar articles by title" do
+    related = @dev_to_article
+    @article.update!(title: "Rails performance tips for production apps")
+    related.update!(title: "Rails performance tips and production tricks")
+
+    get article_path(@article), as: :json
+    assert_response :success
+
+    similar_ids = JSON.parse(response.body)["similar_articles"].map { |row| row["id"] }
+    assert_includes similar_ids, related.id
+    assert_not_includes similar_ids, @article.id
   end
 
   test "show JSON should include bookmark state" do
