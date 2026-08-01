@@ -9,6 +9,7 @@ export interface ArticleCardData {
   score: number
   comment_count: number
   published_at: string
+  low_signal?: boolean
 }
 
 export type ArticleCardTheme = 'primary' | 'green' | 'red' | 'orange'

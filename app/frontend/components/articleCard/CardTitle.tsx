@@ -55,6 +55,9 @@ export default function CardTitle({
       </div>
       <div className="ml-4 flex items-center space-x-2">
         {badge}
+        {article.low_signal && !badge && (
+          <Badge variant="orange">Low signal</Badge>
+        )}
         {showSourceBadge && !badge && (
           <Badge variant={styles.badgeVariant}>{humanizeSourceType(article.source_type)}</Badge>
         )}

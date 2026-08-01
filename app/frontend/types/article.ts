@@ -14,6 +14,7 @@ export interface Article {
   read: boolean
   dismissed: boolean
   pending_dismissal: boolean
+  low_signal?: boolean
 }
 
 export interface Category {

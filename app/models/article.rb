@@ -3,6 +3,8 @@ class Article < ApplicationRecord
   validates :external_id, uniqueness: { scope: :source_type }
   validates :url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
 
+  before_validation :assign_low_signal
+
   has_one :bookmark, dependent: :destroy
   has_one :read_article, dependent: :destroy
   has_one :dismissed_article, dependent: :destroy
@@ -100,5 +102,11 @@ class Article < ApplicationRecord
       dismissed_article.destroy
       reload
     end
+  end
+
+  private
+
+  def assign_low_signal
+    self.low_signal = FeedNoiseClassifier.low_signal?(self)
   end
 end

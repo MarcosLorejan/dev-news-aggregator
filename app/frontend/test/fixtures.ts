@@ -19,6 +19,7 @@ export function buildArticle(overrides: Partial<Article> = {}): Article {
     read: false,
     dismissed: false,
     pending_dismissal: false,
+    low_signal: false,
     ...overrides,
   }
 }

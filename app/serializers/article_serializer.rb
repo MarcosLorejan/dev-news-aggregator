@@ -10,7 +10,8 @@ class ArticleSerializer
       bookmarked: article.bookmarked?,
       read: article.read?,
       dismissed: article.dismissed?,
-      pending_dismissal: article.pending_dismissal?
+      pending_dismissal: article.pending_dismissal?,
+      low_signal: article.low_signal
     )
   end
 

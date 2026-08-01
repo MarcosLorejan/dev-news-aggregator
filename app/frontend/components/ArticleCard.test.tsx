@@ -53,6 +53,25 @@ describe('ArticleCard', () => {
     expect(screen.getByRole('link', { name: /Details/i })).toHaveAttribute('href', '/articles/1')
   })
 
+  it('shows a low signal badge when article is flagged', () => {
+    render(
+      <MemoryRouter>
+        <ArticleCard
+          variant="feed"
+          article={{ ...feedArticle, low_signal: true }}
+          categorySlug="programming"
+          index={0}
+          isDismissing={false}
+          onDismiss={() => {}}
+          onBookmarkToggle={() => {}}
+          onReadToggle={() => {}}
+        />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByText('Low signal')).toBeInTheDocument()
+  })
+
   it('renders bookmark variant with bookmarked metadata', () => {
     render(
       <MemoryRouter>
