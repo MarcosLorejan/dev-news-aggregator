@@ -82,7 +82,7 @@ export default function DigestsIndexPage() {
         <div className="space-y-4">
           {digests.map((digest) => (
             <Card key={digest.id}>
-              <div className="flex flex-wrap items-center justify-between gap-3 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-h3 text-gray-100 capitalize">{digest.period} digest</p>
                   <p className="text-caption text-gray-400">

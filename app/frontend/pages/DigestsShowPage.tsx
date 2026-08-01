@@ -46,10 +46,8 @@ export default function DigestsShowPage() {
             <div className="space-y-3">
               {data.payload.themes.map((theme) => (
                 <Card key={theme.title}>
-                  <div className="p-4">
                     <p className="text-gray-100 font-medium">{theme.title}</p>
                     <p className="text-body text-gray-300 mt-1">{theme.summary}</p>
-                  </div>
                 </Card>
               ))}
             </div>
@@ -60,7 +58,6 @@ export default function DigestsShowPage() {
             <div className="space-y-3">
               {data.payload.articles.map((article) => (
                 <Card key={article.id}>
-                  <div className="p-4">
                     <a
                       href={article.url}
                       target="_blank"
@@ -78,7 +75,6 @@ export default function DigestsShowPage() {
                     >
                       Open in app
                     </Link>
-                  </div>
                 </Card>
               ))}
             </div>
