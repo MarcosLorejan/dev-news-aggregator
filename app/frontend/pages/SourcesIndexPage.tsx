@@ -35,20 +35,42 @@ function SourceFetchStatus({ lastFetch }: { lastFetch: SourceLastFetch | null })
   }
 
   const ok = lastFetch.status === 'success'
+  const empty = Boolean(lastFetch.empty)
+  const duration =
+    lastFetch.duration_seconds == null ? null : `${lastFetch.duration_seconds.toFixed(1)}s`
+  const successRate =
+    lastFetch.success_rate == null ? null : `${lastFetch.success_rate}% success`
 
   return (
     <div className="mt-1 space-y-1" data-testid="source-fetch-status">
       <div className="flex flex-wrap items-center gap-2">
-        <Badge variant={ok ? 'green' : 'red'} size="sm">
-          {ok ? 'Ok' : 'Error'}
+        <Badge variant={ok ? (empty ? 'orange' : 'green') : 'red'} size="sm">
+          {ok ? (empty ? 'Empty' : 'Ok') : 'Error'}
         </Badge>
         <span className="text-caption text-gray-500">
           Last fetch {formatTimeAgo(lastFetch.finished_at)}
         </span>
       </div>
+      <p className="text-caption text-gray-500" data-testid="source-fetch-metrics">
+        {[
+          `${lastFetch.articles_count} articles`,
+          duration,
+          successRate,
+          lastFetch.last_article_at
+            ? `last article ${formatTimeAgo(lastFetch.last_article_at)}`
+            : 'no articles yet',
+        ]
+          .filter(Boolean)
+          .join(' · ')}
+      </p>
       {!ok && lastFetch.error_message && (
         <p className="text-caption text-red-400" data-testid="source-fetch-error">
           {lastFetch.error_message}
+        </p>
+      )}
+      {ok && empty && (
+        <p className="text-caption text-orange-400" data-testid="source-fetch-empty">
+          Fetch succeeded with zero articles
         </p>
       )}
     </div>
