@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_02_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -26,10 +26,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
   end
 
   create_table "articles", force: :cascade do |t|
+    t.string "author"
     t.string "canonical_url"
     t.integer "comment_count"
+    t.string "content_type", default: "article", null: false
     t.datetime "created_at", null: false
     t.text "description"
+    t.integer "duration_seconds"
     t.string "external_id"
     t.boolean "low_signal", default: false, null: false
     t.datetime "published_at"
@@ -38,10 +41,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
     t.datetime "summarized_at"
     t.text "summary"
     t.string "summary_provider"
+    t.string "thumbnail_url"
     t.string "title"
     t.datetime "updated_at", null: false
     t.string "url"
     t.index ["canonical_url"], name: "index_articles_on_canonical_url"
+    t.index ["content_type"], name: "index_articles_on_content_type"
     t.index ["description"], name: "index_articles_on_description_trgm", opclass: :gin_trgm_ops, using: :gin
     t.index ["external_id", "source_type"], name: "index_articles_on_external_id_and_source_type", unique: true
     t.index ["low_signal"], name: "index_articles_on_low_signal"
