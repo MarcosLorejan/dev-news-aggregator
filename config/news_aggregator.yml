@@ -33,9 +33,15 @@ development: &default
       articles_endpoint: "/articles"
       
     reddit:
-      # Public JSON listings return 403; fetchers use Atom RSS (.rss) instead.
+      # Public JSON listings return 403 without OAuth. Default path is Atom RSS
+      # (.rss). Set REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET to use OAuth JSON
+      # listings (includes score / comment_count).
       base_url: "https://www.reddit.com/r"
       format: ".rss"
+      # Shared throttle across all RedditFetcher instances (seconds).
+      min_request_interval_seconds: 2.5
+      # Extra retries after HTTP 429 before the source FetchRun fails.
+      rate_limit_max_retries: 4
       subreddits:
         - programming
         - webdev

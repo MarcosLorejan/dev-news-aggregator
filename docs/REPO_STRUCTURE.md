@@ -68,6 +68,7 @@ dev-news-aggregator/
 | File | Responsibility |
 |------|----------------|
 | `articles_controller.rb` | Article list/show, bookmark, dismiss actions |
+| `api/v1/articles_controller.rb` | Agent-oriented JSON API for list/search/mutations |
 | `bookmarks_controller.rb` | Saved articles index |
 | `read_articles_controller.rb` | Mark articles as read |
 | `dismissed_articles_controller.rb` | Dismissed and recently dismissed lists |
@@ -170,6 +171,7 @@ dev-news-aggregator/
 | File | Purpose |
 |------|---------|
 | `DEVELOPMENT.md` | Commands, architecture, coding and git conventions |
+| `AGENT_API.md` | Versioned `/api/v1` JSON contract for agents |
 | `REPO_STRUCTURE.md` | This file — directory map and maintenance rules |
 | `PRE_COMMIT_HOOKS.md` | Overcommit setup and usage |
 | `REACT_SETUP.md` | React/Vite frontend setup |

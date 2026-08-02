@@ -36,6 +36,14 @@ module NewsAggregatorConfig
       Array(config.dig(:apis, :reddit, :subreddits))
     end
 
+    def reddit_min_request_interval_seconds
+      config.dig(:apis, :reddit, :min_request_interval_seconds) || 2.5
+    end
+
+    def reddit_rate_limit_max_retries
+      config.dig(:apis, :reddit, :rate_limit_max_retries) || 4
+    end
+
     def hacker_news_base_url
       config.dig(:apis, :hacker_news, :base_url)
     end
