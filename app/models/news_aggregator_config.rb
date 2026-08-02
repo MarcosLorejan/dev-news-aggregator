@@ -101,5 +101,9 @@ module NewsAggregatorConfig
       max = config.dig(:apis, :youtube, :enrich_max_per_run) || 100
       [ max.to_i, 0 ].max
     end
+
+    def youtube_max_duration_seconds
+      config.dig(:apis, :youtube, :max_duration_seconds) || 1200
+    end
   end
 end
