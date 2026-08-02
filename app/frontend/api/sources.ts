@@ -20,8 +20,9 @@ export interface SourceLastFetch {
 export interface NewsSource {
   id: number
   name: string
-  source_type: 'hacker_news' | 'dev_to' | 'reddit'
+  source_type: 'hacker_news' | 'dev_to' | 'reddit' | 'youtube'
   subreddit: string | null
+  channel_id?: string | null
   active: boolean
   last_fetch: SourceLastFetch | null
 }

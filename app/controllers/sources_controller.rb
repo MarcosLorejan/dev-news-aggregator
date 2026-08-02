@@ -80,6 +80,7 @@ class SourcesController < ApplicationController
       name: source.name,
       source_type: source.source_type,
       subreddit: source.subreddit,
+      channel_id: source.channel_id,
       active: source.active,
       last_fetch: last_fetch_json(fetch_run, last_article_at)
     }

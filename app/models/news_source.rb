@@ -1,11 +1,12 @@
 # Database-backed source registry. When any enabled records exist,
 # NewsAggregatorService uses them instead of config/news_aggregator.yml defaults.
 class NewsSource < ApplicationRecord
-  SOURCE_TYPES = %w[hacker_news dev_to reddit].freeze
+  SOURCE_TYPES = %w[hacker_news dev_to reddit youtube].freeze
 
   validates :name, presence: true, uniqueness: { scope: :source_type }
   validates :source_type, inclusion: { in: SOURCE_TYPES }
   validate :reddit_subreddit_present, if: -> { source_type == "reddit" }
+  validate :youtube_channel_id_present, if: -> { source_type == "youtube" }
 
   scope :enabled, -> { where(active: true) }
 
@@ -26,15 +27,37 @@ class NewsSource < ApplicationRecord
         source.config = { "subreddit" => subreddit }
       end
     end
+
+    NewsAggregatorConfig.youtube_channels.each do |channel|
+      find_or_create_by!(source_type: "youtube", name: channel[:name]) do |source|
+        source.active = true
+        source.config = {
+          "channel_id" => channel[:channel_id],
+          "channel_name" => channel[:name]
+        }
+      end
+    end
   end
 
   def subreddit
     config["subreddit"]
   end
 
+  def channel_id
+    config["channel_id"]
+  end
+
+  def channel_name
+    config["channel_name"].presence || name
+  end
+
   # Matches NewsFetchers::*#source_key used by FetchRun rows.
   def source_key
-    source_type == "reddit" ? "reddit_#{subreddit}" : source_type
+    case source_type
+    when "reddit" then "reddit_#{subreddit}"
+    when "youtube" then "youtube_#{channel_id}"
+    else source_type
+    end
   end
 
   def build_fetcher
@@ -45,6 +68,8 @@ class NewsSource < ApplicationRecord
       NewsFetchers::DevToFetcher.new
     when "reddit"
       NewsFetchers::RedditFetcher.new(subreddit: subreddit)
+    when "youtube"
+      NewsFetchers::YoutubeFetcher.new(channel_id: channel_id, channel_name: channel_name)
     end
   end
 
@@ -52,5 +77,9 @@ class NewsSource < ApplicationRecord
 
   def reddit_subreddit_present
     errors.add(:config, "must include subreddit") if subreddit.blank?
+  end
+
+  def youtube_channel_id_present
+    errors.add(:config, "must include channel_id") if channel_id.blank?
   end
 end

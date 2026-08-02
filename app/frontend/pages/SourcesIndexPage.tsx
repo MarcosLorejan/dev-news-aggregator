@@ -22,6 +22,9 @@ function sourceLabel(source: NewsSource): string {
   if (source.source_type === 'reddit') {
     return `r/${source.subreddit ?? source.name}`
   }
+  if (source.source_type === 'youtube') {
+    return source.name
+  }
   return source.name
 }
 
@@ -145,8 +148,11 @@ export default function SourcesIndexPage() {
     }
   }
 
-  const fixedSources = sources.filter((source) => source.source_type !== 'reddit')
+  const fixedSources = sources.filter(
+    (source) => source.source_type !== 'reddit' && source.source_type !== 'youtube'
+  )
   const redditSources = sources.filter((source) => source.source_type === 'reddit')
+  const youtubeSources = sources.filter((source) => source.source_type === 'youtube')
 
   if (loading) {
     return (
@@ -244,6 +250,35 @@ export default function SourcesIndexPage() {
           )}
         </div>
       </Card>
+
+      {youtubeSources.length > 0 && (
+        <Card as="section" className="mt-8">
+          <h2 className="text-h3 text-gray-200 mb-4">YouTube channels</h2>
+          <div className="space-y-3">
+            {youtubeSources.map((source) => (
+              <div key={source.id} className="flex items-center justify-between gap-4 py-3 border-b border-dark-700 last:border-0">
+                <div className="min-w-0">
+                  <span className="text-gray-200 font-medium">{source.name}</span>
+                  {source.channel_id && (
+                    <p className="text-caption text-gray-500 mt-1">{source.channel_id}</p>
+                  )}
+                  <SourceFetchStatus lastFetch={source.last_fetch} />
+                </div>
+                <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    className="rounded border-dark-600 bg-dark-800 text-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                    checked={source.active}
+                    onChange={() => handleToggle(source)}
+                    data-testid={`source-toggle-youtube-${source.channel_id ?? source.id}`}
+                  />
+                  {source.active ? 'Enabled' : 'Disabled'}
+                </label>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
       {dialog}
     </PageContainer>
   )
