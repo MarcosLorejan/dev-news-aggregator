@@ -1,6 +1,19 @@
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
+  namespace :api do
+    namespace :v1 do
+      resources :articles, only: [ :index, :show ] do
+        member do
+          post :bookmark
+          delete :unbookmark
+          post :dismiss
+          delete :undismiss
+        end
+      end
+    end
+  end
+
   # Articles routes
   resources :articles, only: [ :index, :show ] do
     collection do
@@ -28,6 +41,8 @@ Rails.application.routes.draw do
   # Dismissed articles routes
   resources :dismissed_articles, only: [ :index ], path: "dismissed"
   get "recently_dismissed", to: "dismissed_articles#recently_dismissed"
+
+  resources :digests, only: [ :index, :show, :create ]
 
   root "articles#index"
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

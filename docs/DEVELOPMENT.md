@@ -235,7 +235,7 @@ config/schedule.rb                      # Cron job definitions
 
 **Dev.to**: Uses REST API (`dev.to/api/articles`) with query params for pagination and filtering by top posts from last 7 days.
 
-**Reddit**: Multiple instances for different subreddits. Each subreddit is treated as a separate source type in the database. Fetchers read the public Atom feed (`/r/{subreddit}/.rss`) because unauthenticated `.json` listings return HTTP 403. Requests are throttled to reduce rate-limit errors; HTTP failures are recorded on `FetchRun` instead of silent zero-article success.
+**Reddit**: Multiple instances for different subreddits. Each subreddit is treated as a separate source type in the database. By default, fetchers read the public Atom feed (`/r/{subreddit}/.rss`) because unauthenticated `.json` listings return HTTP 403 (Atom has no score fields, so new articles seed `score`/`comment_count` to 0). Set `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` to switch to OAuth JSON listings on `oauth.reddit.com`, which persist real scores and comment counts. Requests share a configurable throttle (`apis.reddit.min_request_interval_seconds`, default 2.5s); HTTP 429 responses are retried with backoff (`apis.reddit.rate_limit_max_retries`) and failures are recorded on `FetchRun` instead of silent zero-article success.
 
 ### Database schema
 

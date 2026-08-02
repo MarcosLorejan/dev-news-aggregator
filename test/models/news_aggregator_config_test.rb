@@ -25,4 +25,9 @@ class NewsAggregatorConfigTest < ActiveSupport::TestCase
     assert_equal "https://dev.to/api", NewsAggregatorConfig.devto_base_url
     assert_equal "https://www.reddit.com/r", NewsAggregatorConfig.reddit_base_url
   end
+
+  test "loads reddit throttle settings from news_aggregator.yml" do
+    assert_equal 2.5, NewsAggregatorConfig.reddit_min_request_interval_seconds
+    assert_equal 4, NewsAggregatorConfig.reddit_rate_limit_max_retries
+  end
 end

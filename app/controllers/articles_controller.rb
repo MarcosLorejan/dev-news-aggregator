@@ -5,9 +5,9 @@ class ArticlesController < ApplicationController
   FETCH_RATE_LIMIT = 2.minutes
 
   ALLOWED_SORTS = {
-    "published_at" => { published_at: :desc },
-    "score" => Arel.sql("score DESC NULLS LAST, published_at DESC"),
-    "comment_count" => Arel.sql("comment_count DESC NULLS LAST, published_at DESC")
+    "published_at" => Arel.sql("low_signal ASC, published_at DESC"),
+    "score" => Arel.sql("low_signal ASC, score DESC NULLS LAST, published_at DESC"),
+    "comment_count" => Arel.sql("low_signal ASC, comment_count DESC NULLS LAST, published_at DESC")
   }.freeze
 
   before_action :authenticate_mutation!, only: %i[fetch bookmark unbookmark dismiss undismiss]
@@ -23,6 +23,7 @@ class ArticlesController < ApplicationController
     @total_count = base_scope.unscope(:includes, :order, :select).count
     @articles = base_scope.limit(per_page).offset((page - 1) * per_page)
     @topic_tags = Tag.order(:name).map { |tag| { slug: tag.slug, name: tag.name } }
+    @related_by_article_id = ArticleClusterer.related_by_article_id(@articles)
 
     @articles_by_source = @articles.group_by(&:source_type)
     @articles_by_category = helpers.group_sources_by_category(@articles_by_source)
@@ -32,7 +33,12 @@ class ArticlesController < ApplicationController
       format.html
       format.json do
         render json: {
-          articles: @articles.map { |article| ArticleSerializer.as_json(article) },
+          articles: @articles.map { |article|
+            ArticleSerializer.as_json(
+              article,
+              related_articles: @related_by_article_id[article.id] || []
+            )
+          },
           articles_by_category: @articles_by_category.transform_values { |articles| articles.map(&:id) },
           category_counts: @category_counts,
           categories: @category_counts.keys.map { |name| { name: name, icon: helpers.category_icon(name) } },
@@ -127,6 +133,7 @@ class ArticlesController < ApplicationController
     scope = scope.search(params[:q])
     scope = scope.with_topic_tag(params[:tag])
     scope = helpers.apply_category_filter(scope, params[:category]) if apply_category
+    scope = ArticleClusterer.primaries(scope)
     apply_sort(scope.includes(:bookmark, :read_article, :dismissed_article, :tags))
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_25_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -30,14 +30,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_25_170000) do
     t.datetime "created_at", null: false
     t.text "description"
     t.string "external_id"
+    t.boolean "low_signal", default: false, null: false
     t.datetime "published_at"
     t.integer "score"
     t.string "source_type"
+    t.datetime "summarized_at"
+    t.text "summary"
+    t.string "summary_provider"
     t.string "title"
     t.datetime "updated_at", null: false
     t.string "url"
     t.index ["canonical_url"], name: "index_articles_on_canonical_url"
     t.index ["external_id", "source_type"], name: "index_articles_on_external_id_and_source_type", unique: true
+    t.index ["low_signal"], name: "index_articles_on_low_signal"
     t.index ["published_at"], name: "index_articles_on_published_at"
     t.index ["score", "published_at"], name: "index_articles_on_score_and_published_at", order: :desc
     t.index ["source_type"], name: "index_articles_on_source_type"
@@ -66,15 +71,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_25_170000) do
     t.integer "articles_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.decimal "duration_seconds", precision: 8, scale: 2
+    t.integer "empty_success_count", default: 0, null: false
     t.string "error_class"
     t.text "error_message"
+    t.integer "failure_count", default: 0, null: false
     t.datetime "finished_at", null: false
+    t.datetime "last_failure_at"
+    t.datetime "last_success_at"
     t.string "source_key", null: false
     t.string "status", null: false
+    t.integer "success_count", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["finished_at"], name: "index_fetch_runs_on_finished_at"
     t.index ["source_key"], name: "index_fetch_runs_on_source_key", unique: true
     t.index ["status"], name: "index_fetch_runs_on_status"
+  end
+
+  create_table "news_digests", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.string "period", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "window_end", null: false
+    t.datetime "window_start", null: false
+    t.index ["period", "window_start", "window_end"], name: "index_news_digests_on_period_and_window_start_and_window_end"
   end
 
   create_table "news_sources", force: :cascade do |t|

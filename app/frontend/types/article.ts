@@ -3,6 +3,14 @@ export interface TopicTag {
   name: string
 }
 
+export interface RelatedSource {
+  id: number
+  source_type: string
+  url: string
+  title: string
+  score: number | null
+}
+
 export interface Article {
   id: number
   title: string
@@ -19,7 +27,9 @@ export interface Article {
   read: boolean
   dismissed: boolean
   pending_dismissal: boolean
+  low_signal?: boolean
   topic_tags?: TopicTag[]
+  related_sources?: RelatedSource[]
 }
 
 export interface Category {

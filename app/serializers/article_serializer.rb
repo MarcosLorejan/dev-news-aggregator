@@ -3,7 +3,7 @@ class ArticleSerializer
     id title url description source_type score comment_count external_id published_at
   ].freeze
 
-  def self.as_json(article)
+  def self.as_json(article, related_articles: [])
     base_attributes(article).merge(
       created_at: article.created_at,
       updated_at: article.updated_at,
@@ -11,7 +11,9 @@ class ArticleSerializer
       read: article.read?,
       dismissed: article.dismissed?,
       pending_dismissal: article.pending_dismissal?,
-      topic_tags: article.tags.map { |tag| { slug: tag.slug, name: tag.name } }
+      low_signal: article.low_signal,
+      topic_tags: article.tags.map { |tag| { slug: tag.slug, name: tag.name } },
+      related_sources: Array(related_articles).map { |related| related_source_json(related) }
     )
   end
 
@@ -40,4 +42,15 @@ class ArticleSerializer
     BASE_ATTRIBUTES.index_with { |attribute| article.public_send(attribute) }
   end
   private_class_method :base_attributes
+
+  def self.related_source_json(article)
+    {
+      id: article.id,
+      source_type: article.source_type,
+      url: article.url,
+      title: article.title,
+      score: article.score
+    }
+  end
+  private_class_method :related_source_json
 end
