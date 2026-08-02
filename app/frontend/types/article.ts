@@ -14,6 +14,24 @@ export interface Article {
   read: boolean
   dismissed: boolean
   pending_dismissal: boolean
+  summary?: string | null
+  summary_provider?: string | null
+  summarized_at?: string | null
+  summarizer?: {
+    enabled: boolean
+    provider: string
+  }
+}
+
+export interface ArticleSummaryResponse {
+  summary: string | null
+  summary_provider: string
+  summarized_at: string | null
+  summarizer: {
+    enabled: boolean
+    provider: string
+  }
+  error: string | null
 }
 
 export interface Category {

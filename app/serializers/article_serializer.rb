@@ -3,8 +3,10 @@ class ArticleSerializer
     id title url description source_type score comment_count external_id published_at
   ].freeze
 
-  def self.as_json(article)
-    base_attributes(article).merge(
+  SUMMARY_ATTRIBUTES = %i[summary summary_provider summarized_at].freeze
+
+  def self.as_json(article, include_summary: false)
+    payload = base_attributes(article).merge(
       created_at: article.created_at,
       updated_at: article.updated_at,
       bookmarked: article.bookmarked?,
@@ -12,6 +14,10 @@ class ArticleSerializer
       dismissed: article.dismissed?,
       pending_dismissal: article.pending_dismissal?
     )
+
+    return payload unless include_summary
+
+    payload.merge(summary_attributes(article)).merge(summarizer: ArticleSummarizer.config)
   end
 
   def self.as_bookmark_json(article)
@@ -39,4 +45,9 @@ class ArticleSerializer
     BASE_ATTRIBUTES.index_with { |attribute| article.public_send(attribute) }
   end
   private_class_method :base_attributes
+
+  def self.summary_attributes(article)
+    SUMMARY_ATTRIBUTES.index_with { |attribute| article.public_send(attribute) }
+  end
+  private_class_method :summary_attributes
 end

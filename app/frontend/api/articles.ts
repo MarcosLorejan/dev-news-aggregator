@@ -1,5 +1,5 @@
 import { apiRequest } from './client'
-import type { Article, ArticlesIndexResponse } from '../types/article'
+import type { Article, ArticleSummaryResponse, ArticlesIndexResponse } from '../types/article'
 
 export function fetchArticles(params?: {
   page?: number
@@ -39,6 +39,13 @@ export function fetchNews() {
 
 export function fetchArticle(id: number) {
   return apiRequest<Article>(`/articles/${id}.json`)
+}
+
+export function summarizeArticle(id: number, force = false) {
+  const query = force ? '?force=true' : ''
+  return apiRequest<ArticleSummaryResponse>(`/articles/${id}/summarize${query}`, {
+    method: 'POST',
+  })
 }
 
 export function bookmarkArticle(id: number) {

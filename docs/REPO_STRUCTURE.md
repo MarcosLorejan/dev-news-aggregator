@@ -2,7 +2,7 @@
 
 Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
 
-Last updated: 2026-07-22
+Last updated: 2026-08-01
 
 ## Maintenance
 
@@ -94,6 +94,8 @@ dev-news-aggregator/
 | `news_fetchers/hacker_news_fetcher.rb` | Hacker News Firebase API |
 | `news_fetchers/dev_to_fetcher.rb` | Dev.to REST API |
 | `news_fetchers/reddit_fetcher.rb` | Reddit API (one instance per subreddit) |
+| `article_summarizer.rb` | Pluggable article summarizer facade (`none` / `heuristic` / `openai` / `ollama`) |
+| `summarizers/` | Provider implementations for `ArticleSummarizer` |
 
 ### Jobs
 
@@ -145,6 +147,7 @@ dev-news-aggregator/
 | `create_read_articles` | `read_articles` |
 | `create_dismissed_articles` | `dismissed_articles` |
 | `create_fetch_runs` | `fetch_runs` |
+| `add_summary_to_articles` | `articles.summary`, `summary_provider`, `summarized_at` |
 
 ## `lib/`
 
@@ -173,6 +176,7 @@ dev-news-aggregator/
 | `REPO_STRUCTURE.md` | This file — directory map and maintenance rules |
 | `PRE_COMMIT_HOOKS.md` | Overcommit setup and usage |
 | `REACT_SETUP.md` | React/Vite frontend setup |
+| `SUMMARIZER.md` | Optional pluggable article summarizer (env, providers, caching) |
 
 ## `.github/`
 
@@ -227,6 +231,7 @@ Agents should start here, then use this file as the navigation map:
 | `/` | `articles#index` |
 | `/articles.atom` | `articles#index` (Atom feed; honors `q`, `category`, `sort`, score filters) |
 | `/articles/:id` | `articles#show` |
+| `/articles/:id/summarize` | `articles#summarize` (POST; optional AI/heuristic summary) |
 | `/bookmarks` | `bookmarks#index` |
 | `/bookmarks.atom` | `bookmarks#index` (Atom feed) |
 | `/read` | `read_articles#index` |

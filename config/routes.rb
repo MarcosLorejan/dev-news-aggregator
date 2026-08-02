@@ -12,6 +12,7 @@ Rails.application.routes.draw do
       delete :unbookmark
       post :dismiss
       delete :undismiss
+      post :summarize
     end
   end
 
