@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_02_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -88,6 +88,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_150000) do
     t.index ["finished_at"], name: "index_fetch_runs_on_finished_at"
     t.index ["source_key"], name: "index_fetch_runs_on_source_key", unique: true
     t.index ["status"], name: "index_fetch_runs_on_status"
+  end
+
+  create_table "keyword_filters", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.string "slug", null: false
+    t.string "terms", default: [], null: false, array: true
+    t.datetime "updated_at", null: false
+    t.index ["active", "position"], name: "index_keyword_filters_on_active_and_position"
+    t.index ["slug"], name: "index_keyword_filters_on_slug", unique: true
   end
 
   create_table "news_digests", force: :cascade do |t|

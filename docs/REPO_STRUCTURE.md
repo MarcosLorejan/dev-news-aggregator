@@ -83,7 +83,8 @@ dev-news-aggregator/
 | `read_article.rb` | `read_articles` | Article marked as read |
 | `dismissed_article.rb` | `dismissed_articles` | Article hidden from feed |
 | `news_source.rb` | `news_sources` | Optional DB-backed source registry; overrides YAML defaults when enabled |
-| `news_aggregator_config.rb` | — | Loads `config/news_aggregator.yml` (limits, retention, subreddits) |
+| `news_aggregator_config.rb` | — | Loads `config/news_aggregator.yml` (limits, retention, subreddits, interests) |
+| `keyword_filter.rb` | `keyword_filters` | Saved keyword interests (presets) for filtering the feed by topic |
 | `tag.rb` | `tags` | Topic tag vocabulary for articles |
 | `article_tag.rb` | `article_tags` | Join table for article topic tags |
 | `news_digest.rb` | `news_digests` | Generated unread digests (daily/weekly payloads) |
@@ -164,6 +165,7 @@ dev-news-aggregator/
 | `create_news_digests` | `news_digests` |
 | `enable_pg_trgm_and_article_similarity_indexes` | `pg_trgm` + trigram indexes on `articles` |
 | `add_summary_to_articles` | `articles.summary`, `summary_provider`, `summarized_at` |
+| `create_keyword_filters` | `keyword_filters` |
 
 ## `lib/`
 

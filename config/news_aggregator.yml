@@ -21,6 +21,20 @@ development: &default
     # Clean old articles automatically
     auto_cleanup: true
   
+  # Starter keyword interests, seeded into keyword_filters when the table is empty.
+  # Terms are matched as phrases against article title + description.
+  interests:
+    - name: "Ruby"
+      terms: [ "ruby", "rubygems", "sorbet" ]
+    - name: "Rails"
+      terms: [ "rails", "activerecord", "hotwire", "turbo" ]
+    - name: "Rust"
+      terms: [ "rust", "cargo", "tokio" ]
+    - name: "Software architecture"
+      terms: [ "software architecture", "system design", "domain-driven", "ddd", "event sourcing" ]
+    - name: "AI performance"
+      terms: [ "inference", "quantization", "prompt optimization", "llm latency", "context window" ]
+
   # API endpoints
   apis:
     hacker_news:

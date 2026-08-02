@@ -1,0 +1,20 @@
+ruby_interest:
+  name: "Ruby"
+  slug: "ruby"
+  terms: [ "ruby", "rubygems" ]
+  active: true
+  position: 0
+
+rust_interest:
+  name: "Rust"
+  slug: "rust"
+  terms: [ "rust", "cargo" ]
+  active: true
+  position: 1
+
+archived_interest:
+  name: "Elixir"
+  slug: "elixir"
+  terms: [ "elixir", "phoenix" ]
+  active: false
+  position: 2
