@@ -260,6 +260,8 @@ Copy `.env.example` to `.env` before starting the stack. Docker Compose reads it
 
 **Category filtering**: Articles are grouped into logical categories (Programming Languages, Web Development, Security, AI & Machine Learning, General Tech) for easier browsing.
 
+**Keyword interests**: Saved topic presets (`KeywordFilter`) filter the feed by title/description terms (`keywords`, `interest` / `interests`). Manage them at `/interests`; see [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md).
+
 **Multi-source aggregation**: Default sources are defined in `config/news_aggregator.yml` — Hacker News, Dev.to, and 11 Reddit subreddits (programming, webdev, javascript, ruby, rust, netsec, cybersecurity, technology, MachineLearning, artificial, LocalLLaMA). Override via enabled `NewsSource` records.
 
 ### Adding new news sources

@@ -247,16 +247,19 @@ Agents should start here, then use this file as the navigation map:
 1. [AGENTS.md](../AGENTS.md) — work rules and verification (`bin/validate`)
 2. [CONTRIBUTING.md](../CONTRIBUTING.md) — PR workflow
 3. [DEVELOPMENT.md](DEVELOPMENT.md) — setup, commands, conventions
-4. This file — directory and entry-point map
+4. [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md) — interest/keyword feed filters
+5. This file — directory and entry-point map
 
 ## Routes (summary)
 
 | Path | Controller#action |
 |------|-------------------|
 | `/` | `articles#index` |
-| `/articles.atom` | `articles#index` (Atom feed; honors `q`, `category`, `sort`, score filters) |
+| `/articles.atom` | `articles#index` (Atom feed; honors `q`, `keywords`, `match`, `interest`/`interests`, `category`, `tag`, `sort`, score filters — see [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md)) |
 | `/articles/:id` | `articles#show` |
 | `/articles/:id/summarize` | `articles#summarize` (POST; optional AI/heuristic summary) |
+| `/keyword_filters` | `keyword_filters#index` (CRUD JSON for interest presets) |
+| `/interests` | SPA interests management page |
 | `/bookmarks` | `bookmarks#index` |
 | `/bookmarks.atom` | `bookmarks#index` (Atom feed) |
 | `/read` | `read_articles#index` |

@@ -6,9 +6,10 @@ A Rails application that aggregates developer news from Hacker News, Dev.to, and
 
 - **Multi-source aggregation**: Fetches from 12+ sources including Hacker News, Dev.to, and programming subreddits
 - **Article bookmarking**: Save articles for later reading with category filtering  
-- **Atom feeds**: Subscribe to `/articles.atom` (main feed) and `/bookmarks.atom` (reading list)
+- **Keyword interests**: Filter the feed by saved topic presets (ruby, rails, rust, architecture, …) — see [docs/KEYWORD_FILTERS.md](docs/KEYWORD_FILTERS.md)
+- **Atom feeds**: Subscribe to `/articles.atom` (main feed; supports `q`, keyword interests, category, score) and `/bookmarks.atom` (reading list)
 - **Automated updates**: Hourly fetching during business hours via cron jobs
-- **Responsive interface**: React SPA with source-based filtering and Vite HMR in development
+- **Responsive interface**: React SPA with source- and interest-based filtering and Vite HMR in development
 
 ## Quick Start
 
@@ -106,7 +107,7 @@ Production deploys use Kamal via the **Deploy** GitHub Actions workflow (manual)
 
 ## Development
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the contributor entry point, [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for development guidelines, and [docs/REPO_STRUCTURE.md](docs/REPO_STRUCTURE.md) for the repository map (keep it updated when structure changes).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contributor entry point, [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for development guidelines, [docs/KEYWORD_FILTERS.md](docs/KEYWORD_FILTERS.md) for interest/keyword filtering, and [docs/REPO_STRUCTURE.md](docs/REPO_STRUCTURE.md) for the repository map (keep it updated when structure changes).
 
 ### Pre-commit Hooks
 

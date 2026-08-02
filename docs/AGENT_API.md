@@ -32,6 +32,8 @@ Query params:
 | `show_read` | `true` to include read articles |
 | `page`, `per_page` | Pagination (`per_page` max 100) |
 
+For the richer HTML/JSON feed (`GET /articles.json` / `.atom`) — including `keywords`, `match`, `interest` / `interests`, categories, and tags — see [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md). Those params are not yet mirrored on `/api/v1/articles`.
+
 Response:
 
 ```json
