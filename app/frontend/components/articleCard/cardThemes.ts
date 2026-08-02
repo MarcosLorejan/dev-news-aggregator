@@ -17,6 +17,7 @@ export interface ArticleCardData {
     title: string
     score: number | null
   }>
+  matched_keywords?: string[]
 }
 
 export type ArticleCardTheme = 'primary' | 'green' | 'red' | 'orange'

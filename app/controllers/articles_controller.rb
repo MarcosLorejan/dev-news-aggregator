@@ -29,6 +29,7 @@ class ArticlesController < ApplicationController
     @articles_by_source = @articles.group_by(&:source_type)
     @articles_by_category = helpers.group_sources_by_category(@articles_by_source)
     @last_updated = Article.maximum(:updated_at)
+    filter_terms = active_keyword_terms
 
     respond_to do |format|
       format.html
@@ -37,7 +38,8 @@ class ArticlesController < ApplicationController
           articles: @articles.map { |article|
             ArticleSerializer.as_json(
               article,
-              related_articles: @related_by_article_id[article.id] || []
+              related_articles: @related_by_article_id[article.id] || [],
+              matched_keywords: filter_terms && article.matched_keywords_for(filter_terms)
             )
           },
           articles_by_category: @articles_by_category.transform_values { |articles| articles.map(&:id) },
@@ -161,17 +163,29 @@ class ArticlesController < ApplicationController
   # with any explicit `keywords`; `match` then applies to the combined list. An unknown slug
   # filters everything out, mirroring how an unknown category behaves.
   def apply_keyword_filter(scope)
-    terms = Article.normalize_keywords(params[:keywords])
-    slugs = interest_slugs
-
-    if slugs.any?
-      interests = KeywordFilter.where(slug: slugs).to_a
-      return scope.none if interests.size < slugs.size
-
-      terms += interests.flat_map(&:terms)
-    end
+    terms = resolved_keyword_terms
+    return scope.none if terms == :unknown
 
     scope.matching_keywords(terms, match: params[:match])
+  end
+
+  # Normalized terms currently driving the keyword/interest filter, or nil when none apply.
+  def active_keyword_terms
+    terms = resolved_keyword_terms
+    return nil if terms == :unknown || terms.empty?
+
+    terms
+  end
+
+  def resolved_keyword_terms
+    terms = Article.normalize_keywords(params[:keywords])
+    slugs = interest_slugs
+    return terms if slugs.empty?
+
+    interests = KeywordFilter.where(slug: slugs).to_a
+    return :unknown if interests.size < slugs.size
+
+    Article.normalize_keywords(terms + interests.flat_map(&:terms))
   end
 
   def interest_slugs

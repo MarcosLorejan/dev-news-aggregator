@@ -304,6 +304,23 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_includes ids, @rust_article.id
   end
 
+  test "index JSON includes matched_keywords when a keyword filter is active" do
+    get articles_url(keywords: "rust"), as: :json
+    assert_response :success
+
+    article = JSON.parse(response.body)["articles"].find { |item| item["id"] == @rust_article.id }
+    assert_equal [ "rust" ], article["matched_keywords"]
+  end
+
+  test "index JSON omits matched_keywords when no keyword filter is active" do
+    get articles_url, as: :json
+    assert_response :success
+
+    article = JSON.parse(response.body)["articles"].first
+    assert article
+    assert_not article.key?("matched_keywords")
+  end
+
   test "index JSON unions terms from several interest slugs" do
     get articles_url(interests: "ruby,rust"), as: :json
     assert_response :success

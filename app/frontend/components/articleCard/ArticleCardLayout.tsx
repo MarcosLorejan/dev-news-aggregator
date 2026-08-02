@@ -4,7 +4,10 @@ import { cn } from '../../utils/cn'
 import { DetailsLink } from './CardActions'
 import CardMetadata from './CardMetadata'
 import CardTitle from './CardTitle'
+import Badge from '../ui/Badge'
 import { CARD_THEMES, type ArticleCardData, type ArticleCardAccent, type ArticleCardTheme } from './cardThemes'
+
+const MATCHED_KEYWORD_LIMIT = 3
 
 interface ArticleCardLayoutProps {
   article: ArticleCardData
@@ -31,6 +34,26 @@ const ACCENT_BAR_CLASSES: Record<NonNullable<ArticleCardAccent>, string> = {
   red: 'border-l-[3px] border-l-red-500/70',
 }
 
+function MatchedKeywordBadges({ keywords }: { keywords: string[] }) {
+  const visible = keywords.slice(0, MATCHED_KEYWORD_LIMIT)
+  const overflow = keywords.length - visible.length
+
+  return (
+    <div className="mb-5 flex flex-wrap items-center gap-2" data-testid="matched-keywords">
+      {visible.map((keyword) => (
+        <Badge key={keyword} variant="primary" size="sm">
+          {keyword}
+        </Badge>
+      ))}
+      {overflow > 0 && (
+        <Badge variant="orange" size="sm">
+          +{overflow}
+        </Badge>
+      )}
+    </div>
+  )
+}
+
 export default function ArticleCardLayout({
   article,
   index,
@@ -50,6 +73,7 @@ export default function ArticleCardLayout({
 }: ArticleCardLayoutProps) {
   const styles = CARD_THEMES[theme]
   const relatedSources = article.related_sources ?? []
+  const matchedKeywords = article.matched_keywords ?? []
 
   return (
     <article
@@ -83,6 +107,8 @@ export default function ArticleCardLayout({
           {truncate(article.description, 280)}
         </p>
       )}
+
+      {matchedKeywords.length > 0 && <MatchedKeywordBadges keywords={matchedKeywords} />}
 
       {relatedSources.length > 0 && (
         <div className="mb-5 flex flex-wrap items-center gap-2" data-testid="related-sources">
