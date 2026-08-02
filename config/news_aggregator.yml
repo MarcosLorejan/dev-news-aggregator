@@ -74,6 +74,10 @@ development: &default
       feed_base_url: "https://www.youtube.com/feeds/videos.xml"
       min_request_interval_seconds: 2.0
       rate_limit_max_retries: 4
+      # Optional videos.list enrichment (1 unit / call, up to 50 IDs). Needs YOUTUBE_API_KEY.
+      enrich_with_api: true
+      enrich_batch_size: 50
+      enrich_max_per_run: 100
       channels:
         - channel_id: "UCWnPjmqvljcafA0QXblOU1A"
           name: "Confreaks"

@@ -86,5 +86,20 @@ module NewsAggregatorConfig
     def youtube_feed_base_url
       config.dig(:apis, :youtube, :feed_base_url) || "https://www.youtube.com/feeds/videos.xml"
     end
+
+    def youtube_enrich_with_api?
+      flag = config.dig(:apis, :youtube, :enrich_with_api)
+      flag.nil? ? true : ActiveModel::Type::Boolean.new.cast(flag)
+    end
+
+    def youtube_enrich_batch_size
+      size = config.dig(:apis, :youtube, :enrich_batch_size) || 50
+      [ size.to_i, 1 ].max.clamp(1, 50)
+    end
+
+    def youtube_enrich_max_per_run
+      max = config.dig(:apis, :youtube, :enrich_max_per_run) || 100
+      [ max.to_i, 0 ].max
+    end
   end
 end

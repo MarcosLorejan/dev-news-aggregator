@@ -110,6 +110,7 @@ dev-news-aggregator/
 | `digest_builder.rb` | Builds schema-validated unread digests (title-only without LLM) |
 | `article_summarizer.rb` | Pluggable article summarizer facade (`none` / `heuristic` / `openai` / `ollama`) |
 | `summarizers/` | Provider implementations for `ArticleSummarizer` |
+| `youtube_video_enricher.rb` | Optional YouTube `videos.list` duration/stats enrichment |
 
 ### Jobs
 
