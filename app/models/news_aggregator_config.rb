@@ -59,5 +59,32 @@ module NewsAggregatorConfig
     def reddit_base_url
       config.dig(:apis, :reddit, :base_url)
     end
+
+    def youtube_channels
+      Array(config.dig(:apis, :youtube, :channels)).filter_map { |entry|
+        next if entry.blank?
+
+        channel = entry.is_a?(Hash) ? entry : { channel_id: entry }
+        channel_id = channel[:channel_id].presence || channel["channel_id"].presence
+        next if channel_id.blank?
+
+        {
+          channel_id: channel_id.to_s,
+          name: (channel[:name] || channel["name"]).presence || channel_id.to_s
+        }
+      }
+    end
+
+    def youtube_min_request_interval_seconds
+      config.dig(:apis, :youtube, :min_request_interval_seconds) || 2.0
+    end
+
+    def youtube_rate_limit_max_retries
+      config.dig(:apis, :youtube, :rate_limit_max_retries) || 4
+    end
+
+    def youtube_feed_base_url
+      config.dig(:apis, :youtube, :feed_base_url) || "https://www.youtube.com/feeds/videos.xml"
+    end
   end
 end

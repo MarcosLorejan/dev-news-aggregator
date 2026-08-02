@@ -23,6 +23,8 @@ class NewsAggregatorServiceTest < ActiveSupport::TestCase
     assert fetchers.any? { |f| f.is_a?(NewsFetchers::DevToFetcher) }
     reddit_fetchers = fetchers.select { |f| f.is_a?(NewsFetchers::RedditFetcher) }
     assert_equal NewsAggregatorConfig.reddit_subreddits.length, reddit_fetchers.length
+    youtube_fetchers = fetchers.select { |f| f.is_a?(NewsFetchers::YoutubeFetcher) }
+    assert_equal NewsAggregatorConfig.youtube_channels.length, youtube_fetchers.length
   end
 
   test "uses enabled database sources when present" do

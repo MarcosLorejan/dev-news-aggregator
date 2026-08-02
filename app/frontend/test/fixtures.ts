@@ -151,6 +151,7 @@ export function buildNewsSource(overrides: Partial<NewsSource> = {}): NewsSource
     name: 'Hacker News',
     source_type: 'hacker_news',
     subreddit: null,
+    channel_id: null,
     active: true,
     last_fetch: null,
     ...overrides,

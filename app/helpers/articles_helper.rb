@@ -8,6 +8,7 @@ module ArticlesHelper
   }.freeze
 
   KNOWN_SOURCE_TYPES = CATEGORIES.values.flatten.freeze
+  YOUTUBE_SOURCE_PREFIX = "youtube_".freeze
 
   def group_sources_by_category(articles_by_source)
     grouped = {}
@@ -20,8 +21,13 @@ module ArticlesHelper
       grouped[category_name] = category_articles if category_articles.any?
     end
 
-    # Add any sources not in predefined categories
-    other_sources = articles_by_source.keys - KNOWN_SOURCE_TYPES
+    video_keys = youtube_source_types(articles_by_source.keys)
+    if video_keys.any?
+      grouped["Videos"] = video_keys.flat_map { |source_type| articles_by_source[source_type] || [] }
+    end
+
+    # Add any sources not in predefined categories (and not YouTube).
+    other_sources = articles_by_source.keys - KNOWN_SOURCE_TYPES - video_keys
     if other_sources.any?
       other_articles = []
       other_sources.each do |source_type|
@@ -40,6 +46,7 @@ module ArticlesHelper
       "Security" => "🔒",
       "AI & Machine Learning" => "🤖",
       "General Tech" => "💻",
+      "Videos" => "▶️",
       "Other" => "📰"
     }
     icons[category_name] || "📄"
@@ -57,6 +64,7 @@ module ArticlesHelper
       return source_types if category_slug(name) == slug
     end
 
+    return :videos if category_slug("Videos") == slug
     return :other if category_slug("Other") == slug
 
     nil
@@ -67,8 +75,12 @@ module ArticlesHelper
     return scope if source_types.nil? && (slug.blank? || slug == "all")
     return scope.none if source_types.nil?
 
-    if source_types == :other
+    case source_types
+    when :videos
+      scope.where("source_type LIKE ?", "#{YOUTUBE_SOURCE_PREFIX}%")
+    when :other
       scope.where.not(source_type: KNOWN_SOURCE_TYPES)
+           .where.not("source_type LIKE ?", "#{YOUTUBE_SOURCE_PREFIX}%")
     else
       scope.where(source_type: source_types)
     end
@@ -87,9 +99,17 @@ module ArticlesHelper
       grouped[category_name] = count if count.positive?
     end
 
-    other_count = counts_by_source.except(*KNOWN_SOURCE_TYPES).values.sum
+    video_keys = youtube_source_types(counts_by_source.keys)
+    video_count = video_keys.sum { |key| counts_by_source[key] || 0 }
+    grouped["Videos"] = video_count if video_count.positive?
+
+    other_count = counts_by_source.except(*KNOWN_SOURCE_TYPES, *video_keys).values.sum
     grouped["Other"] = other_count if other_count.positive?
 
     grouped
+  end
+
+  def youtube_source_types(source_types)
+    Array(source_types).select { |source_type| source_type.to_s.start_with?(YOUTUBE_SOURCE_PREFIX) }
   end
 end

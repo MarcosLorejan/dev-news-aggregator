@@ -55,7 +55,7 @@ dev-news-aggregator/
 | `app/models/` | ActiveRecord models |
 | `app/services/` | Business logic — news aggregation orchestration |
 | `app/services/error_reporting/` | Rails.error subscriber + optional webhook alerts |
-| `app/services/news_fetchers/` | Per-source API fetchers (HN, Dev.to, Reddit) |
+| `app/services/news_fetchers/` | Per-source API fetchers (HN, Dev.to, Reddit, YouTube) |
 | `app/jobs/` | Background jobs (e.g. permanent dismissal) |
 | `app/helpers/` | View helpers (categories, formatting) |
 | `app/views/` | ERB templates |
@@ -101,6 +101,7 @@ dev-news-aggregator/
 | `news_fetchers/hacker_news_fetcher.rb` | Hacker News Firebase API |
 | `news_fetchers/dev_to_fetcher.rb` | Dev.to REST API |
 | `news_fetchers/reddit_fetcher.rb` | Reddit API (one instance per subreddit) |
+| `news_fetchers/youtube_fetcher.rb` | YouTube channel Atom feeds (no API key) |
 | `personal_feed_ranker.rb` | For you sort — source affinity from bookmarks/dismissals |
 | `article_topic_classifier.rb` | Schema-validated topic tagging (keyword heuristics) |
 | `feed_noise_classifier.rb` | Heuristics to flag low-signal / meme feed items |

@@ -69,6 +69,21 @@ development: &default
         - artificial
         - LocalLLaMA
 
+    youtube:
+      # Public channel Atom feeds — no API key / quota. Prefer channel_id (UC...).
+      feed_base_url: "https://www.youtube.com/feeds/videos.xml"
+      min_request_interval_seconds: 2.0
+      rate_limit_max_retries: 4
+      channels:
+        - channel_id: "UCWnPjmqvljcafA0QXblOU1A"
+          name: "Confreaks"
+        - channel_id: "UCsBjURrPoezykLs9EqgamOA"
+          name: "Fireship"
+        - channel_id: "UC_x5XG1OV2P6uZZ5FSM9Ttw"
+          name: "Google for Developers"
+        - channel_id: "UCUyeluBRhGPCW4rPe7MhPUA"
+          name: "ThePrimeagen"
+
 test:
   <<: *default
   fetching:

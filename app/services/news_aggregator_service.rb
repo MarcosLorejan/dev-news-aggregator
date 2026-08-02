@@ -26,6 +26,13 @@ class NewsAggregatorService
       fetchers << NewsFetchers::RedditFetcher.new(subreddit: subreddit)
     end
 
+    NewsAggregatorConfig.youtube_channels.each do |channel|
+      fetchers << NewsFetchers::YoutubeFetcher.new(
+        channel_id: channel[:channel_id],
+        channel_name: channel[:name]
+      )
+    end
+
     fetchers
   end
 
