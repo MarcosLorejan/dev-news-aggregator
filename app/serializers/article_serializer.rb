@@ -11,6 +11,7 @@ class ArticleSerializer
       read: article.read?,
       dismissed: article.dismissed?,
       pending_dismissal: article.pending_dismissal?,
+      low_signal: article.low_signal,
       related_sources: Array(related_articles).map { |related| related_source_json(related) }
     )
   end

@@ -9,6 +9,7 @@ export interface ArticleCardData {
   score: number
   comment_count: number
   published_at: string
+  low_signal?: boolean
   related_sources?: Array<{
     id: number
     source_type: string

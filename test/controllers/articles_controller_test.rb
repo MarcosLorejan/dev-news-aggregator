@@ -159,6 +159,29 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal published_ats, published_ats.sort.reverse
   end
 
+  test "index JSON demotes low_signal articles after high-signal ones" do
+    high = articles(:hacker_news_article)
+    high.update!(title: "Substantive engineering deep dive article", url: "https://example.com/deep-dive")
+
+    low = articles(:dev_to_article)
+    low.update!(title: "lol", url: "https://i.redd.it/meme.png", description: "pic")
+
+    get articles_url, as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)["articles"]
+    high_row = body.find { |article| article["id"] == high.id }
+    low_row = body.find { |article| article["id"] == low.id }
+
+    assert high_row
+    assert low_row
+    assert_equal false, high_row["low_signal"]
+    assert_equal true, low_row["low_signal"]
+
+    ids = body.map { |article| article["id"] }
+    assert_operator ids.index(high.id), :<, ids.index(low.id)
+  end
+
   test "index JSON sorts by score descending" do
     get articles_url(sort: "score"), as: :json
     assert_response :success

@@ -4,6 +4,7 @@ class Article < ApplicationRecord
   validates :url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
 
   before_validation :assign_canonical_url
+  before_validation :assign_low_signal
 
   has_one :bookmark, dependent: :destroy
   has_one :read_article, dependent: :destroy
@@ -108,5 +109,9 @@ class Article < ApplicationRecord
 
   def assign_canonical_url
     self.canonical_url = UrlCanonicalizer.canonicalize(url)
+  end
+
+  def assign_low_signal
+    self.low_signal = FeedNoiseClassifier.low_signal?(self)
   end
 end

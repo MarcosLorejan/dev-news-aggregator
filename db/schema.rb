@@ -20,6 +20,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_130000) do
     t.datetime "created_at", null: false
     t.text "description"
     t.string "external_id"
+    t.boolean "low_signal", default: false, null: false
     t.datetime "published_at"
     t.integer "score"
     t.string "source_type"
@@ -31,6 +32,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_130000) do
     t.string "url"
     t.index ["canonical_url"], name: "index_articles_on_canonical_url"
     t.index ["external_id", "source_type"], name: "index_articles_on_external_id_and_source_type", unique: true
+    t.index ["low_signal"], name: "index_articles_on_low_signal"
     t.index ["published_at"], name: "index_articles_on_published_at"
     t.index ["score", "published_at"], name: "index_articles_on_score_and_published_at", order: :desc
     t.index ["source_type"], name: "index_articles_on_source_type"

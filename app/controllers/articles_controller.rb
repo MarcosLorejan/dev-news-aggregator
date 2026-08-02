@@ -5,9 +5,9 @@ class ArticlesController < ApplicationController
   FETCH_RATE_LIMIT = 2.minutes
 
   ALLOWED_SORTS = {
-    "published_at" => { published_at: :desc },
-    "score" => Arel.sql("score DESC NULLS LAST, published_at DESC"),
-    "comment_count" => Arel.sql("comment_count DESC NULLS LAST, published_at DESC")
+    "published_at" => Arel.sql("low_signal ASC, published_at DESC"),
+    "score" => Arel.sql("low_signal ASC, score DESC NULLS LAST, published_at DESC"),
+    "comment_count" => Arel.sql("low_signal ASC, comment_count DESC NULLS LAST, published_at DESC")
   }.freeze
 
   before_action :authenticate_mutation!, only: %i[fetch bookmark unbookmark dismiss undismiss]
