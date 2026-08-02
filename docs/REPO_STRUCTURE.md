@@ -123,6 +123,11 @@ dev-news-aggregator/
 |------|---------|
 | `app/frontend/entrypoints/application.tsx` | Vite/React mount point |
 | `app/frontend/components/App.tsx` | Root React component |
+| `app/frontend/pages/InterestsIndexPage.tsx` | Manage saved keyword interest presets |
+| `app/frontend/api/keywordFilters.ts` | Keyword filter CRUD client |
+| `app/frontend/types/keywordFilter.ts` | Keyword filter TypeScript types |
+| `app/frontend/components/InterestFilter.tsx` | Interest chip filters on the articles index |
+| `app/frontend/components/TermChipInput.tsx` | Chip input for interest keyword terms |
 
 ## `config/`
 

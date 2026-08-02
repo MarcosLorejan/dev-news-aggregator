@@ -77,7 +77,11 @@ export async function apiRequest<T>(
     let message = `Request failed: ${response.status}`
     try {
       const body = await response.json()
-      if (body?.error) message = body.error
+      if (typeof body?.error === 'string' && body.error) {
+        message = body.error
+      } else if (Array.isArray(body?.errors) && body.errors.length > 0) {
+        message = body.errors.join(', ')
+      }
     } catch {
       // ignore JSON parse errors
     }

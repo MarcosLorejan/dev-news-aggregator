@@ -61,6 +61,9 @@ export default function PageHeader({
           <NavLink to="/sources" className={navLinkClassName('purple')}>
             Sources
           </NavLink>
+          <NavLink to="/interests" className={navLinkClassName('blue')}>
+            Interests
+          </NavLink>
           {onShowReadChange && (
             <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
               <input
