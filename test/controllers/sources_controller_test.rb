@@ -40,10 +40,15 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "success", hn["last_fetch"]["status"]
     assert_equal 12, hn["last_fetch"]["articles_count"]
     assert_not_nil hn["last_fetch"]["finished_at"]
+    assert_equal false, hn["last_fetch"]["empty"]
+    assert_equal 1, hn["last_fetch"]["success_count"]
+    assert_equal 100.0, hn["last_fetch"]["success_rate"]
+    assert hn["last_fetch"].key?("last_article_at")
 
     assert_equal "failure", rust["last_fetch"]["status"]
     assert_equal "rate limited", rust["last_fetch"]["error_message"]
     assert_equal "StandardError", rust["last_fetch"]["error_class"]
+    assert_equal 1, rust["last_fetch"]["failure_count"]
 
     assert_nil never_fetched["last_fetch"]
   end

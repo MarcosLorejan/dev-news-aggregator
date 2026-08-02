@@ -5,9 +5,10 @@ class ArticlesController < ApplicationController
   FETCH_RATE_LIMIT = 2.minutes
 
   ALLOWED_SORTS = {
-    "published_at" => { published_at: :desc },
-    "score" => Arel.sql("score DESC NULLS LAST, published_at DESC"),
-    "comment_count" => Arel.sql("comment_count DESC NULLS LAST, published_at DESC")
+    "published_at" => Arel.sql("low_signal ASC, published_at DESC"),
+    "score" => Arel.sql("low_signal ASC, score DESC NULLS LAST, published_at DESC"),
+    "comment_count" => Arel.sql("low_signal ASC, comment_count DESC NULLS LAST, published_at DESC"),
+    "for_you" => :for_you
   }.freeze
 
   before_action :authenticate_mutation!, only: %i[fetch bookmark unbookmark dismiss undismiss summarize]
@@ -22,6 +23,8 @@ class ArticlesController < ApplicationController
     base_scope = article_index_scope
     @total_count = base_scope.unscope(:includes, :order, :select).count
     @articles = base_scope.limit(per_page).offset((page - 1) * per_page)
+    @topic_tags = Tag.order(:name).map { |tag| { slug: tag.slug, name: tag.name } }
+    @related_by_article_id = ArticleClusterer.related_by_article_id(@articles)
 
     @articles_by_source = @articles.group_by(&:source_type)
     @articles_by_category = helpers.group_sources_by_category(@articles_by_source)
@@ -31,10 +34,16 @@ class ArticlesController < ApplicationController
       format.html
       format.json do
         render json: {
-          articles: @articles.map { |article| ArticleSerializer.as_json(article) },
+          articles: @articles.map { |article|
+            ArticleSerializer.as_json(
+              article,
+              related_articles: @related_by_article_id[article.id] || []
+            )
+          },
           articles_by_category: @articles_by_category.transform_values { |articles| articles.map(&:id) },
           category_counts: @category_counts,
           categories: @category_counts.keys.map { |name| { name: name, icon: helpers.category_icon(name) } },
+          topic_tags: @topic_tags,
           pagination: {
             current_page: page,
             per_page: per_page,
@@ -63,10 +72,15 @@ class ArticlesController < ApplicationController
 
   def show
     @article = Article.includes(:bookmark, :read_article, :dismissed_article).find(params[:id])
+    @similar_articles = Article.similar_to(@article).includes(:bookmark, :read_article, :dismissed_article)
 
     respond_to do |format|
       format.html
-      format.json { render json: ArticleSerializer.as_json(@article, include_summary: true) }
+      format.json {
+        render json: ArticleSerializer.as_json(@article, include_summary: true).merge(
+          similar_articles: @similar_articles.map { |article| ArticleSerializer.as_json(article) }
+        )
+      }
     end
   end
 
@@ -136,12 +150,31 @@ class ArticlesController < ApplicationController
 
     scope = apply_score_filter(scope)
     scope = scope.search(params[:q])
+    scope = scope.with_topic_tag(params[:tag])
     scope = helpers.apply_category_filter(scope, params[:category]) if apply_category
-    apply_sort(scope.includes(:bookmark, :read_article, :dismissed_article))
+    scope = ArticleClusterer.primaries(scope)
+    apply_sort(scope.includes(:bookmark, :read_article, :dismissed_article, :tags))
   end
 
   def apply_sort(scope)
+    if params[:q].present? && params[:sort].blank?
+      q = params[:q].to_s.strip
+      return scope.order(
+        Arel.sql(
+          Article.sanitize_sql_array(
+            [
+              "GREATEST(similarity(articles.title, ?), similarity(COALESCE(articles.description, ''), ?)) DESC, articles.published_at DESC",
+              q,
+              q
+            ]
+          )
+        )
+      )
+    end
+
     key = params[:sort].presence_in(ALLOWED_SORTS.keys) || "published_at"
+    return PersonalFeedRanker.apply(scope) if key == "for_you"
+
     scope.order(ALLOWED_SORTS[key])
   end
 

@@ -34,6 +34,20 @@ class FetchRunTest < ActiveSupport::TestCase
     assert run.failure?
     assert_equal "StandardError", run.error_class
     assert_equal "API down", run.error_message
+    assert_equal 1, run.failure_count
+    assert_not_nil run.last_failure_at
+  end
+
+  test "record_outcome increments health counters and empty successes" do
+    FetchRun.record_outcome(source_key: "hacker_news", status: "success", articles_count: 0)
+    run = FetchRun.record_outcome(source_key: "hacker_news", status: "success", articles_count: 3)
+    FetchRun.record_outcome(source_key: "hacker_news", status: "failure", error: StandardError.new("boom"))
+
+    run.reload
+    assert_equal 2, run.success_count
+    assert_equal 1, run.failure_count
+    assert_equal 1, run.empty_success_count
+    assert_equal 66.7, run.success_rate
   end
 
   test "failed scope returns only failed sources" do

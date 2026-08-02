@@ -142,6 +142,21 @@ describe('ArticlesIndexPage dismiss flow', () => {
     expect(screen.getByRole('button', { name: 'Highest score' })).toHaveAttribute('aria-pressed', 'true')
   })
 
+  it('requests for_you sort when selected', async () => {
+    const user = userEvent.setup()
+    renderPage()
+
+    await waitForArticlesFeed()
+    await user.click(screen.getByRole('button', { name: 'For you' }))
+
+    await waitFor(() => {
+      expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+        expect.objectContaining({ sort: 'for_you' })
+      )
+    })
+    expect(screen.getByRole('button', { name: 'For you' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
   it('updates sort via the sort control', async () => {
     const user = userEvent.setup()
     renderPage()

@@ -22,6 +22,7 @@ describe('AppShell', () => {
     expect(screen.getByTestId('app-nav-saved')).toHaveTextContent('Reading List')
     expect(screen.getByTestId('app-nav-read')).toHaveTextContent('Already Read')
     expect(screen.getByTestId('app-nav-dismissed')).toHaveTextContent('Recently Dismissed')
+    expect(screen.getByTestId('app-nav-digests')).toHaveTextContent('Digests')
   })
 
   it('highlights Feed on articles index', () => {

@@ -5,14 +5,17 @@ class ArticleSerializer
 
   SUMMARY_ATTRIBUTES = %i[summary summary_provider summarized_at].freeze
 
-  def self.as_json(article, include_summary: false)
+  def self.as_json(article, related_articles: [], include_summary: false)
     payload = base_attributes(article).merge(
       created_at: article.created_at,
       updated_at: article.updated_at,
       bookmarked: article.bookmarked?,
       read: article.read?,
       dismissed: article.dismissed?,
-      pending_dismissal: article.pending_dismissal?
+      pending_dismissal: article.pending_dismissal?,
+      low_signal: article.low_signal,
+      topic_tags: article.tags.map { |tag| { slug: tag.slug, name: tag.name } },
+      related_sources: Array(related_articles).map { |related| related_source_json(related) }
     )
 
     return payload unless include_summary
@@ -50,4 +53,15 @@ class ArticleSerializer
     SUMMARY_ATTRIBUTES.index_with { |attribute| article.public_send(attribute) }
   end
   private_class_method :summary_attributes
+
+  def self.related_source_json(article)
+    {
+      id: article.id,
+      source_type: article.source_type,
+      url: article.url,
+      title: article.title,
+      score: article.score
+    }
+  end
+  private_class_method :related_source_json
 end

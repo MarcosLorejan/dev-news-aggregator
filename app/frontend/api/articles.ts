@@ -6,6 +6,7 @@ export function fetchArticles(params?: {
   per_page?: number
   show_read?: boolean
   category?: string
+  tag?: string
   q?: string
   sort?: string
   min_score?: number
@@ -17,6 +18,7 @@ export function fetchArticles(params?: {
   if (params?.per_page) search.set('per_page', String(params.per_page))
   if (params?.show_read) search.set('show_read', 'true')
   if (params?.category && params.category !== 'all') search.set('category', params.category)
+  if (params?.tag && params.tag !== 'all') search.set('tag', params.tag)
   if (params?.q?.trim()) search.set('q', params.q.trim())
   if (params?.sort && params.sort !== 'published_at') search.set('sort', params.sort)
   if (params?.min_score) search.set('min_score', String(params.min_score))
