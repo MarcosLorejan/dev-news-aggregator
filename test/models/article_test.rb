@@ -444,6 +444,13 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal [ literal ], Article.matching_keywords("100%").to_a
   end
 
+  test "matched_keywords_for returns only terms present in title or description" do
+    article = articles(:reddit_rust_article)
+
+    assert_equal [ "rust" ], article.matched_keywords_for("ruby,rust,wasm")
+    assert_empty article.matched_keywords_for("elixir")
+  end
+
   test "similar_to returns title-similar articles" do
     related = articles(:dev_to_article)
     @article.update!(title: "Rails performance tips for production")

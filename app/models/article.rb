@@ -82,6 +82,12 @@ class Article < ApplicationRecord
     term_groups.each_index.map { |index| row.public_send("keyword_count_#{index}").to_i }
   end
 
+  # Which of the requested terms appear in this article's title/description (case-insensitive).
+  def matched_keywords_for(terms)
+    haystack = "#{title} #{description}".downcase
+    self.class.normalize_keywords(terms).select { |term| haystack.include?(term.downcase) }
+  end
+
   def self.similar_to(article, limit: 5)
     title = article.title.to_s.strip
     return none if title.blank?

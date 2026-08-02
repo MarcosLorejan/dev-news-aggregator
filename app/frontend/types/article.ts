@@ -30,6 +30,7 @@ export interface Article {
   low_signal?: boolean
   topic_tags?: TopicTag[]
   related_sources?: RelatedSource[]
+  matched_keywords?: string[]
   similar_articles?: Article[]
   summary?: string | null
   summary_provider?: string | null

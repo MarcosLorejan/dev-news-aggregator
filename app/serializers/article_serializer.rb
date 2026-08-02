@@ -5,7 +5,7 @@ class ArticleSerializer
 
   SUMMARY_ATTRIBUTES = %i[summary summary_provider summarized_at].freeze
 
-  def self.as_json(article, related_articles: [], include_summary: false)
+  def self.as_json(article, related_articles: [], include_summary: false, matched_keywords: nil)
     payload = base_attributes(article).merge(
       created_at: article.created_at,
       updated_at: article.updated_at,
@@ -17,6 +17,7 @@ class ArticleSerializer
       topic_tags: article.tags.map { |tag| { slug: tag.slug, name: tag.name } },
       related_sources: Array(related_articles).map { |related| related_source_json(related) }
     )
+    payload[:matched_keywords] = matched_keywords unless matched_keywords.nil?
 
     return payload unless include_summary
 

@@ -103,6 +103,52 @@ describe('ArticleCard', () => {
     expect(screen.getByRole('link', { name: /Dev To/i })).toHaveAttribute('href', '/articles/9')
   })
 
+  it('renders matched keyword badges with overflow', () => {
+    render(
+      <MemoryRouter>
+        <ArticleCard
+          variant="feed"
+          article={{
+            ...feedArticle,
+            matched_keywords: ['rust', 'cargo', 'wasm', 'tokio'],
+          }}
+          categorySlug="programming"
+          index={0}
+          isDismissing={false}
+          onDismiss={() => {}}
+          onBookmarkToggle={() => {}}
+          onReadToggle={() => {}}
+        />
+      </MemoryRouter>
+    )
+
+    const badges = screen.getByTestId('matched-keywords')
+    expect(badges).toHaveTextContent('rust')
+    expect(badges).toHaveTextContent('cargo')
+    expect(badges).toHaveTextContent('wasm')
+    expect(badges).toHaveTextContent('+1')
+    expect(badges).not.toHaveTextContent('tokio')
+  })
+
+  it('omits matched keyword badges when the field is absent', () => {
+    render(
+      <MemoryRouter>
+        <ArticleCard
+          variant="feed"
+          article={feedArticle}
+          categorySlug="programming"
+          index={0}
+          isDismissing={false}
+          onDismiss={() => {}}
+          onBookmarkToggle={() => {}}
+          onReadToggle={() => {}}
+        />
+      </MemoryRouter>
+    )
+
+    expect(screen.queryByTestId('matched-keywords')).not.toBeInTheDocument()
+  })
+
   it('renders bookmark variant with bookmarked metadata', () => {
     render(
       <MemoryRouter>
