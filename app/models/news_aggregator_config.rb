@@ -105,5 +105,47 @@ module NewsAggregatorConfig
     def youtube_max_duration_seconds
       config.dig(:apis, :youtube, :max_duration_seconds) || 1200
     end
+
+    def youtube_search
+      config.dig(:apis, :youtube, :search) || {}
+    end
+
+    def youtube_search_enabled?
+      ActiveModel::Type::Boolean.new.cast(youtube_search[:enabled])
+    end
+
+    def youtube_search_daily_call_budget
+      [ youtube_search.fetch(:daily_call_budget, 20).to_i, 0 ].max
+    end
+
+    def youtube_search_min_interval_hours
+      [ youtube_search.fetch(:min_interval_hours, 12).to_i, 0 ].max
+    end
+
+    def youtube_search_max_results
+      [ youtube_search.fetch(:max_results, 10).to_i, 1 ].max.clamp(1, 50)
+    end
+
+    def youtube_search_video_duration
+      value = youtube_search[:video_duration].to_s
+      %w[short medium long any].include?(value) ? value : "medium"
+    end
+
+    def youtube_search_order
+      value = youtube_search[:order].to_s
+      %w[date relevance viewCount rating].include?(value) ? value : "date"
+    end
+
+    def youtube_search_relevance_language
+      youtube_search[:relevance_language].presence || "en"
+    end
+
+    def youtube_search_region_code
+      youtube_search[:region_code].presence || "US"
+    end
+
+    def youtube_search_published_after_days
+      [ youtube_search.fetch(:published_after_days, 7).to_i, 1 ].max
+    end
   end
 end
