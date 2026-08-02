@@ -10,12 +10,15 @@ class FetchNewsJobTest < ActiveJob::TestCase
     }
 
     original = NewsAggregatorService.method(:fetch_all_news)
+    enrich_original = YoutubeVideoEnricher.method(:enrich!)
     NewsAggregatorService.define_singleton_method(:fetch_all_news) { expected }
+    YoutubeVideoEnricher.define_singleton_method(:enrich!) { { enriched: 0, skipped: true } }
     begin
       result = FetchNewsJob.perform_now
       assert_equal expected, result
     ensure
       NewsAggregatorService.define_singleton_method(:fetch_all_news, original)
+      YoutubeVideoEnricher.define_singleton_method(:enrich!, enrich_original)
     end
   end
 end

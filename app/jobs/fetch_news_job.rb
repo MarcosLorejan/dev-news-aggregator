@@ -2,6 +2,8 @@ class FetchNewsJob < ApplicationJob
   queue_as :default
 
   def perform
-    NewsAggregatorService.fetch_all_news
+    result = NewsAggregatorService.fetch_all_news
+    YoutubeVideoEnricher.enrich!
+    result
   end
 end
