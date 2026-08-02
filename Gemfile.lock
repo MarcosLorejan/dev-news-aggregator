@@ -317,7 +317,7 @@ GEM
       websocket (~> 1.0)
     simplecov (1.0.2)
     simplecov-lcov (0.9.0)
-    solid_cable (3.0.12)
+    solid_cable (4.0.2)
       actioncable (>= 7.2)
       activejob (>= 7.2)
       activerecord (>= 7.2)
