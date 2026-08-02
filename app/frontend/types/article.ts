@@ -30,6 +30,7 @@ export interface Article {
   low_signal?: boolean
   topic_tags?: TopicTag[]
   related_sources?: RelatedSource[]
+  similar_articles?: Article[]
 }
 
 export interface Category {

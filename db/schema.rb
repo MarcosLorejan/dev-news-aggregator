@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "article_tags", force: :cascade do |t|
     t.bigint "article_id", null: false
@@ -41,11 +42,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_130000) do
     t.datetime "updated_at", null: false
     t.string "url"
     t.index ["canonical_url"], name: "index_articles_on_canonical_url"
+    t.index ["description"], name: "index_articles_on_description_trgm", opclass: :gin_trgm_ops, using: :gin
     t.index ["external_id", "source_type"], name: "index_articles_on_external_id_and_source_type", unique: true
     t.index ["low_signal"], name: "index_articles_on_low_signal"
     t.index ["published_at"], name: "index_articles_on_published_at"
     t.index ["score", "published_at"], name: "index_articles_on_score_and_published_at", order: :desc
     t.index ["source_type"], name: "index_articles_on_source_type"
+    t.index ["title"], name: "index_articles_on_title_trgm", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "bookmarks", force: :cascade do |t|
