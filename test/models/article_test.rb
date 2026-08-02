@@ -361,4 +361,20 @@ class ArticleTest < ActiveSupport::TestCase
     assert_includes titles, "100% coverage tips"
     assert_equal 1, titles.size
   end
+
+  test "search matches fuzzy title via trigram" do
+    @article.update!(title: "Learning Rust concurrency patterns")
+    results = Article.search("Rust concurrency")
+    assert_includes results, @article
+  end
+
+  test "similar_to returns title-similar articles" do
+    related = articles(:dev_to_article)
+    @article.update!(title: "Rails performance tips for production")
+    related.update!(title: "Rails performance tips and tricks")
+
+    similar = Article.similar_to(@article)
+    assert_includes similar, related
+    assert_not_includes similar, @article
+  end
 end

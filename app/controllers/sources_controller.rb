@@ -63,12 +63,17 @@ class SourcesController < ApplicationController
 
   def sources_json
     sources = NewsSource.order(:source_type, :name).to_a
-    runs_by_key = FetchRun.where(source_key: sources.map(&:source_key)).index_by(&:source_key)
-    sources.map { |source| source_json(source, runs_by_key[source.source_key]) }
+    keys = sources.map(&:source_key)
+    runs_by_key = FetchRun.where(source_key: keys).index_by(&:source_key)
+    last_article_at_by_key = Article.where(source_type: keys).group(:source_type).maximum(:published_at)
+    sources.map { |source|
+      source_json(source, runs_by_key[source.source_key], last_article_at_by_key[source.source_key])
+    }
   end
 
-  def source_json(source, fetch_run = nil)
+  def source_json(source, fetch_run = nil, last_article_at = nil)
     fetch_run ||= FetchRun.find_by(source_key: source.source_key)
+    last_article_at ||= Article.where(source_type: source.source_key).maximum(:published_at)
 
     {
       id: source.id,
@@ -76,11 +81,11 @@ class SourcesController < ApplicationController
       source_type: source.source_type,
       subreddit: source.subreddit,
       active: source.active,
-      last_fetch: last_fetch_json(fetch_run)
+      last_fetch: last_fetch_json(fetch_run, last_article_at)
     }
   end
 
-  def last_fetch_json(fetch_run)
+  def last_fetch_json(fetch_run, last_article_at = nil)
     return nil unless fetch_run
 
     {
@@ -89,7 +94,15 @@ class SourcesController < ApplicationController
       articles_count: fetch_run.articles_count,
       duration_seconds: fetch_run.duration_seconds,
       error_class: fetch_run.error_class,
-      error_message: fetch_run.error_message
+      error_message: fetch_run.error_message,
+      empty: fetch_run.empty_success?,
+      success_count: fetch_run.success_count,
+      failure_count: fetch_run.failure_count,
+      empty_success_count: fetch_run.empty_success_count,
+      success_rate: fetch_run.success_rate,
+      last_success_at: fetch_run.last_success_at,
+      last_failure_at: fetch_run.last_failure_at,
+      last_article_at: last_article_at
     }
   end
 end
