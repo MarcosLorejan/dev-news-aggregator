@@ -10,6 +10,7 @@ const DismissedArticlesIndexPage = lazy(() => import('../pages/DismissedArticles
 const ReadArticlesIndexPage = lazy(() => import('../pages/ReadArticlesIndexPage'))
 const RecentlyDismissedPage = lazy(() => import('../pages/RecentlyDismissedPage'))
 const SourcesIndexPage = lazy(() => import('../pages/SourcesIndexPage'))
+const InterestsIndexPage = lazy(() => import('../pages/InterestsIndexPage'))
 const DigestsIndexPage = lazy(() => import('../pages/DigestsIndexPage'))
 const DigestsShowPage = lazy(() => import('../pages/DigestsShowPage'))
 
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="/dismissed" element={<DismissedArticlesIndexPage />} />
             <Route path="/recently_dismissed" element={<RecentlyDismissedPage />} />
             <Route path="/sources" element={<SourcesIndexPage />} />
+            <Route path="/interests" element={<InterestsIndexPage />} />
             <Route path="/digests" element={<DigestsIndexPage />} />
             <Route path="/digests/:id" element={<DigestsShowPage />} />
           </Route>

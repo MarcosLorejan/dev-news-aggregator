@@ -28,6 +28,11 @@ export const sourcesBreadcrumbs: BreadcrumbItem[] = [
   { label: 'News Sources' },
 ]
 
+export const interestsBreadcrumbs: BreadcrumbItem[] = [
+  feedBreadcrumb,
+  { label: 'Interests' },
+]
+
 export function articleBreadcrumbs(title: string): BreadcrumbItem[] {
   return [feedBreadcrumb, { label: title }]
 }

@@ -77,6 +77,19 @@ describe('apiRequest', () => {
     expect(retryHeaders.get('Authorization')).toBe(`Basic ${btoa('admin:secret')}`)
   })
 
+  it('joins plural errors from unprocessable responses', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 422,
+      json: async () => ({ errors: ["Name can't be blank", 'Terms must include at least one keyword'] }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(apiRequest('/keyword_filters.json', { method: 'POST', body: '{}' })).rejects.toThrow(
+      "Name can't be blank, Terms must include at least one keyword"
+    )
+  })
+
   it('isAbortError detects AbortError', () => {
     expect(isAbortError(new DOMException('Aborted', 'AbortError'))).toBe(true)
     expect(isAbortError(Object.assign(new Error('Aborted'), { name: 'AbortError' }))).toBe(true)
