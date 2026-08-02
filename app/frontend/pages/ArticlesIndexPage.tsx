@@ -25,6 +25,7 @@ import PageHeaderSkeleton from '../components/PageHeaderSkeleton'
 import PageContainer from '../components/ui/PageContainer'
 import Card from '../components/ui/Card'
 import PaginationControls from '../components/PaginationControls'
+import TopicFilter from '../components/TopicFilter'
 import ScoreFilter, { parseScoreFilter, scoreFilterParams, type ScoreFilterValue } from '../components/ScoreFilter'
 import SortControl, { parseSort, type SortValue } from '../components/SortControl'
 import { usePatchSearchParams } from '../hooks/useSearchParamState'
@@ -53,6 +54,7 @@ export default function ArticlesIndexPage() {
     return Number.isFinite(raw) && raw >= 1 ? raw : 1
   })()
   const activeFilter = searchParams.get('category') ?? 'all'
+  const activeTag = searchParams.get('tag') ?? 'all'
   const activeScoreFilter = parseScoreFilter(searchParams.get('score'))
   const activeSort = parseSort(searchParams.get('sort'))
   const showRead = searchParams.get('show_read') === 'true'
@@ -110,6 +112,7 @@ export default function ArticlesIndexPage() {
         page,
         show_read: showRead,
         category: activeFilter !== 'all' ? activeFilter : undefined,
+        tag: activeTag !== 'all' ? activeTag : undefined,
         q: searchQuery || undefined,
         sort: activeSort,
         ...scoreFilterParams(activeScoreFilter),
@@ -130,7 +133,7 @@ export default function ArticlesIndexPage() {
     } finally {
       if (!signal.aborted) setLoading(false)
     }
-  }, [showRead, activeScoreFilter, activeFilter, activeSort, searchQuery, currentPage, patchSearchParams])
+  }, [showRead, activeScoreFilter, activeFilter, activeTag, activeSort, searchQuery, currentPage, patchSearchParams])
 
   useEffect(() => {
     void loadArticles()
@@ -259,6 +262,14 @@ export default function ArticlesIndexPage() {
     patchSearchParams((params) => {
       if (filter === 'all') params.delete('category')
       else params.set('category', filter)
+      params.delete('page')
+    })
+  }
+
+  const handleTagChange = (tag: string) => {
+    patchSearchParams((params) => {
+      if (tag === 'all') params.delete('tag')
+      else params.set('tag', tag)
       params.delete('page')
     })
   }
@@ -444,6 +455,12 @@ export default function ArticlesIndexPage() {
         totalCount={allArticlesCount}
         activeFilter={activeFilter}
         onFilterChange={handleFilterChange}
+      />
+
+      <TopicFilter
+        tags={data.topic_tags ?? []}
+        activeTag={activeTag}
+        onTagChange={handleTagChange}
       />
 
       {showNoSearchResults ? (

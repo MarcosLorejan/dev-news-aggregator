@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
-import { truncate } from '../../utils/format'
+import { humanizeSourceType, truncate } from '../../utils/format'
 import { cn } from '../../utils/cn'
 import { DetailsLink } from './CardActions'
 import CardMetadata from './CardMetadata'
@@ -49,6 +49,7 @@ export default function ArticleCardLayout({
   featured = false,
 }: ArticleCardLayoutProps) {
   const styles = CARD_THEMES[theme]
+  const relatedSources = article.related_sources ?? []
 
   return (
     <article
@@ -81,6 +82,22 @@ export default function ArticleCardLayout({
         <p className="text-body text-gray-200 mb-6 line-clamp-3 leading-relaxed max-w-prose">
           {truncate(article.description, 280)}
         </p>
+      )}
+
+      {relatedSources.length > 0 && (
+        <div className="mb-5 flex flex-wrap items-center gap-2" data-testid="related-sources">
+          <span className="text-caption text-gray-400">Also on</span>
+          {relatedSources.map((related) => (
+            <a
+              key={related.id}
+              href={`/articles/${related.id}`}
+              className="text-caption rounded-md border border-dark-500 px-2 py-1 text-gray-200 hover:border-primary-500/40 hover:text-primary-300 transition-colors"
+              onClick={(event) => event.stopPropagation()}
+            >
+              {humanizeSourceType(related.source_type)}
+            </a>
+          ))}
+        </div>
       )}
 
       <div className="flex justify-between items-center text-caption text-gray-300 border-t border-dark-600 pt-4">

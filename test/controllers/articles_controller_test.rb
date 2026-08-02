@@ -159,6 +159,29 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal published_ats, published_ats.sort.reverse
   end
 
+  test "index JSON demotes low_signal articles after high-signal ones" do
+    high = articles(:hacker_news_article)
+    high.update!(title: "Substantive engineering deep dive article", url: "https://example.com/deep-dive")
+
+    low = articles(:dev_to_article)
+    low.update!(title: "lol", url: "https://i.redd.it/meme.png", description: "pic")
+
+    get articles_url, as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)["articles"]
+    high_row = body.find { |article| article["id"] == high.id }
+    low_row = body.find { |article| article["id"] == low.id }
+
+    assert high_row
+    assert low_row
+    assert_equal false, high_row["low_signal"]
+    assert_equal true, low_row["low_signal"]
+
+    ids = body.map { |article| article["id"] }
+    assert_operator ids.index(high.id), :<, ids.index(low.id)
+  end
+
   test "index JSON sorts by score descending" do
     get articles_url(sort: "score"), as: :json
     assert_response :success
@@ -174,6 +197,40 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
     counts = JSON.parse(response.body)["articles"].map { |article| article["comment_count"] }
     assert_equal counts, counts.sort.reverse
+  end
+
+  test "index JSON filters by topic tag" do
+    article = articles(:reddit_rust_article)
+    ArticleTopicClassifier.apply!(article)
+
+    get articles_url(tag: "rust"), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    ids = body["articles"].map { |row| row["id"] }
+    assert_includes ids, article.id
+    assert body["articles"].all? { |row|
+      row["topic_tags"].any? { |tag| tag["slug"] == "rust" }
+    }
+    assert body["topic_tags"].any? { |tag| tag["slug"] == "rust" }
+  end
+
+  test "index JSON collapses duplicate canonical urls into one primary" do
+    shared = "https://example.com/same-story"
+    @article.update!(url: "#{shared}?utm_source=hn", score: 40)
+    @dev_to_article.update!(url: shared, score: 90)
+
+    get articles_url, as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    ids = body["articles"].map { |article| article["id"] }
+    assert_includes ids, @dev_to_article.id
+    assert_not_includes ids, @article.id
+
+    primary = body["articles"].find { |article| article["id"] == @dev_to_article.id }
+    related_ids = primary["related_sources"].map { |related| related["id"] }
+    assert_includes related_ids, @article.id
   end
 
   test "index JSON falls back to published_at for invalid sort" do
