@@ -13,6 +13,37 @@ class ArticleTest < ActiveSupport::TestCase
     assert_not @article.bookmarked?
   end
 
+  test "content_type defaults to article for existing rows" do
+    assert_equal "article", @article.content_type
+    assert_not @article.video?
+    assert_includes Article.articles_only, @article
+    assert_not_includes Article.videos, @article
+  end
+
+  test "content_type must be article or video" do
+    @article.content_type = "podcast"
+    assert_not @article.valid?
+    assert_includes @article.errors[:content_type], "is not included in the list"
+  end
+
+  test "videos scope returns only video content" do
+    video = Article.create!(
+      title: "Short tip",
+      url: "https://youtube.com/watch?v=abc",
+      external_id: "yt-abc",
+      source_type: "youtube",
+      published_at: Time.current,
+      content_type: "video",
+      duration_seconds: 45,
+      thumbnail_url: "https://i.ytimg.com/vi/abc/hqdefault.jpg",
+      author: "Dev Channel"
+    )
+
+    assert video.video?
+    assert_includes Article.videos, video
+    assert_not_includes Article.articles_only, video
+  end
+
   test "bookmarked? returns true when bookmark exists" do
     @article.create_bookmark
     assert @article.bookmarked?

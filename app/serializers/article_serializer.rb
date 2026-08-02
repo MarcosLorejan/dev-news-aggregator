@@ -1,6 +1,7 @@
 class ArticleSerializer
   BASE_ATTRIBUTES = %i[
     id title url description source_type score comment_count external_id published_at
+    content_type duration_seconds thumbnail_url author
   ].freeze
 
   SUMMARY_ATTRIBUTES = %i[summary summary_provider summarized_at].freeze

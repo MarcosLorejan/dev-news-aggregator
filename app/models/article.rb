@@ -1,10 +1,12 @@
 class Article < ApplicationRecord
   # Keeps keyword queries bounded no matter how long a saved interest preset grows.
   MAX_KEYWORDS = 20
+  CONTENT_TYPES = %w[article video].freeze
 
   validates :title, :url, :external_id, :source_type, presence: true
   validates :external_id, uniqueness: { scope: :source_type }
   validates :url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
+  validates :content_type, inclusion: { in: CONTENT_TYPES }
 
   before_validation :assign_canonical_url
   before_validation :assign_low_signal
@@ -23,6 +25,8 @@ class Article < ApplicationRecord
   scope :not_dismissed, -> { left_joins(:dismissed_article).where("dismissed_articles.id IS NULL OR dismissed_articles.permanent = false") }
   scope :dismissed, -> { joins(:dismissed_article).where(dismissed_articles: { permanent: true }) }
   scope :pending_dismissal, -> { joins(:dismissed_article).where(dismissed_articles: { permanent: false }) }
+  scope :videos, -> { where(content_type: "video") }
+  scope :articles_only, -> { where(content_type: "article") }
   scope :search, ->(query) {
     q = query.to_s.strip
     if q.blank?
@@ -100,6 +104,10 @@ class Article < ApplicationRecord
 
   def bookmarked?
     bookmark.present?
+  end
+
+  def video?
+    content_type == "video"
   end
 
   def bookmark!

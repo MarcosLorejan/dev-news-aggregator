@@ -79,7 +79,7 @@ dev-news-aggregator/
 
 | File | Table | Purpose |
 |------|-------|---------|
-| `article.rb` | `articles` | Aggregated news item from any source |
+| `article.rb` | `articles` | Aggregated news item (article or video) from any source |
 | `bookmark.rb` | `bookmarks` | User-saved article |
 | `read_article.rb` | `read_articles` | Article marked as read |
 | `dismissed_article.rb` | `dismissed_articles` | Article hidden from feed |
@@ -172,6 +172,7 @@ dev-news-aggregator/
 | `enable_pg_trgm_and_article_similarity_indexes` | `pg_trgm` + trigram indexes on `articles` |
 | `add_summary_to_articles` | `articles.summary`, `summary_provider`, `summarized_at` |
 | `create_keyword_filters` | `keyword_filters` |
+| `add_video_metadata_to_articles` | `articles.content_type`, `duration_seconds`, `thumbnail_url`, `author` |
 
 ## `lib/`
 

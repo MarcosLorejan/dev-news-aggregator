@@ -28,6 +28,10 @@ export interface Article {
   dismissed: boolean
   pending_dismissal: boolean
   low_signal?: boolean
+  content_type?: 'article' | 'video'
+  duration_seconds?: number | null
+  thumbnail_url?: string | null
+  author?: string | null
   topic_tags?: TopicTag[]
   related_sources?: RelatedSource[]
   matched_keywords?: string[]
