@@ -4,6 +4,7 @@ import { cn } from '../../utils/cn'
 import { DetailsLink } from './CardActions'
 import CardMetadata from './CardMetadata'
 import CardTitle from './CardTitle'
+import VideoThumbnail from './VideoThumbnail'
 import Badge from '../ui/Badge'
 import { CARD_THEMES, type ArticleCardData, type ArticleCardAccent, type ArticleCardTheme } from './cardThemes'
 
@@ -74,6 +75,7 @@ export default function ArticleCardLayout({
   const styles = CARD_THEMES[theme]
   const relatedSources = article.related_sources ?? []
   const matchedKeywords = article.matched_keywords ?? []
+  const isVideo = article.content_type === 'video'
 
   return (
     <article
@@ -87,6 +89,7 @@ export default function ArticleCardLayout({
       )}
       data-source={article.source_type}
       data-category={categorySlug}
+      data-content-type={article.content_type ?? 'article'}
       data-featured={featured || undefined}
       style={{
         animationDelay: `${index * 50}ms`,
@@ -101,6 +104,21 @@ export default function ArticleCardLayout({
         showSourceBadge={showSourceBadge}
         headerActions={headerActions}
       />
+
+      {isVideo && (
+        <VideoThumbnail
+          title={article.title}
+          url={article.url}
+          thumbnailUrl={article.thumbnail_url}
+          durationSeconds={article.duration_seconds}
+        />
+      )}
+
+      {isVideo && article.author && (
+        <p className="mb-4 text-sm text-gray-300" data-testid="video-channel">
+          {article.author}
+        </p>
+      )}
 
       {article.description && (
         <p className="text-body text-gray-200 mb-6 line-clamp-3 leading-relaxed max-w-prose">

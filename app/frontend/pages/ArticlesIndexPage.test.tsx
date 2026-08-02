@@ -294,6 +294,31 @@ describe('ArticlesIndexPage dismiss flow', () => {
     expect(screen.getByText('Rust 2024 Edition Highlights')).toBeInTheDocument()
   })
 
+  it('applies content_type and max_duration from the URL', async () => {
+    renderPage(['/articles?content_type=video&max_duration=20'])
+
+    await waitForArticlesFeed()
+    expect(screen.getByRole('button', { name: 'Videos' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: '≤ 20 min' })).toHaveAttribute('aria-pressed', 'true')
+    expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+      expect.objectContaining({ content_type: 'video', max_duration: 20 })
+    )
+  })
+
+  it('updates content type params and resets pagination', async () => {
+    const user = userEvent.setup()
+    renderPage(['/articles?page=3'])
+
+    await waitForArticlesFeed()
+    await user.click(screen.getByRole('button', { name: 'Videos' }))
+
+    await waitFor(() => {
+      expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+        expect.objectContaining({ content_type: 'video', page: 1 })
+      )
+    })
+  })
+
   it('counts down dismiss toast and removes article after timeout', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true })
     const user = userEvent.setup()

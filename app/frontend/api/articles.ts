@@ -12,6 +12,8 @@ export function fetchArticles(params?: {
   sort?: string
   min_score?: number
   top_percent?: number
+  content_type?: 'article' | 'video'
+  max_duration?: number
   signal?: AbortSignal
 }) {
   const search = new URLSearchParams()
@@ -25,6 +27,8 @@ export function fetchArticles(params?: {
   if (params?.sort && params.sort !== 'published_at') search.set('sort', params.sort)
   if (params?.min_score) search.set('min_score', String(params.min_score))
   if (params?.top_percent) search.set('top_percent', String(params.top_percent))
+  if (params?.content_type) search.set('content_type', params.content_type)
+  if (params?.max_duration) search.set('max_duration', String(params.max_duration))
 
   const query = search.toString()
   return apiRequest<ArticlesIndexResponse>(`/articles.json${query ? `?${query}` : ''}`, {

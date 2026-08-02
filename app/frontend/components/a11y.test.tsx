@@ -7,6 +7,7 @@ import ArticleCard from './ArticleCard'
 import CategoryFilter from './CategoryFilter'
 import ConfirmDialog from './ConfirmDialog'
 import InterestFilter from './InterestFilter'
+import ContentTypeFilter from './ContentTypeFilter'
 import PageHeading from './ui/PageHeading'
 import { buildKeywordFilter } from '../test/fixtures'
 
@@ -72,6 +73,24 @@ describe('accessibility audits', () => {
     expect(results).toHaveNoViolations()
   })
 
+  it('ContentTypeFilter has no critical accessibility violations', async () => {
+    const { container } = render(
+      <ContentTypeFilter
+        activeContentType="video"
+        activeMaxDuration="20"
+        onContentTypeChange={vi.fn()}
+        onMaxDurationChange={vi.fn()}
+      />
+    )
+
+    const results = await axe(container, {
+      rules: {
+        'color-contrast': { enabled: true },
+      },
+    })
+    expect(results).toHaveNoViolations()
+  })
+
   it('feed ArticleCard has no critical accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>
@@ -79,6 +98,33 @@ describe('accessibility audits', () => {
           variant="feed"
           article={baseArticle}
           categorySlug="programming-languages"
+          index={0}
+          isDismissing={false}
+          onDismiss={() => {}}
+          onBookmarkToggle={() => {}}
+          onReadToggle={() => {}}
+        />
+      </MemoryRouter>
+    )
+
+    const results = await axe(container)
+    expect(results).toHaveNoViolations()
+  })
+
+  it('feed video ArticleCard has no critical accessibility violations', async () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ArticleCard
+          variant="feed"
+          article={{
+            ...baseArticle,
+            content_type: 'video',
+            author: 'Thoughtbot',
+            thumbnail_url: 'https://i.ytimg.com/vi/abc123/hqdefault.jpg',
+            duration_seconds: 372,
+            source_type: 'youtube_thoughtbot',
+          }}
+          categorySlug="videos"
           index={0}
           isDismissing={false}
           onDismiss={() => {}}

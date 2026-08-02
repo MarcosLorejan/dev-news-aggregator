@@ -30,6 +30,14 @@ import Card from '../components/ui/Card'
 import PaginationControls from '../components/PaginationControls'
 import TopicFilter from '../components/TopicFilter'
 import ScoreFilter, { parseScoreFilter, scoreFilterParams, type ScoreFilterValue } from '../components/ScoreFilter'
+import ContentTypeFilter, {
+  contentTypeFilterParams,
+  maxDurationFilterParams,
+  parseContentTypeFilter,
+  parseMaxDurationFilter,
+  type ContentTypeFilterValue,
+  type MaxDurationFilterValue,
+} from '../components/ContentTypeFilter'
 import SortControl, { parseSort, type SortValue } from '../components/SortControl'
 import { usePatchSearchParams } from '../hooks/useSearchParamState'
 
@@ -59,6 +67,8 @@ export default function ArticlesIndexPage() {
   const activeFilter = searchParams.get('category') ?? 'all'
   const activeTag = searchParams.get('tag') ?? 'all'
   const activeScoreFilter = parseScoreFilter(searchParams.get('score'))
+  const activeContentType = parseContentTypeFilter(searchParams.get('content_type'))
+  const activeMaxDuration = parseMaxDurationFilter(searchParams.get('max_duration'))
   const activeSort = parseSort(searchParams.get('sort'))
   const showRead = searchParams.get('show_read') === 'true'
   const searchQuery = (searchParams.get('q') ?? '').trim()
@@ -123,6 +133,8 @@ export default function ArticlesIndexPage() {
         q: searchQuery || undefined,
         sort: activeSort,
         ...scoreFilterParams(activeScoreFilter),
+        ...contentTypeFilterParams(activeContentType),
+        ...maxDurationFilterParams(activeMaxDuration),
         signal,
       })
       if (signal.aborted) return
@@ -140,7 +152,19 @@ export default function ArticlesIndexPage() {
     } finally {
       if (!signal.aborted) setLoading(false)
     }
-  }, [showRead, activeScoreFilter, activeFilter, activeTag, activeInterests, activeSort, searchQuery, currentPage, patchSearchParams])
+  }, [
+    showRead,
+    activeScoreFilter,
+    activeContentType,
+    activeMaxDuration,
+    activeFilter,
+    activeTag,
+    activeInterests,
+    activeSort,
+    searchQuery,
+    currentPage,
+    patchSearchParams,
+  ])
 
   useEffect(() => {
     void loadArticles()
@@ -275,6 +299,22 @@ export default function ArticlesIndexPage() {
     patchSearchParams((params) => {
       if (value === 'all') params.delete('score')
       else params.set('score', value)
+      params.delete('page')
+    })
+  }
+
+  const handleContentTypeChange = (value: ContentTypeFilterValue) => {
+    patchSearchParams((params) => {
+      if (value === 'all') params.delete('content_type')
+      else params.set('content_type', value)
+      params.delete('page')
+    })
+  }
+
+  const handleMaxDurationChange = (value: MaxDurationFilterValue) => {
+    patchSearchParams((params) => {
+      if (value === 'all') params.delete('max_duration')
+      else params.set('max_duration', value)
       params.delete('page')
     })
   }
@@ -510,6 +550,13 @@ export default function ArticlesIndexPage() {
       <ScoreFilter
         activeScoreFilter={activeScoreFilter}
         onScoreFilterChange={handleScoreFilterChange}
+      />
+
+      <ContentTypeFilter
+        activeContentType={activeContentType}
+        activeMaxDuration={activeMaxDuration}
+        onContentTypeChange={handleContentTypeChange}
+        onMaxDurationChange={handleMaxDurationChange}
       />
 
       <SortControl

@@ -149,6 +149,91 @@ describe('ArticleCard', () => {
     expect(screen.queryByTestId('matched-keywords')).not.toBeInTheDocument()
   })
 
+  it('renders video thumbnail, duration badge, and channel name', () => {
+    render(
+      <MemoryRouter>
+        <ArticleCard
+          variant="feed"
+          article={{
+            ...feedArticle,
+            content_type: 'video',
+            title: 'Hexagonal Architecture in Rails',
+            author: 'Thoughtbot',
+            thumbnail_url: 'https://i.ytimg.com/vi/abc123/hqdefault.jpg',
+            duration_seconds: 372,
+            source_type: 'youtube_thoughtbot',
+          }}
+          categorySlug="videos"
+          index={0}
+          isDismissing={false}
+          onDismiss={() => {}}
+          onBookmarkToggle={() => {}}
+          onReadToggle={() => {}}
+        />
+      </MemoryRouter>
+    )
+
+    const thumb = screen.getByTestId('video-thumbnail')
+    expect(thumb).toHaveAttribute('aria-label', 'Watch Hexagonal Architecture in Rails')
+    expect(thumb.querySelector('img')).toHaveAttribute(
+      'src',
+      'https://i.ytimg.com/vi/abc123/hqdefault.jpg'
+    )
+    expect(screen.getByTestId('video-duration')).toHaveTextContent('6:12')
+    expect(screen.getByTestId('video-channel')).toHaveTextContent('Thoughtbot')
+    expect(screen.getByRole('article')).toHaveAttribute('data-content-type', 'video')
+  })
+
+  it('degrades cleanly when thumbnail and duration are missing', () => {
+    render(
+      <MemoryRouter>
+        <ArticleCard
+          variant="feed"
+          article={{
+            ...feedArticle,
+            content_type: 'video',
+            author: 'Confreaks',
+            thumbnail_url: null,
+            duration_seconds: null,
+            source_type: 'youtube_confreaks',
+          }}
+          categorySlug="videos"
+          index={0}
+          isDismissing={false}
+          onDismiss={() => {}}
+          onBookmarkToggle={() => {}}
+          onReadToggle={() => {}}
+        />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByTestId('video-thumbnail')).toBeInTheDocument()
+    expect(screen.queryByTestId('video-duration')).not.toBeInTheDocument()
+    expect(screen.getByTestId('video-channel')).toHaveTextContent('Confreaks')
+    expect(screen.queryByRole('img')).not.toBeInTheDocument()
+  })
+
+  it('leaves text articles visually without video chrome', () => {
+    render(
+      <MemoryRouter>
+        <ArticleCard
+          variant="feed"
+          article={{ ...feedArticle, content_type: 'article' }}
+          categorySlug="programming"
+          index={0}
+          isDismissing={false}
+          onDismiss={() => {}}
+          onBookmarkToggle={() => {}}
+          onReadToggle={() => {}}
+        />
+      </MemoryRouter>
+    )
+
+    expect(screen.queryByTestId('video-thumbnail')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('video-channel')).not.toBeInTheDocument()
+    expect(screen.getByRole('article')).toHaveAttribute('data-content-type', 'article')
+  })
+
   it('renders bookmark variant with bookmarked metadata', () => {
     render(
       <MemoryRouter>
