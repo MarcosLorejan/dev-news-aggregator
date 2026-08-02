@@ -36,6 +36,10 @@ module NewsAggregatorConfig
       Array(config.dig(:apis, :reddit, :subreddits))
     end
 
+    def interests
+      Array(config[:interests])
+    end
+
     def reddit_min_request_interval_seconds
       config.dig(:apis, :reddit, :min_request_interval_seconds) || 2.5
     end
