@@ -6,7 +6,9 @@ import { axe } from 'vitest-axe'
 import ArticleCard from './ArticleCard'
 import CategoryFilter from './CategoryFilter'
 import ConfirmDialog from './ConfirmDialog'
+import InterestFilter from './InterestFilter'
 import PageHeading from './ui/PageHeading'
+import { buildKeywordFilter } from '../test/fixtures'
 
 const baseArticle = {
   id: 1,
@@ -38,6 +40,27 @@ describe('accessibility audits', () => {
         totalCount={4}
         activeFilter="all"
         onFilterChange={vi.fn()}
+      />
+    )
+
+    const results = await axe(container, {
+      rules: {
+        'color-contrast': { enabled: true },
+      },
+    })
+    expect(results).toHaveNoViolations()
+  })
+
+  it('InterestFilter has no critical accessibility violations', async () => {
+    const { container } = render(
+      <InterestFilter
+        interests={[
+          buildKeywordFilter(),
+          buildKeywordFilter({ id: 2, name: 'Rust', slug: 'rust', terms: ['rust'], article_count: 5 }),
+        ]}
+        selectedSlugs={['ruby']}
+        onToggle={vi.fn()}
+        onClear={vi.fn()}
       />
     )
 

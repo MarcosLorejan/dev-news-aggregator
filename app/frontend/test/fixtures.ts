@@ -1,6 +1,7 @@
 import type { Article, ArticlesIndexResponse } from '../types/article'
 import type { BookmarkArticle, BookmarksIndexResponse } from '../types/bookmark'
 import type { NewsSource, SourcesIndexResponse } from '../api/sources'
+import type { KeywordFilter, KeywordFiltersIndexResponse } from '../types/keywordFilter'
 
 export function buildArticle(overrides: Partial<Article> = {}): Article {
   return {
@@ -61,6 +62,38 @@ export function buildArticlesIndexResponse(
       total_pages: 1,
     },
     last_updated: '2024-06-01T12:00:00Z',
+    ...overrides,
+  }
+}
+
+export function buildKeywordFilter(overrides: Partial<KeywordFilter> = {}): KeywordFilter {
+  return {
+    id: 1,
+    name: 'Ruby',
+    slug: 'ruby',
+    terms: ['ruby', 'rubygems'],
+    active: true,
+    position: 0,
+    article_count: 3,
+    ...overrides,
+  }
+}
+
+export function buildKeywordFiltersResponse(
+  overrides: Partial<KeywordFiltersIndexResponse> = {}
+): KeywordFiltersIndexResponse {
+  return {
+    keyword_filters: [
+      buildKeywordFilter(),
+      buildKeywordFilter({
+        id: 2,
+        name: 'Rust',
+        slug: 'rust',
+        terms: ['rust'],
+        position: 1,
+        article_count: 5,
+      }),
+    ],
     ...overrides,
   }
 }
