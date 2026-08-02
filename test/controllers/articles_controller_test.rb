@@ -281,6 +281,33 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal JSON.parse(response.body)["pagination"]["total_count"], unfiltered
   end
 
+  test "index JSON filters by a saved interest slug" do
+    get articles_url(interest: "ruby"), as: :json
+    assert_response :success
+
+    ids = JSON.parse(response.body)["articles"].map { |article| article["id"] }
+    assert_includes ids, @dev_to_article.id
+    assert_not_includes ids, @rust_article.id
+  end
+
+  test "index JSON unions interest terms with explicit keywords" do
+    get articles_url(interest: "ruby", keywords: "rust"), as: :json
+    assert_response :success
+
+    ids = JSON.parse(response.body)["articles"].map { |article| article["id"] }
+    assert_includes ids, @dev_to_article.id
+    assert_includes ids, @rust_article.id
+  end
+
+  test "index JSON returns nothing for an unknown interest" do
+    get articles_url(interest: "does-not-exist"), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    assert_empty body["articles"]
+    assert_equal 0, body["pagination"]["total_count"]
+  end
+
   test "index JSON keeps category counts consistent with keyword filter" do
     get articles_url(keywords: "rust"), as: :json
     assert_response :success

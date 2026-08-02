@@ -31,6 +31,8 @@ Rails.application.routes.draw do
 
   resources :sources, only: [ :index, :create, :update, :destroy ]
 
+  resources :keyword_filters, only: [ :index, :create, :update, :destroy ]
+
   # Bookmarks routes
   resources :bookmarks, only: [ :index ]
 

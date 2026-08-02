@@ -73,6 +73,7 @@ dev-news-aggregator/
 | `bookmarks_controller.rb` | Saved articles index |
 | `read_articles_controller.rb` | Mark articles as read |
 | `dismissed_articles_controller.rb` | Dismissed and recently dismissed lists |
+| `keyword_filters_controller.rb` | CRUD for saved keyword interests (presets) |
 
 ### Models
 
