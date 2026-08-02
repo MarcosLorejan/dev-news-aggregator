@@ -7,7 +7,8 @@ class ArticlesController < ApplicationController
   ALLOWED_SORTS = {
     "published_at" => Arel.sql("low_signal ASC, published_at DESC"),
     "score" => Arel.sql("low_signal ASC, score DESC NULLS LAST, published_at DESC"),
-    "comment_count" => Arel.sql("low_signal ASC, comment_count DESC NULLS LAST, published_at DESC")
+    "comment_count" => Arel.sql("low_signal ASC, comment_count DESC NULLS LAST, published_at DESC"),
+    "for_you" => :for_you
   }.freeze
 
   before_action :authenticate_mutation!, only: %i[fetch bookmark unbookmark dismiss undismiss]
@@ -159,6 +160,8 @@ class ArticlesController < ApplicationController
     end
 
     key = params[:sort].presence_in(ALLOWED_SORTS.keys) || "published_at"
+    return PersonalFeedRanker.apply(scope) if key == "for_you"
+
     scope.order(ALLOWED_SORTS[key])
   end
 

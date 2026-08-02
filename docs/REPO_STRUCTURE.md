@@ -99,6 +99,7 @@ dev-news-aggregator/
 | `news_fetchers/hacker_news_fetcher.rb` | Hacker News Firebase API |
 | `news_fetchers/dev_to_fetcher.rb` | Dev.to REST API |
 | `news_fetchers/reddit_fetcher.rb` | Reddit API (one instance per subreddit) |
+| `personal_feed_ranker.rb` | For you sort — source affinity from bookmarks/dismissals |
 | `article_topic_classifier.rb` | Schema-validated topic tagging (keyword heuristics) |
 | `feed_noise_classifier.rb` | Heuristics to flag low-signal / meme feed items |
 | `url_canonicalizer.rb` | Normalizes article URLs for cross-source clustering |

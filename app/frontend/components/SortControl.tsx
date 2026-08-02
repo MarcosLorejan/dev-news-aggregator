@@ -1,7 +1,7 @@
 import Button from './ui/Button'
 import Card from './ui/Card'
 
-export type SortValue = 'published_at' | 'score' | 'comment_count'
+export type SortValue = 'published_at' | 'for_you' | 'score' | 'comment_count'
 
 interface SortControlProps {
   activeSort: SortValue
@@ -10,6 +10,7 @@ interface SortControlProps {
 
 const OPTIONS: { value: SortValue; label: string }[] = [
   { value: 'published_at', label: 'Newest' },
+  { value: 'for_you', label: 'For you' },
   { value: 'score', label: 'Highest score' },
   { value: 'comment_count', label: 'Most comments' },
 ]
