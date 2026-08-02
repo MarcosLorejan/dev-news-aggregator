@@ -43,14 +43,8 @@ class Article < ApplicationRecord
     joins(:tags).where(tags: { slug: slug }).distinct
   }
   scope :matching_keywords, ->(terms, match: :any) {
-    keywords = Article.normalize_keywords(terms)
-    return all if keywords.empty?
-
-    joiner = match.to_s == "all" ? " AND " : " OR "
-    clause = keywords.map { "(title ILIKE ? OR COALESCE(description, '') ILIKE ?)" }.join(joiner)
-    patterns = keywords.flat_map { |keyword| [ "%#{sanitize_sql_like(keyword)}%" ] * 2 }
-
-    where(clause, *patterns)
+    clause = Article.keyword_clause(terms, match: match)
+    clause ? where(clause) : all
   }
 
   # Accepts a comma-separated string or an array; multi-word terms stay whole phrases.
@@ -61,6 +55,31 @@ class Article < ApplicationRecord
         .reject(&:blank?)
         .uniq { |term| term.downcase }
         .first(MAX_KEYWORDS)
+  end
+
+  # Sanitized SQL fragment for the given terms, or nil when there is nothing to match.
+  def self.keyword_clause(terms, match: :any)
+    keywords = normalize_keywords(terms)
+    return nil if keywords.empty?
+
+    joiner = match.to_s == "all" ? " AND " : " OR "
+    keywords.map { |keyword|
+      pattern = "%#{sanitize_sql_like(keyword)}%"
+      sanitize_sql_array([ "(title ILIKE ? OR COALESCE(description, '') ILIKE ?)", pattern, pattern ])
+    }.join(joiner)
+  end
+
+  # Conditional counts in one query, so listing N keyword presets stays a single round trip.
+  def self.keyword_match_counts(term_groups, scope: all)
+    return [] if term_groups.empty?
+
+    projections = term_groups.each_with_index.map { |terms, index|
+      "COUNT(CASE WHEN #{keyword_clause(terms) || 'FALSE'} THEN 1 END) AS keyword_count_#{index}"
+    }
+
+    row = scope.unscope(:includes, :order, :select, :limit, :offset).select(projections.join(", ")).take
+
+    term_groups.each_index.map { |index| row.public_send("keyword_count_#{index}").to_i }
   end
 
   def self.similar_to(article, limit: 5)

@@ -150,11 +150,27 @@ class ArticlesController < ApplicationController
 
     scope = apply_score_filter(scope)
     scope = scope.search(params[:q])
-    scope = scope.matching_keywords(params[:keywords], match: params[:match])
+    scope = apply_keyword_filter(scope)
     scope = scope.with_topic_tag(params[:tag])
     scope = helpers.apply_category_filter(scope, params[:category]) if apply_category
     scope = ArticleClusterer.primaries(scope)
     apply_sort(scope.includes(:bookmark, :read_article, :dismissed_article, :tags))
+  end
+
+  # `interest=<slug>` expands to that preset's saved terms and is unioned with any explicit
+  # `keywords`; `match` then applies to the combined list. An unknown slug filters everything
+  # out, mirroring how an unknown category behaves.
+  def apply_keyword_filter(scope)
+    terms = Article.normalize_keywords(params[:keywords])
+
+    if params[:interest].present?
+      interest = KeywordFilter.find_by(slug: params[:interest])
+      return scope.none if interest.nil?
+
+      terms += interest.terms
+    end
+
+    scope.matching_keywords(terms, match: params[:match])
   end
 
   def apply_sort(scope)
