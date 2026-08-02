@@ -42,6 +42,8 @@ Rails.application.routes.draw do
   resources :dismissed_articles, only: [ :index ], path: "dismissed"
   get "recently_dismissed", to: "dismissed_articles#recently_dismissed"
 
+  resources :digests, only: [ :index, :show, :create ]
+
   root "articles#index"
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by uptime monitors and load balancers.

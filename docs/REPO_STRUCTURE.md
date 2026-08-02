@@ -2,7 +2,7 @@
 
 Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
 
-Last updated: 2026-08-01
+Last updated: 2026-08-02
 
 ## Maintenance
 
@@ -69,6 +69,7 @@ dev-news-aggregator/
 |------|----------------|
 | `articles_controller.rb` | Article list/show, bookmark, dismiss actions |
 | `api/v1/articles_controller.rb` | Agent-oriented JSON API for list/search/mutations |
+| `digests_controller.rb` | Unread digest list/show/generate |
 | `bookmarks_controller.rb` | Saved articles index |
 | `read_articles_controller.rb` | Mark articles as read |
 | `dismissed_articles_controller.rb` | Dismissed and recently dismissed lists |
@@ -83,6 +84,9 @@ dev-news-aggregator/
 | `dismissed_article.rb` | `dismissed_articles` | Article hidden from feed |
 | `news_source.rb` | `news_sources` | Optional DB-backed source registry; overrides YAML defaults when enabled |
 | `news_aggregator_config.rb` | — | Loads `config/news_aggregator.yml` (limits, retention, subreddits) |
+| `tag.rb` | `tags` | Topic tag vocabulary for articles |
+| `article_tag.rb` | `article_tags` | Join table for article topic tags |
+| `news_digest.rb` | `news_digests` | Generated unread digests (daily/weekly payloads) |
 | `fetch_run.rb` | `fetch_runs` | Latest per-source news fetch outcome (status, duration, errors) |
 
 ### Services
@@ -95,6 +99,7 @@ dev-news-aggregator/
 | `news_fetchers/hacker_news_fetcher.rb` | Hacker News Firebase API |
 | `news_fetchers/dev_to_fetcher.rb` | Dev.to REST API |
 | `news_fetchers/reddit_fetcher.rb` | Reddit API (one instance per subreddit) |
+| `digest_builder.rb` | Builds schema-validated unread digests (title-only without LLM) |
 
 ### Jobs
 
@@ -146,6 +151,7 @@ dev-news-aggregator/
 | `create_read_articles` | `read_articles` |
 | `create_dismissed_articles` | `dismissed_articles` |
 | `create_fetch_runs` | `fetch_runs` |
+| `create_news_digests` | `news_digests` |
 
 ## `lib/`
 
