@@ -15,6 +15,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_130000) do
   enable_extension "pg_catalog.plpgsql"
 
   create_table "articles", force: :cascade do |t|
+    t.string "canonical_url"
     t.integer "comment_count"
     t.datetime "created_at", null: false
     t.text "description"
@@ -28,6 +29,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_130000) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.string "url"
+    t.index ["canonical_url"], name: "index_articles_on_canonical_url"
     t.index ["external_id", "source_type"], name: "index_articles_on_external_id_and_source_type", unique: true
     t.index ["published_at"], name: "index_articles_on_published_at"
     t.index ["score", "published_at"], name: "index_articles_on_score_and_published_at", order: :desc
