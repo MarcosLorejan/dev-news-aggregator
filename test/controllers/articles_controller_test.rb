@@ -399,6 +399,9 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal @article.title, json_response["title"]
     assert json_response.key?("bookmarked")
     assert json_response.key?("read")
+    assert json_response.key?("summary")
+    assert_equal false, json_response.dig("summarizer", "enabled")
+    assert_equal "none", json_response.dig("summarizer", "provider")
     assert json_response.key?("similar_articles")
   end
 
@@ -413,6 +416,37 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     similar_ids = JSON.parse(response.body)["similar_articles"].map { |row| row["id"] }
     assert_includes similar_ids, related.id
     assert_not_includes similar_ids, @article.id
+  end
+
+  test "summarize is disabled by default and does not break" do
+    post summarize_article_path(@article), as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert_nil json_response["summary"]
+    assert_equal "summarizer_disabled", json_response["error"]
+    assert_equal false, json_response.dig("summarizer", "enabled")
+    assert_nil @article.reload.summary
+  end
+
+  test "summarize with heuristic provider caches summary" do
+    previous = ENV["ARTICLE_SUMMARIZER_PROVIDER"]
+    ENV["ARTICLE_SUMMARIZER_PROVIDER"] = "heuristic"
+
+    post summarize_article_path(@article), as: :json
+
+    assert_response :success
+    json_response = JSON.parse(response.body)
+    assert_nil json_response["error"]
+    assert_includes json_response["summary"], "amazing product"
+    assert_equal "heuristic", json_response["summary_provider"]
+    assert_equal json_response["summary"], @article.reload.summary
+  ensure
+    if previous
+      ENV["ARTICLE_SUMMARIZER_PROVIDER"] = previous
+    else
+      ENV.delete("ARTICLE_SUMMARIZER_PROVIDER")
+    end
   end
 
   test "show JSON should include bookmark state" do

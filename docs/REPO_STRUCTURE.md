@@ -105,6 +105,8 @@ dev-news-aggregator/
 | `url_canonicalizer.rb` | Normalizes article URLs for cross-source clustering |
 | `article_clusterer.rb` | Collapses duplicate canonical URLs; related source lookup |
 | `digest_builder.rb` | Builds schema-validated unread digests (title-only without LLM) |
+| `article_summarizer.rb` | Pluggable article summarizer facade (`none` / `heuristic` / `openai` / `ollama`) |
+| `summarizers/` | Provider implementations for `ArticleSummarizer` |
 
 ### Jobs
 
@@ -160,6 +162,8 @@ dev-news-aggregator/
 | `add_canonical_url_to_articles` | `articles.canonical_url` + index |
 | `add_low_signal_to_articles` | `articles.low_signal` + index |
 | `create_news_digests` | `news_digests` |
+| `enable_pg_trgm_and_article_similarity_indexes` | `pg_trgm` + trigram indexes on `articles` |
+| `add_summary_to_articles` | `articles.summary`, `summary_provider`, `summarized_at` |
 
 ## `lib/`
 
@@ -189,6 +193,7 @@ dev-news-aggregator/
 | `REPO_STRUCTURE.md` | This file — directory map and maintenance rules |
 | `PRE_COMMIT_HOOKS.md` | Overcommit setup and usage |
 | `REACT_SETUP.md` | React/Vite frontend setup |
+| `SUMMARIZER.md` | Optional pluggable article summarizer (env, providers, caching) |
 
 ## `.github/`
 
@@ -243,6 +248,7 @@ Agents should start here, then use this file as the navigation map:
 | `/` | `articles#index` |
 | `/articles.atom` | `articles#index` (Atom feed; honors `q`, `category`, `sort`, score filters) |
 | `/articles/:id` | `articles#show` |
+| `/articles/:id/summarize` | `articles#summarize` (POST; optional AI/heuristic summary) |
 | `/bookmarks` | `bookmarks#index` |
 | `/bookmarks.atom` | `bookmarks#index` (Atom feed) |
 | `/read` | `read_articles#index` |

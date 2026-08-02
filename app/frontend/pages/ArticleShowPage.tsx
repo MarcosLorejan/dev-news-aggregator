@@ -4,6 +4,7 @@ import {
   bookmarkArticle,
   fetchArticle,
   markArticleAsRead,
+  summarizeArticle,
   unbookmarkArticle,
   unmarkArticleAsRead,
 } from '../api/articles'
@@ -28,6 +29,7 @@ export default function ArticleShowPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+  const [summarizing, setSummarizing] = useState(false)
   const { confirm, dialog } = useConfirmDialog()
 
   const loadArticle = useCallback(async () => {
@@ -101,6 +103,35 @@ export default function ArticleShowPage() {
       }
     } catch {
       setActionError('Failed to update bookmark.')
+    }
+  }
+
+  const handleSummarize = async () => {
+    if (!article) return
+    setActionError(null)
+    setSummarizing(true)
+    try {
+      const result = await summarizeArticle(article.id, Boolean(article.summary))
+      if (result.error && !result.summary) {
+        setActionError(
+          result.error === 'summarizer_disabled'
+            ? 'Summarizer is disabled.'
+            : 'Failed to generate summary.'
+        )
+        return
+      }
+
+      setArticle({
+        ...article,
+        summary: result.summary,
+        summary_provider: result.summary_provider,
+        summarized_at: result.summarized_at,
+        summarizer: result.summarizer,
+      })
+    } catch {
+      setActionError('Failed to generate summary.')
+    } finally {
+      setSummarizing(false)
     }
   }
 
@@ -180,6 +211,40 @@ export default function ArticleShowPage() {
             <div className="prose prose-lg prose-invert max-w-prose">
               <p className="whitespace-pre-wrap">{article.description}</p>
             </div>
+          </div>
+        )}
+
+        {(article.summary || article.summarizer?.enabled) && (
+          <div className="mb-8 rounded-xl border border-dark-600 bg-dark-900/40 p-5">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold text-gray-100">Summary</h2>
+              {article.summarizer?.enabled && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={handleSummarize}
+                  disabled={summarizing}
+                >
+                  {summarizing
+                    ? 'Generating…'
+                    : article.summary
+                      ? 'Refresh summary'
+                      : 'Generate summary'}
+                </Button>
+              )}
+            </div>
+            {article.summary ? (
+              <p className="whitespace-pre-wrap text-gray-200">{article.summary}</p>
+            ) : (
+              <p className="text-sm text-gray-400">
+                No summary yet. Generate one with the {article.summarizer?.provider} provider.
+              </p>
+            )}
+            {article.summary_provider && (
+              <p className="mt-3 text-xs text-gray-500">
+                Provider: {article.summary_provider}
+              </p>
+            )}
           </div>
         )}
 

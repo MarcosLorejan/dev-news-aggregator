@@ -22,6 +22,10 @@ export function buildArticle(overrides: Partial<Article> = {}): Article {
     low_signal: false,
     topic_tags: [],
     related_sources: [],
+    summary: null,
+    summary_provider: null,
+    summarized_at: null,
+    summarizer: { enabled: false, provider: 'none' },
     ...overrides,
   }
 }

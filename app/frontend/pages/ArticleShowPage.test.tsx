@@ -12,6 +12,7 @@ vi.mock('../api/articles', () => ({
   unbookmarkArticle: vi.fn(),
   markArticleAsRead: vi.fn(),
   unmarkArticleAsRead: vi.fn(),
+  summarizeArticle: vi.fn(),
 }))
 
 function renderPage(path = '/articles/1') {
@@ -167,5 +168,30 @@ describe('ArticleShowPage', () => {
     await user.click(screen.getByRole('button', { name: 'Add to Reading List' }))
 
     expect(await screen.findByText('Failed to update bookmark.')).toBeInTheDocument()
+  })
+
+  it('generates a summary when the summarizer is enabled', async () => {
+    vi.mocked(articlesApi.fetchArticle).mockResolvedValue(
+      buildArticle({
+        summarizer: { enabled: true, provider: 'heuristic' },
+      })
+    )
+    vi.mocked(articlesApi.summarizeArticle).mockResolvedValue({
+      summary: 'A short generated summary.',
+      summary_provider: 'heuristic',
+      summarized_at: '2024-06-01T12:30:00Z',
+      summarizer: { enabled: true, provider: 'heuristic' },
+      error: null,
+    })
+    const user = userEvent.setup()
+    renderPage()
+    await waitForArticleShow()
+
+    await user.click(screen.getByRole('button', { name: 'Generate summary' }))
+
+    await waitFor(() => {
+      expect(articlesApi.summarizeArticle).toHaveBeenCalledWith(1, false)
+    })
+    expect(screen.getByText('A short generated summary.')).toBeInTheDocument()
   })
 })

@@ -11,7 +11,7 @@ class ArticlesController < ApplicationController
     "for_you" => :for_you
   }.freeze
 
-  before_action :authenticate_mutation!, only: %i[fetch bookmark unbookmark dismiss undismiss]
+  before_action :authenticate_mutation!, only: %i[fetch bookmark unbookmark dismiss undismiss summarize]
 
   def index
     @show_read = params[:show_read] == "true"
@@ -77,11 +77,24 @@ class ArticlesController < ApplicationController
     respond_to do |format|
       format.html
       format.json {
-        render json: ArticleSerializer.as_json(@article).merge(
+        render json: ArticleSerializer.as_json(@article, include_summary: true).merge(
           similar_articles: @similar_articles.map { |article| ArticleSerializer.as_json(article) }
         )
       }
     end
+  end
+
+  def summarize
+    @article = Article.find(params[:id])
+    result = ArticleSummarizer.call(@article, force: ActiveModel::Type::Boolean.new.cast(params[:force]))
+
+    render json: {
+      summary: result.summary,
+      summary_provider: result.provider,
+      summarized_at: @article.reload.summarized_at,
+      summarizer: ArticleSummarizer.config,
+      error: result.error
+    }
   end
 
   def bookmark

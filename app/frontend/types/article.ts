@@ -31,6 +31,24 @@ export interface Article {
   topic_tags?: TopicTag[]
   related_sources?: RelatedSource[]
   similar_articles?: Article[]
+  summary?: string | null
+  summary_provider?: string | null
+  summarized_at?: string | null
+  summarizer?: {
+    enabled: boolean
+    provider: string
+  }
+}
+
+export interface ArticleSummaryResponse {
+  summary: string | null
+  summary_provider: string
+  summarized_at: string | null
+  summarizer: {
+    enabled: boolean
+    provider: string
+  }
+  error: string | null
 }
 
 export interface Category {
