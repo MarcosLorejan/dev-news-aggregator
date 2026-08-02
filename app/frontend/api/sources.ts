@@ -7,6 +7,14 @@ export interface SourceLastFetch {
   duration_seconds: number | null
   error_class: string | null
   error_message: string | null
+  empty?: boolean
+  success_count?: number
+  failure_count?: number
+  empty_success_count?: number
+  success_rate?: number | null
+  last_success_at?: string | null
+  last_failure_at?: string | null
+  last_article_at?: string | null
 }
 
 export interface NewsSource {

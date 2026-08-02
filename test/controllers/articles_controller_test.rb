@@ -199,6 +199,24 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal counts, counts.sort.reverse
   end
 
+  test "index JSON collapses duplicate canonical urls into one primary" do
+    shared = "https://example.com/same-story"
+    @article.update!(url: "#{shared}?utm_source=hn", score: 40)
+    @dev_to_article.update!(url: shared, score: 90)
+
+    get articles_url, as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    ids = body["articles"].map { |article| article["id"] }
+    assert_includes ids, @dev_to_article.id
+    assert_not_includes ids, @article.id
+
+    primary = body["articles"].find { |article| article["id"] == @dev_to_article.id }
+    related_ids = primary["related_sources"].map { |related| related["id"] }
+    assert_includes related_ids, @article.id
+  end
+
   test "index JSON falls back to published_at for invalid sort" do
     get articles_url(sort: "not_a_column"), as: :json
     assert_response :success

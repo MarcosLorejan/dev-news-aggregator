@@ -10,19 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
-
-  create_table "article_tags", force: :cascade do |t|
-    t.bigint "article_id", null: false
-    t.datetime "created_at", null: false
-    t.bigint "tag_id", null: false
-    t.datetime "updated_at", null: false
-    t.index ["article_id", "tag_id"], name: "index_article_tags_on_article_id_and_tag_id", unique: true
-    t.index ["article_id"], name: "index_article_tags_on_article_id"
-    t.index ["tag_id"], name: "index_article_tags_on_tag_id"
-  end
 
   create_table "articles", force: :cascade do |t|
     t.string "canonical_url"
@@ -34,6 +24,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_120000) do
     t.datetime "published_at"
     t.integer "score"
     t.string "source_type"
+    t.datetime "summarized_at"
+    t.text "summary"
+    t.string "summary_provider"
     t.string "title"
     t.datetime "updated_at", null: false
     t.string "url"
@@ -68,11 +61,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_120000) do
     t.integer "articles_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.decimal "duration_seconds", precision: 8, scale: 2
+    t.integer "empty_success_count", default: 0, null: false
     t.string "error_class"
     t.text "error_message"
+    t.integer "failure_count", default: 0, null: false
     t.datetime "finished_at", null: false
+    t.datetime "last_failure_at"
+    t.datetime "last_success_at"
     t.string "source_key", null: false
     t.string "status", null: false
+    t.integer "success_count", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["finished_at"], name: "index_fetch_runs_on_finished_at"
     t.index ["source_key"], name: "index_fetch_runs_on_source_key", unique: true
@@ -108,16 +106,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_120000) do
     t.index ["article_id"], name: "index_read_articles_on_article_id", unique: true
   end
 
-  create_table "tags", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "name", null: false
-    t.string "slug", null: false
-    t.datetime "updated_at", null: false
-    t.index ["slug"], name: "index_tags_on_slug", unique: true
-  end
-
-  add_foreign_key "article_tags", "articles"
-  add_foreign_key "article_tags", "tags"
   add_foreign_key "bookmarks", "articles"
   add_foreign_key "dismissed_articles", "articles"
   add_foreign_key "read_articles", "articles"

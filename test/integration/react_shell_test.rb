@@ -35,11 +35,12 @@ class ReactShellTest < ActionDispatch::IntegrationTest
 
     entry = JSON.parse(manifest_path.read).fetch("entrypoints/application.tsx")
     dynamic_imports = entry.fetch("dynamicImports")
+    lazy_pages = lazy_route_pages
 
-    assert_includes dynamic_imports, "pages/ArticlesIndexPage.tsx"
-    assert_includes dynamic_imports, "pages/ArticleShowPage.tsx"
-    assert_includes dynamic_imports, "pages/BookmarksIndexPage.tsx"
-    assert_equal 7, dynamic_imports.size
+    assert_not_empty lazy_pages, "expected App.tsx to lazy-load route pages"
+    assert_equal lazy_pages.sort, dynamic_imports.sort
+    assert_empty entry.fetch("imports", []).grep(%r{\Apages/}),
+                 "route pages must stay lazy, not enter the main bundle"
   end
 
   test "bookmarks index renders react mount point" do
@@ -88,5 +89,16 @@ class ReactShellTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "#root"
     assert_select "script[type='module'][src*='application']"
+  end
+
+  private
+
+  # Pages App.tsx loads with React.lazy, in manifest key form (e.g. "pages/ArticlesIndexPage.tsx").
+  def lazy_route_pages
+    source = Rails.root.join("app/frontend/components/App.tsx").read
+
+    source.scan(%r{lazy\(\(\)\s*=>\s*import\(['"]\.\./pages/([\w./-]+)['"]\)\)})
+          .flatten
+          .map { |page| "pages/#{page.end_with?('.tsx') ? page : "#{page}.tsx"}" }
   end
 end
