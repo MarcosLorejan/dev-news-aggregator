@@ -129,7 +129,9 @@ dev-news-aggregator/
 | `app/frontend/api/keywordFilters.ts` | Keyword filter CRUD client |
 | `app/frontend/types/keywordFilter.ts` | Keyword filter TypeScript types |
 | `app/frontend/components/InterestFilter.tsx` | Interest chip filters on the articles index |
+| `app/frontend/components/ContentTypeFilter.tsx` | Content type and max video duration filters on the articles index |
 | `app/frontend/components/TermChipInput.tsx` | Chip input for interest keyword terms |
+| `app/frontend/components/articleCard/VideoThumbnail.tsx` | Thumbnail, duration badge, and play affordance for video cards |
 
 ## `config/`
 

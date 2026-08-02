@@ -10,6 +10,10 @@ export interface ArticleCardData {
   comment_count: number
   published_at: string
   low_signal?: boolean
+  content_type?: 'article' | 'video'
+  duration_seconds?: number | null
+  thumbnail_url?: string | null
+  author?: string | null
   related_sources?: Array<{
     id: number
     source_type: string
