@@ -1,4 +1,7 @@
 class Article < ApplicationRecord
+  # Keeps keyword queries bounded no matter how long a saved interest preset grows.
+  MAX_KEYWORDS = 20
+
   validates :title, :url, :external_id, :source_type, presence: true
   validates :external_id, uniqueness: { scope: :source_type }
   validates :url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
@@ -39,6 +42,26 @@ class Article < ApplicationRecord
 
     joins(:tags).where(tags: { slug: slug }).distinct
   }
+  scope :matching_keywords, ->(terms, match: :any) {
+    keywords = Article.normalize_keywords(terms)
+    return all if keywords.empty?
+
+    joiner = match.to_s == "all" ? " AND " : " OR "
+    clause = keywords.map { "(title ILIKE ? OR COALESCE(description, '') ILIKE ?)" }.join(joiner)
+    patterns = keywords.flat_map { |keyword| [ "%#{sanitize_sql_like(keyword)}%" ] * 2 }
+
+    where(clause, *patterns)
+  }
+
+  # Accepts a comma-separated string or an array; multi-word terms stay whole phrases.
+  def self.normalize_keywords(terms)
+    list = terms.is_a?(String) ? terms.split(",") : Array(terms)
+
+    list.map { |term| term.to_s.strip }
+        .reject(&:blank?)
+        .uniq { |term| term.downcase }
+        .first(MAX_KEYWORDS)
+  end
 
   def self.similar_to(article, limit: 5)
     title = article.title.to_s.strip

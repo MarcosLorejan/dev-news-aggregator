@@ -150,6 +150,7 @@ class ArticlesController < ApplicationController
 
     scope = apply_score_filter(scope)
     scope = scope.search(params[:q])
+    scope = scope.matching_keywords(params[:keywords], match: params[:match])
     scope = scope.with_topic_tag(params[:tag])
     scope = helpers.apply_category_filter(scope, params[:category]) if apply_category
     scope = ArticleClusterer.primaries(scope)

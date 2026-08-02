@@ -368,6 +368,82 @@ class ArticleTest < ActiveSupport::TestCase
     assert_includes results, @article
   end
 
+  test "matching_keywords returns all articles when no usable term is given" do
+    assert_equal Article.count, Article.matching_keywords(nil).count
+    assert_equal Article.count, Article.matching_keywords("").count
+    assert_equal Article.count, Article.matching_keywords(" , ,  ").count
+    assert_equal Article.count, Article.matching_keywords([]).count
+  end
+
+  test "matching_keywords with any match returns articles hitting either term" do
+    results = Article.matching_keywords("ruby,rust")
+
+    assert_includes results, articles(:dev_to_article)
+    assert_includes results, articles(:reddit_rust_article)
+    assert_not_includes results, articles(:hacker_news_article)
+  end
+
+  test "matching_keywords with all match requires every term" do
+    both = articles(:reddit_ruby_article)
+    both.update!(description: "Exploring the latest Rails features and their performance impact")
+
+    results = Article.matching_keywords("rails,performance", match: :all)
+
+    assert_includes results, both
+    assert_not_includes results, articles(:reddit_rust_article)
+  end
+
+  test "matching_keywords treats multi-word terms as phrases" do
+    architecture = Article.create!(
+      title: "Notes on software architecture reviews",
+      url: "https://example.com/architecture",
+      external_id: "architecture-1",
+      source_type: "hacker_news",
+      published_at: Time.current,
+      description: "Trade-offs in layered designs"
+    )
+    Article.create!(
+      title: "Software testing without architecture talk",
+      url: "https://example.com/testing",
+      external_id: "testing-1",
+      source_type: "hacker_news",
+      published_at: Time.current,
+      description: "Only the two words apart"
+    )
+
+    results = Article.matching_keywords("software architecture")
+
+    assert_equal [ architecture ], results.to_a
+  end
+
+  test "matching_keywords ignores duplicate terms regardless of case" do
+    assert_equal(
+      Article.matching_keywords("ruby").pluck(:id).sort,
+      Article.matching_keywords("ruby,Ruby, RUBY ").pluck(:id).sort
+    )
+  end
+
+  test "matching_keywords caps the number of terms" do
+    filler = (1..Article::MAX_KEYWORDS).map { |index| "no-match-#{index}" }
+
+    results = Article.matching_keywords(filler + [ "rust" ])
+
+    assert_not_includes results, articles(:reddit_rust_article)
+  end
+
+  test "matching_keywords escapes LIKE wildcards" do
+    literal = Article.create!(
+      title: "Ship 100% typed Ruby",
+      url: "https://example.com/typed",
+      external_id: "typed-1",
+      source_type: "dev_to",
+      published_at: Time.current,
+      description: "literal percent"
+    )
+
+    assert_equal [ literal ], Article.matching_keywords("100%").to_a
+  end
+
   test "similar_to returns title-similar articles" do
     related = articles(:dev_to_article)
     @article.update!(title: "Rails performance tips for production")
