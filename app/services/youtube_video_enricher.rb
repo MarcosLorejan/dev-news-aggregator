@@ -61,10 +61,23 @@ class YoutubeVideoEnricher
 
       article.update!(attributes)
       updated += 1
+      discard_if_too_long!(article)
     rescue StandardError => e
       Rails.logger.error "Failed to enrich YouTube video #{article.external_id}: #{e.message}"
     end
     updated
+  end
+
+  def discard_if_too_long!(article)
+    max = NewsAggregatorConfig.youtube_max_duration_seconds.to_i
+    return if max <= 0
+    return if article.duration_seconds.blank? || article.duration_seconds <= max
+    return if article.bookmarked? || article.read?
+
+    Rails.logger.info(
+      "Discarding YouTube video #{article.external_id} (#{article.duration_seconds}s > #{max}s cap)"
+    )
+    article.destroy!
   end
 
   def fetch_videos(ids)

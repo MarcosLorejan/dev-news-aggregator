@@ -153,10 +153,35 @@ class ArticlesController < ApplicationController
     scope = apply_score_filter(scope)
     scope = scope.search(params[:q])
     scope = apply_keyword_filter(scope)
+    scope = apply_content_type_filter(scope)
+    scope = apply_max_duration_filter(scope)
     scope = scope.with_topic_tag(params[:tag])
     scope = helpers.apply_category_filter(scope, params[:category]) if apply_category
     scope = ArticleClusterer.primaries(scope)
     apply_sort(scope.includes(:bookmark, :read_article, :dismissed_article, :tags))
+  end
+
+  def apply_content_type_filter(scope)
+    case params[:content_type].to_s
+    when "video" then scope.videos
+    when "article" then scope.articles_only
+    else scope
+    end
+  end
+
+  # max_duration is in minutes. Text articles are untouched; videos with unknown duration
+  # stay included so Atom-only items remain visible before enrichment.
+  def apply_max_duration_filter(scope)
+    return scope if params[:max_duration].blank?
+
+    seconds = params[:max_duration].to_i * 60
+    return scope if seconds <= 0
+
+    scope.where(
+      "content_type != ? OR duration_seconds IS NULL OR duration_seconds <= ?",
+      "video",
+      seconds
+    )
   end
 
   # `interests=<slug,slug>` (or singular `interest`) expands to the presets' saved terms, unioned

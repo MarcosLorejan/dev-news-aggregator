@@ -78,6 +78,8 @@ development: &default
       enrich_with_api: true
       enrich_batch_size: 50
       enrich_max_per_run: 100
+      # After enrichment, drop videos longer than this (seconds). 0 disables.
+      max_duration_seconds: 1200
       channels:
         - channel_id: "UCWnPjmqvljcafA0QXblOU1A"
           name: "Confreaks"

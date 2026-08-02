@@ -102,6 +102,23 @@ class YoutubeVideoEnricherTest < ActiveSupport::TestCase
     assert_equal 1, @video.comment_count
   end
 
+  test "enrich! discards videos longer than the configured ingest cap" do
+    stub_videos_list(
+      items: [
+        {
+          "id" => "abc123XYZ",
+          "contentDetails" => { "duration" => "PT45M" },
+          "statistics" => { "viewCount" => "9", "commentCount" => "0" }
+        }
+      ]
+    )
+
+    result = YoutubeVideoEnricher.enrich!
+
+    assert_equal 1, result[:enriched]
+    assert_nil Article.find_by(id: @video.id)
+  end
+
   private
 
   def stub_videos_list(items:)

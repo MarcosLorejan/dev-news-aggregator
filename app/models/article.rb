@@ -27,6 +27,10 @@ class Article < ApplicationRecord
   scope :pending_dismissal, -> { joins(:dismissed_article).where(dismissed_articles: { permanent: false }) }
   scope :videos, -> { where(content_type: "video") }
   scope :articles_only, -> { where(content_type: "article") }
+  # Unknown durations are included so Atom-only videos are not hidden before enrichment.
+  scope :shorter_than_or_unknown, ->(seconds) {
+    where("duration_seconds IS NULL OR duration_seconds <= ?", seconds.to_i)
+  }
   scope :search, ->(query) {
     q = query.to_s.strip
     if q.blank?

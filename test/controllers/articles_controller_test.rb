@@ -321,6 +321,82 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_not article.key?("matched_keywords")
   end
 
+  test "index JSON filters by content_type video" do
+    video = Article.create!(
+      title: "Short Ruby tip",
+      url: "https://www.youtube.com/watch?v=vid1",
+      external_id: "vid1",
+      source_type: "youtube_UCtest",
+      published_at: Time.current,
+      content_type: "video",
+      duration_seconds: 90
+    )
+
+    get articles_url(content_type: "video"), as: :json
+    assert_response :success
+
+    ids = JSON.parse(response.body)["articles"].map { |item| item["id"] }
+    assert_includes ids, video.id
+    assert_not_includes ids, @article.id
+  end
+
+  test "index JSON filters by content_type article" do
+    Article.create!(
+      title: "Short Ruby tip",
+      url: "https://www.youtube.com/watch?v=vid2",
+      external_id: "vid2",
+      source_type: "youtube_UCtest",
+      published_at: Time.current,
+      content_type: "video",
+      duration_seconds: 90
+    )
+
+    get articles_url(content_type: "article"), as: :json
+    assert_response :success
+
+    types = JSON.parse(response.body)["articles"].map { |item| item["content_type"] }.uniq
+    assert_equal [ "article" ], types
+  end
+
+  test "index JSON max_duration keeps text articles and short or unknown videos" do
+    short = Article.create!(
+      title: "Short tip",
+      url: "https://www.youtube.com/watch?v=short1",
+      external_id: "short1",
+      source_type: "youtube_UCtest",
+      published_at: Time.current,
+      content_type: "video",
+      duration_seconds: 60
+    )
+    long = Article.create!(
+      title: "Long talk",
+      url: "https://www.youtube.com/watch?v=long1",
+      external_id: "long1",
+      source_type: "youtube_UCtest",
+      published_at: Time.current,
+      content_type: "video",
+      duration_seconds: 3600
+    )
+    unknown = Article.create!(
+      title: "Unknown length",
+      url: "https://www.youtube.com/watch?v=unk1",
+      external_id: "unk1",
+      source_type: "youtube_UCtest",
+      published_at: Time.current,
+      content_type: "video",
+      duration_seconds: nil
+    )
+
+    get articles_url(max_duration: 20), as: :json
+    assert_response :success
+
+    ids = JSON.parse(response.body)["articles"].map { |item| item["id"] }
+    assert_includes ids, @article.id
+    assert_includes ids, short.id
+    assert_includes ids, unknown.id
+    assert_not_includes ids, long.id
+  end
+
   test "index JSON unions terms from several interest slugs" do
     get articles_url(interests: "ruby,rust"), as: :json
     assert_response :success
