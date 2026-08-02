@@ -223,6 +223,72 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal published_ats, published_ats.sort.reverse
   end
 
+  test "index JSON filters by any of the given keywords" do
+    get articles_url(keywords: "ruby,rust"), as: :json
+    assert_response :success
+
+    ids = JSON.parse(response.body)["articles"].map { |article| article["id"] }
+    assert_includes ids, @dev_to_article.id
+    assert_includes ids, @rust_article.id
+    assert_not_includes ids, @article.id
+  end
+
+  test "index JSON requires every keyword when match is all" do
+    both = articles(:reddit_ruby_article)
+    both.update!(description: "Exploring the latest Rails features and their performance impact")
+
+    get articles_url(keywords: "rails,performance", match: "all"), as: :json
+    assert_response :success
+
+    ids = JSON.parse(response.body)["articles"].map { |article| article["id"] }
+    assert_includes ids, both.id
+    assert_not_includes ids, @rust_article.id
+  end
+
+  test "index JSON matches multi-word keywords as phrases" do
+    phrase = Article.create!(
+      title: "A pragmatic take on software architecture",
+      url: "https://example.com/architecture-index",
+      external_id: "architecture-index",
+      source_type: "hacker_news",
+      published_at: Time.current,
+      description: "Layering trade-offs"
+    )
+
+    get articles_url(keywords: "software architecture"), as: :json
+    assert_response :success
+
+    ids = JSON.parse(response.body)["articles"].map { |article| article["id"] }
+    assert_equal [ phrase.id ], ids
+  end
+
+  test "index JSON composes keywords with q, category and min_score" do
+    get articles_url(keywords: "ruby,rust", q: "Rust", category: "programming-languages", min_score: 100), as: :json
+    assert_response :success
+
+    ids = JSON.parse(response.body)["articles"].map { |article| article["id"] }
+    assert_includes ids, @rust_article.id
+    assert_not_includes ids, @dev_to_article.id
+  end
+
+  test "index JSON ignores blank keywords" do
+    get articles_url(keywords: " , "), as: :json
+    assert_response :success
+
+    unfiltered = JSON.parse(response.body)["pagination"]["total_count"]
+
+    get articles_url, as: :json
+    assert_equal JSON.parse(response.body)["pagination"]["total_count"], unfiltered
+  end
+
+  test "index JSON keeps category counts consistent with keyword filter" do
+    get articles_url(keywords: "rust"), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    assert_equal 1, body["category_counts"].values.sum
+  end
+
   test "index JSON filters by topic tag" do
     article = articles(:reddit_rust_article)
     ArticleTopicClassifier.apply!(article)
