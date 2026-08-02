@@ -12,6 +12,7 @@ class ArticleSerializer
       dismissed: article.dismissed?,
       pending_dismissal: article.pending_dismissal?,
       low_signal: article.low_signal,
+      topic_tags: article.tags.map { |tag| { slug: tag.slug, name: tag.name } },
       related_sources: Array(related_articles).map { |related| related_source_json(related) }
     )
   end

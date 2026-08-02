@@ -99,6 +99,7 @@ dev-news-aggregator/
 | `news_fetchers/hacker_news_fetcher.rb` | Hacker News Firebase API |
 | `news_fetchers/dev_to_fetcher.rb` | Dev.to REST API |
 | `news_fetchers/reddit_fetcher.rb` | Reddit API (one instance per subreddit) |
+| `article_topic_classifier.rb` | Schema-validated topic tagging (keyword heuristics) |
 | `feed_noise_classifier.rb` | Heuristics to flag low-signal / meme feed items |
 | `url_canonicalizer.rb` | Normalizes article URLs for cross-source clustering |
 | `article_clusterer.rb` | Collapses duplicate canonical URLs; related source lookup |
@@ -154,7 +155,9 @@ dev-news-aggregator/
 | `create_read_articles` | `read_articles` |
 | `create_dismissed_articles` | `dismissed_articles` |
 | `create_fetch_runs` | `fetch_runs` |
+| `create_tags_and_article_tags` | `tags`, `article_tags` |
 | `add_canonical_url_to_articles` | `articles.canonical_url` + index |
+| `add_low_signal_to_articles` | `articles.low_signal` + index |
 | `create_news_digests` | `news_digests` |
 
 ## `lib/`

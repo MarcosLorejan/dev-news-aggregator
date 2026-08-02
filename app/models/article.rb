@@ -5,10 +5,13 @@ class Article < ApplicationRecord
 
   before_validation :assign_canonical_url
   before_validation :assign_low_signal
+  after_commit :refresh_topic_tags, on: %i[create update]
 
   has_one :bookmark, dependent: :destroy
   has_one :read_article, dependent: :destroy
   has_one :dismissed_article, dependent: :destroy
+  has_many :article_tags, dependent: :destroy
+  has_many :tags, through: :article_tags
 
   scope :bookmarked, -> { joins(:bookmark) }
   scope :not_bookmarked, -> { left_joins(:bookmark).where(bookmarks: { id: nil }) }
@@ -25,6 +28,11 @@ class Article < ApplicationRecord
       pattern = "%#{sanitize_sql_like(q)}%"
       where("title ILIKE :q OR COALESCE(description, '') ILIKE :q", q: pattern)
     end
+  }
+  scope :with_topic_tag, ->(slug) {
+    return all if slug.blank?
+
+    joins(:tags).where(tags: { slug: slug }).distinct
   }
 
   def bookmarked?
@@ -113,5 +121,15 @@ class Article < ApplicationRecord
 
   def assign_low_signal
     self.low_signal = FeedNoiseClassifier.low_signal?(self)
+  end
+
+  def refresh_topic_tags
+    relevant = previous_changes.key?("title") ||
+               previous_changes.key?("description") ||
+               previous_changes.key?("source_type") ||
+               previous_changes.key?("id")
+    return unless relevant
+
+    ArticleTopicClassifier.apply!(self)
   end
 end

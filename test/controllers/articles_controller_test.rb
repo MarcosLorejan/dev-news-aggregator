@@ -199,6 +199,22 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal counts, counts.sort.reverse
   end
 
+  test "index JSON filters by topic tag" do
+    article = articles(:reddit_rust_article)
+    ArticleTopicClassifier.apply!(article)
+
+    get articles_url(tag: "rust"), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    ids = body["articles"].map { |row| row["id"] }
+    assert_includes ids, article.id
+    assert body["articles"].all? { |row|
+      row["topic_tags"].any? { |tag| tag["slug"] == "rust" }
+    }
+    assert body["topic_tags"].any? { |tag| tag["slug"] == "rust" }
+  end
+
   test "index JSON collapses duplicate canonical urls into one primary" do
     shared = "https://example.com/same-story"
     @article.update!(url: "#{shared}?utm_source=hn", score: 40)

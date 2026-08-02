@@ -14,6 +14,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
+  create_table "article_tags", force: :cascade do |t|
+    t.bigint "article_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["article_id", "tag_id"], name: "index_article_tags_on_article_id_and_tag_id", unique: true
+    t.index ["article_id"], name: "index_article_tags_on_article_id"
+    t.index ["tag_id"], name: "index_article_tags_on_tag_id"
+  end
+
   create_table "articles", force: :cascade do |t|
     t.string "canonical_url"
     t.integer "comment_count"
@@ -106,6 +116,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_130000) do
     t.index ["article_id"], name: "index_read_articles_on_article_id", unique: true
   end
 
+  create_table "tags", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_tags_on_slug", unique: true
+  end
+
+  add_foreign_key "article_tags", "articles"
+  add_foreign_key "article_tags", "tags"
   add_foreign_key "bookmarks", "articles"
   add_foreign_key "dismissed_articles", "articles"
   add_foreign_key "read_articles", "articles"

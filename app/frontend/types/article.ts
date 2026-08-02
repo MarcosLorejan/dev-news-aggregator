@@ -1,3 +1,8 @@
+export interface TopicTag {
+  slug: string
+  name: string
+}
+
 export interface RelatedSource {
   id: number
   source_type: string
@@ -23,6 +28,7 @@ export interface Article {
   dismissed: boolean
   pending_dismissal: boolean
   low_signal?: boolean
+  topic_tags?: TopicTag[]
   related_sources?: RelatedSource[]
 }
 
@@ -43,6 +49,7 @@ export interface ArticlesIndexResponse {
   articles_by_category: Record<string, number[]>
   category_counts: Record<string, number>
   categories: Category[]
+  topic_tags?: TopicTag[]
   pagination: Pagination
   last_updated: string | null
 }
