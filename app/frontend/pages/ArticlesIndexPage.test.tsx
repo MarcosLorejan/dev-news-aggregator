@@ -4,7 +4,12 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ArticlesIndexPage from '../pages/ArticlesIndexPage'
 import * as articlesApi from '../api/articles'
-import { buildArticle, buildArticlesIndexResponse } from '../test/fixtures'
+import * as keywordFiltersApi from '../api/keywordFilters'
+import {
+  buildArticle,
+  buildArticlesIndexResponse,
+  buildKeywordFiltersResponse,
+} from '../test/fixtures'
 
 vi.mock('../api/articles', () => ({
   fetchArticles: vi.fn(),
@@ -15,6 +20,10 @@ vi.mock('../api/articles', () => ({
   markArticleAsRead: vi.fn(),
   unmarkArticleAsRead: vi.fn(),
   fetchNews: vi.fn(),
+}))
+
+vi.mock('../api/keywordFilters', () => ({
+  fetchKeywordFilters: vi.fn(),
 }))
 
 function renderPage(initialEntries = ['/articles']) {
@@ -37,6 +46,7 @@ describe('ArticlesIndexPage dismiss flow', () => {
     vi.mocked(articlesApi.fetchArticles).mockResolvedValue(buildArticlesIndexResponse())
     vi.mocked(articlesApi.dismissArticle).mockResolvedValue({ status: 'dismissed', timeout: 15 })
     vi.mocked(articlesApi.undismissArticle).mockResolvedValue({ status: 'restored' })
+    vi.mocked(keywordFiltersApi.fetchKeywordFilters).mockResolvedValue(buildKeywordFiltersResponse())
   })
 
   afterEach(() => {
@@ -197,6 +207,91 @@ describe('ArticlesIndexPage dismiss flow', () => {
     expect(screen.getByText('No articles match your search')).toBeInTheDocument()
     expect(screen.queryByText('Your feed is empty')).not.toBeInTheDocument()
     expect(screen.getByTestId('article-search-input')).toHaveValue('zzzz-no-match')
+  })
+
+  it('renders interest chips and reflects the interests URL param', async () => {
+    renderPage(['/articles?interests=rust'])
+
+    await waitForArticlesFeed()
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Rust (5)' })).toHaveAttribute('aria-pressed', 'true')
+    })
+    expect(screen.getByRole('button', { name: 'Ruby (3)' })).toHaveAttribute('aria-pressed', 'false')
+    expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+      expect.objectContaining({ interests: ['rust'] })
+    )
+  })
+
+  it('adds and removes interests from the request as chips are toggled', async () => {
+    const user = userEvent.setup()
+    renderPage(['/articles?interests=rust'])
+
+    await waitForArticlesFeed()
+    await user.click(await screen.findByRole('button', { name: 'Ruby (3)' }))
+
+    await waitFor(() => {
+      expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+        expect.objectContaining({ interests: ['rust', 'ruby'] })
+      )
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Rust (5)' }))
+
+    await waitFor(() => {
+      expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+        expect.objectContaining({ interests: ['ruby'] })
+      )
+    })
+  })
+
+  it('clears interests and resets pagination', async () => {
+    const user = userEvent.setup()
+    renderPage(['/articles?interests=ruby,rust&page=3'])
+
+    await waitForArticlesFeed()
+    await user.click(await screen.findByTestId('clear-interests'))
+
+    await waitFor(() => {
+      expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
+        expect.objectContaining({ interests: undefined, page: 1 })
+      )
+    })
+    expect(screen.queryByTestId('clear-interests')).not.toBeInTheDocument()
+  })
+
+  it('shows an interest-specific empty state when nothing matches', async () => {
+    vi.mocked(articlesApi.fetchArticles).mockResolvedValue(
+      buildArticlesIndexResponse({
+        articles: [],
+        articles_by_category: {},
+        category_counts: {},
+        pagination: {
+          current_page: 1,
+          per_page: 20,
+          total_count: 0,
+          total_pages: 0,
+        },
+      })
+    )
+
+    renderPage(['/articles?interests=rust'])
+
+    await screen.findByTestId('articles-page')
+    expect(await screen.findByText('No articles match these interests')).toBeInTheDocument()
+    expect(screen.queryByText('Your feed is empty')).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Rust (5)' })).toBeInTheDocument()
+    })
+  })
+
+  it('keeps the feed usable when interests fail to load', async () => {
+    vi.mocked(keywordFiltersApi.fetchKeywordFilters).mockRejectedValue(new Error('boom'))
+
+    renderPage()
+
+    await waitForArticlesFeed()
+    expect(screen.queryByText('Filter by interest')).not.toBeInTheDocument()
+    expect(screen.getByText('Rust 2024 Edition Highlights')).toBeInTheDocument()
   })
 
   it('counts down dismiss toast and removes article after timeout', async () => {

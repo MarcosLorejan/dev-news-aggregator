@@ -12,7 +12,12 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   def count_queries
     count = 0
-    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") { count += 1 }
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |_name, _start, _finish, _id, payload|
+      # SCHEMA lookups (and similar) vary by connection cache warmth and are not N+1.
+      next if payload[:name] == "SCHEMA" || payload[:sql].to_s.match?(/\A(BEGIN|COMMIT|SAVEPOINT|RELEASE)/i)
+
+      count += 1
+    end
     yield
     count
   ensure
@@ -297,6 +302,23 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     ids = JSON.parse(response.body)["articles"].map { |article| article["id"] }
     assert_includes ids, @dev_to_article.id
     assert_includes ids, @rust_article.id
+  end
+
+  test "index JSON unions terms from several interest slugs" do
+    get articles_url(interests: "ruby,rust"), as: :json
+    assert_response :success
+
+    ids = JSON.parse(response.body)["articles"].map { |article| article["id"] }
+    assert_includes ids, @dev_to_article.id
+    assert_includes ids, @rust_article.id
+    assert_not_includes ids, @article.id
+  end
+
+  test "index JSON returns nothing when one of several interests is unknown" do
+    get articles_url(interests: "ruby,nope"), as: :json
+    assert_response :success
+
+    assert_empty JSON.parse(response.body)["articles"]
   end
 
   test "index JSON returns nothing for an unknown interest" do

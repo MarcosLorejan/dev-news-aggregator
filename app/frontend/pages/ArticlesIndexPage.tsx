@@ -12,7 +12,9 @@ import {
   type Article,
 } from '../api/articles'
 import { isAbortError } from '../api/client'
+import { fetchKeywordFilters } from '../api/keywordFilters'
 import type { ArticlesIndexResponse } from '../types/article'
+import type { KeywordFilter } from '../types/keywordFilter'
 import { parameterize, truncate } from '../utils/format'
 import ArticleList from '../components/ArticleList'
 import ArticleListSkeleton from '../components/ArticleListSkeleton'
@@ -20,6 +22,7 @@ import ArticleSearch from '../components/ArticleSearch'
 import CategoryFilter from '../components/CategoryFilter'
 import DismissToast from '../components/DismissToast'
 import EmptyState from '../components/EmptyState'
+import InterestFilter, { parseInterests, toggleInterest } from '../components/InterestFilter'
 import PageHeader from '../components/PageHeader'
 import PageHeaderSkeleton from '../components/PageHeaderSkeleton'
 import PageContainer from '../components/ui/PageContainer'
@@ -59,8 +62,11 @@ export default function ArticlesIndexPage() {
   const activeSort = parseSort(searchParams.get('sort'))
   const showRead = searchParams.get('show_read') === 'true'
   const searchQuery = (searchParams.get('q') ?? '').trim()
+  const interestsParam = searchParams.get('interests') ?? ''
+  const activeInterests = useMemo(() => parseInterests(interestsParam), [interestsParam])
 
   const [searchInput, setSearchInput] = useState(searchQuery)
+  const [interests, setInterests] = useState<KeywordFilter[]>([])
   const [data, setData] = useState<ArticlesIndexResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -113,6 +119,7 @@ export default function ArticlesIndexPage() {
         show_read: showRead,
         category: activeFilter !== 'all' ? activeFilter : undefined,
         tag: activeTag !== 'all' ? activeTag : undefined,
+        interests: activeInterests.length > 0 ? activeInterests : undefined,
         q: searchQuery || undefined,
         sort: activeSort,
         ...scoreFilterParams(activeScoreFilter),
@@ -133,7 +140,7 @@ export default function ArticlesIndexPage() {
     } finally {
       if (!signal.aborted) setLoading(false)
     }
-  }, [showRead, activeScoreFilter, activeFilter, activeTag, activeSort, searchQuery, currentPage, patchSearchParams])
+  }, [showRead, activeScoreFilter, activeFilter, activeTag, activeInterests, activeSort, searchQuery, currentPage, patchSearchParams])
 
   useEffect(() => {
     void loadArticles()
@@ -141,6 +148,20 @@ export default function ArticlesIndexPage() {
       abortRef.current?.abort()
     }
   }, [loadArticles])
+
+  // Interest presets are an enhancement over the rest of the filters: if they fail to load the
+  // chips stay hidden instead of blocking the feed.
+  useEffect(() => {
+    const controller = new AbortController()
+
+    fetchKeywordFilters({ signal: controller.signal })
+      .then((response) => {
+        if (!controller.signal.aborted) setInterests(response.keyword_filters)
+      })
+      .catch(() => {})
+
+    return () => controller.abort()
+  }, [])
 
   const articleCategories = useMemo(
     () => (data ? buildArticleCategories(data) : {}),
@@ -157,6 +178,14 @@ export default function ArticlesIndexPage() {
   const articles = useMemo(
     () => data?.articles.filter((article) => !removedIds.has(article.id)) ?? [],
     [data, removedIds]
+  )
+
+  const interestLabels = useMemo(
+    () =>
+      activeInterests
+        .map((slug) => interests.find((interest) => interest.slug === slug)?.name ?? slug)
+        .join(', '),
+    [activeInterests, interests]
   )
 
   const clearDismissTimer = () => {
@@ -274,6 +303,22 @@ export default function ArticlesIndexPage() {
     })
   }
 
+  const handleInterestToggle = (slug: string) => {
+    patchSearchParams((params) => {
+      const next = toggleInterest(parseInterests(params.get('interests')), slug)
+      if (next.length === 0) params.delete('interests')
+      else params.set('interests', next.join(','))
+      params.delete('page')
+    })
+  }
+
+  const handleInterestsClear = () => {
+    patchSearchParams((params) => {
+      params.delete('interests')
+      params.delete('page')
+    })
+  }
+
   const handlePageChange = (page: number) => {
     patchSearchParams((params) => {
       if (page <= 1) params.delete('page')
@@ -381,9 +426,25 @@ export default function ArticlesIndexPage() {
     )
   }
 
-  const showEmptyFeed = !data || (!searchQuery && allArticlesCount === 0 && articles.length === 0)
-  const showNoSearchResults =
-    Boolean(searchQuery) && articles.length === 0 && (data?.pagination.total_count ?? 0) === 0
+  const hasInterestFilter = activeInterests.length > 0
+  const noResults = articles.length === 0 && (data?.pagination.total_count ?? 0) === 0
+  const showEmptyFeed =
+    !data || (!searchQuery && !hasInterestFilter && allArticlesCount === 0 && articles.length === 0)
+  const showNoSearchResults = Boolean(searchQuery) && noResults
+  const showNoInterestResults = !searchQuery && hasInterestFilter && noResults
+
+  let emptyResults: { title: string; description: string } | null = null
+  if (showNoSearchResults) {
+    emptyResults = {
+      title: 'No articles match your search',
+      description: `Nothing matched “${searchQuery}”. Try a different term or clear the search.`,
+    }
+  } else if (showNoInterestResults) {
+    emptyResults = {
+      title: 'No articles match these interests',
+      description: `Nothing in the feed mentions ${interestLabels}. Try picking fewer interests or clearing them.`,
+    }
+  }
 
   if (showEmptyFeed) {
     return (
@@ -439,6 +500,13 @@ export default function ArticlesIndexPage() {
 
       <ArticleSearch value={searchInput} onChange={setSearchInput} />
 
+      <InterestFilter
+        interests={interests}
+        selectedSlugs={activeInterests}
+        onToggle={handleInterestToggle}
+        onClear={handleInterestsClear}
+      />
+
       <ScoreFilter
         activeScoreFilter={activeScoreFilter}
         onScoreFilterChange={handleScoreFilterChange}
@@ -463,7 +531,7 @@ export default function ArticlesIndexPage() {
         onTagChange={handleTagChange}
       />
 
-      {showNoSearchResults ? (
+      {emptyResults ? (
         <EmptyState
           icon={
             <svg className="w-10 h-10 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -475,8 +543,8 @@ export default function ArticlesIndexPage() {
               />
             </svg>
           }
-          title="No articles match your search"
-          description={`Nothing matched “${searchQuery}”. Try a different term or clear the search.`}
+          title={emptyResults.title}
+          description={emptyResults.description}
         />
       ) : (
         <>

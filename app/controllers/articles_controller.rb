@@ -157,20 +157,29 @@ class ArticlesController < ApplicationController
     apply_sort(scope.includes(:bookmark, :read_article, :dismissed_article, :tags))
   end
 
-  # `interest=<slug>` expands to that preset's saved terms and is unioned with any explicit
-  # `keywords`; `match` then applies to the combined list. An unknown slug filters everything
-  # out, mirroring how an unknown category behaves.
+  # `interests=<slug,slug>` (or singular `interest`) expands to the presets' saved terms, unioned
+  # with any explicit `keywords`; `match` then applies to the combined list. An unknown slug
+  # filters everything out, mirroring how an unknown category behaves.
   def apply_keyword_filter(scope)
     terms = Article.normalize_keywords(params[:keywords])
+    slugs = interest_slugs
 
-    if params[:interest].present?
-      interest = KeywordFilter.find_by(slug: params[:interest])
-      return scope.none if interest.nil?
+    if slugs.any?
+      interests = KeywordFilter.where(slug: slugs).to_a
+      return scope.none if interests.size < slugs.size
 
-      terms += interest.terms
+      terms += interests.flat_map(&:terms)
     end
 
     scope.matching_keywords(terms, match: params[:match])
+  end
+
+  def interest_slugs
+    [ params[:interests], params[:interest] ]
+      .flat_map { |value| value.to_s.split(",") }
+      .map { |slug| slug.strip.downcase }
+      .reject(&:empty?)
+      .uniq
   end
 
   def apply_sort(scope)
