@@ -1,6 +1,19 @@
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
+  namespace :api do
+    namespace :v1 do
+      resources :articles, only: [ :index, :show ] do
+        member do
+          post :bookmark
+          delete :unbookmark
+          post :dismiss
+          delete :undismiss
+        end
+      end
+    end
+  end
+
   # Articles routes
   resources :articles, only: [ :index, :show ] do
     collection do
