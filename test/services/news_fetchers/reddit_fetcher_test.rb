@@ -4,6 +4,7 @@ class NewsFetchers::RedditFetcherTest < ActiveSupport::TestCase
   def setup
     @fetcher = NewsFetchers::RedditFetcher.new(subreddit: "programming")
     NewsFetchers::RedditFetcher.min_request_interval_seconds = 0
+    NewsFetchers::RedditFetcher.rate_limit_jitter_factor = 0
     NewsFetchers::RedditFetcher.reset_throttle!
     NewsFetchers::RedditFetcher.reset_oauth_token!
     @previous_client_id = ENV["REDDIT_CLIENT_ID"]
@@ -15,6 +16,7 @@ class NewsFetchers::RedditFetcherTest < ActiveSupport::TestCase
   def teardown
     NewsFetchers::RedditFetcher.min_request_interval_seconds = nil
     NewsFetchers::RedditFetcher.rate_limit_backoff_seconds = nil
+    NewsFetchers::RedditFetcher.rate_limit_jitter_factor = nil
     NewsFetchers::RedditFetcher.reset_throttle!
     NewsFetchers::RedditFetcher.reset_oauth_token!
     if @previous_client_id
@@ -73,14 +75,44 @@ class NewsFetchers::RedditFetcherTest < ActiveSupport::TestCase
     end
   end
 
-  test "fetch_articles raises when Reddit returns HTTP errors" do
+  test "fetch_articles raises after exhausting retries on persistent HTTP 403" do
     stub_request(:get, "https://www.reddit.com/r/programming/.rss")
       .to_return(status: 403, body: "<html>Blocked</html>", headers: { "Content-Type" => "text/html" })
 
+    NewsFetchers::RedditFetcher.rate_limit_backoff_seconds = 0
     error = assert_raises(NewsFetchers::BaseFetcher::FetchError) do
       @fetcher.fetch_articles
     end
     assert_match(/HTTP 403/, error.message)
+  end
+
+  test "fetch_articles retries transient HTTP 403 on Atom then succeeds" do
+    stub_request(:get, "https://www.reddit.com/r/programming/.rss")
+      .to_return(
+        { status: 403, body: "<html>Blocked</html>", headers: { "Content-Type" => "text/html" } },
+        {
+          status: 200,
+          body: <<~ATOM,
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <id>t3_403retry</id>
+                <title>After 403</title>
+                <link href="https://www.reddit.com/r/programming/comments/403retry/title/" />
+                <published>2023-11-14T22:13:20+00:00</published>
+                <content type="html">&lt;a href="https://example.com/ok"&gt;[link]&lt;/a&gt;</content>
+              </entry>
+            </feed>
+          ATOM
+          headers: { "Content-Type" => "application/atom+xml" }
+        }
+      )
+
+    NewsFetchers::RedditFetcher.rate_limit_backoff_seconds = 0
+    assert_difference "Article.count", 1 do
+      article = @fetcher.fetch_articles.first
+      assert_equal "After 403", article.title
+      assert_equal "403retry", article.external_id
+    end
   end
 
   test "fetch_articles retries HTTP 429 then succeeds" do
@@ -109,6 +141,90 @@ class NewsFetchers::RedditFetcherTest < ActiveSupport::TestCase
       article = @fetcher.fetch_articles.first
       assert_equal "After Retry", article.title
       assert_equal "retry1", article.external_id
+    end
+  end
+
+  test "fetch_articles honors x-ratelimit-reset on HTTP 429" do
+    stub_request(:get, "https://www.reddit.com/r/programming/.rss")
+      .to_return(
+        {
+          status: 429,
+          body: "",
+          headers: {
+            "Content-Type" => "text/html",
+            "x-ratelimit-remaining" => "0",
+            "x-ratelimit-reset" => "7"
+          }
+        },
+        {
+          status: 200,
+          body: <<~ATOM,
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <id>t3_reset1</id>
+                <title>After Reset Header</title>
+                <link href="https://www.reddit.com/r/programming/comments/reset1/title/" />
+                <published>2023-11-14T22:13:20+00:00</published>
+                <content type="html">&lt;a href="https://example.com/ok"&gt;[link]&lt;/a&gt;</content>
+              </entry>
+            </feed>
+          ATOM
+          headers: { "Content-Type" => "application/atom+xml" }
+        }
+      )
+
+    slept = []
+    original_sleep = Kernel.method(:sleep)
+    Kernel.define_singleton_method(:sleep) do |duration = nil|
+      slept << duration.to_f
+    end
+
+    begin
+      article = @fetcher.fetch_articles.first
+      assert_equal "After Reset Header", article.title
+      assert_includes slept, 7.0
+    ensure
+      Kernel.define_singleton_method(:sleep, original_sleep)
+    end
+  end
+
+  test "fetch_articles honors Retry-After on HTTP 429" do
+    stub_request(:get, "https://www.reddit.com/r/programming/.rss")
+      .to_return(
+        {
+          status: 429,
+          body: "",
+          headers: { "Content-Type" => "text/html", "Retry-After" => "3" }
+        },
+        {
+          status: 200,
+          body: <<~ATOM,
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <entry>
+                <id>t3_ra1</id>
+                <title>After Retry-After</title>
+                <link href="https://www.reddit.com/r/programming/comments/ra1/title/" />
+                <published>2023-11-14T22:13:20+00:00</published>
+                <content type="html">&lt;a href="https://example.com/ok"&gt;[link]&lt;/a&gt;</content>
+              </entry>
+            </feed>
+          ATOM
+          headers: { "Content-Type" => "application/atom+xml" }
+        }
+      )
+
+    slept = []
+    original_sleep = Kernel.method(:sleep)
+    Kernel.define_singleton_method(:sleep) do |duration = nil|
+      slept << duration.to_f
+    end
+
+    begin
+      article = @fetcher.fetch_articles.first
+      assert_equal "After Retry-After", article.title
+      assert_includes slept, 3.0
+    ensure
+      Kernel.define_singleton_method(:sleep, original_sleep)
     end
   end
 

@@ -5,6 +5,7 @@ class NewsFetchers::YoutubeFetcherTest < ActiveSupport::TestCase
     NewsFetchers::YoutubeFetcher.reset_throttle!
     NewsFetchers::YoutubeFetcher.min_request_interval_seconds = 0
     NewsFetchers::YoutubeFetcher.rate_limit_backoff_seconds = 0
+    NewsFetchers::YoutubeFetcher.rate_limit_jitter_factor = 0
     @channel_id = "UCWnPjmqvljcafA0QXblOU1A"
     @fetcher = NewsFetchers::YoutubeFetcher.new(channel_id: @channel_id, channel_name: "Confreaks")
   end
@@ -12,6 +13,7 @@ class NewsFetchers::YoutubeFetcherTest < ActiveSupport::TestCase
   teardown do
     NewsFetchers::YoutubeFetcher.min_request_interval_seconds = nil
     NewsFetchers::YoutubeFetcher.rate_limit_backoff_seconds = nil
+    NewsFetchers::YoutubeFetcher.rate_limit_jitter_factor = nil
     NewsFetchers::YoutubeFetcher.reset_throttle!
   end
 

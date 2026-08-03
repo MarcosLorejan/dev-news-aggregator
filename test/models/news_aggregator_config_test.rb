@@ -27,7 +27,8 @@ class NewsAggregatorConfigTest < ActiveSupport::TestCase
   end
 
   test "loads reddit throttle settings from news_aggregator.yml" do
-    assert_equal 2.5, NewsAggregatorConfig.reddit_min_request_interval_seconds
+    assert_equal 60, NewsAggregatorConfig.reddit_min_request_interval_seconds
     assert_equal 4, NewsAggregatorConfig.reddit_rate_limit_max_retries
+    assert_equal 90, NewsAggregatorConfig.reddit_rate_limit_max_wait_seconds
   end
 end

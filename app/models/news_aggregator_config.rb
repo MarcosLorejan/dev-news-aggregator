@@ -41,11 +41,15 @@ module NewsAggregatorConfig
     end
 
     def reddit_min_request_interval_seconds
-      config.dig(:apis, :reddit, :min_request_interval_seconds) || 2.5
+      config.dig(:apis, :reddit, :min_request_interval_seconds) || 60
     end
 
     def reddit_rate_limit_max_retries
       config.dig(:apis, :reddit, :rate_limit_max_retries) || 4
+    end
+
+    def reddit_rate_limit_max_wait_seconds
+      config.dig(:apis, :reddit, :rate_limit_max_wait_seconds) || 90
     end
 
     def hacker_news_base_url
@@ -81,6 +85,10 @@ module NewsAggregatorConfig
 
     def youtube_rate_limit_max_retries
       config.dig(:apis, :youtube, :rate_limit_max_retries) || 4
+    end
+
+    def youtube_rate_limit_max_wait_seconds
+      config.dig(:apis, :youtube, :rate_limit_max_wait_seconds) || 90
     end
 
     def youtube_feed_base_url

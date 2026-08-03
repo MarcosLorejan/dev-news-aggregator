@@ -105,6 +105,50 @@ class NewsFetchers::BaseFetcherTest < ActiveSupport::TestCase
       NewsFetchers::BaseFetcher.send(:parse_http_response, fake_response)
     end
     assert_match(/HTTP 403/, error.message)
+    assert_not_kind_of NewsFetchers::BaseFetcher::RateLimitedError, error
+  end
+
+  test "parse_http_response raises RateLimitedError for HTTP 429 with retry headers" do
+    request = Object.new
+    request.define_singleton_method(:uri) { "https://example.com/api" }
+
+    fake_response = Object.new
+    fake_response.define_singleton_method(:success?) { false }
+    fake_response.define_singleton_method(:code) { 429 }
+    fake_response.define_singleton_method(:body) { "slow down" }
+    fake_response.define_singleton_method(:request) { request }
+    fake_response.define_singleton_method(:headers) do
+      { "Retry-After" => "5", "x-ratelimit-reset" => "12" }
+    end
+    fake_response.define_singleton_method(:is_a?) { |klass| klass == HTTParty::Response }
+
+    error = assert_raises(NewsFetchers::BaseFetcher::RateLimitedError) do
+      NewsFetchers::BaseFetcher.send(:parse_http_response, fake_response)
+    end
+    assert_equal 429, error.http_status
+    assert_equal 5.0, error.retry_after_seconds
+  end
+
+  test "parse_retry_after_seconds prefers Retry-After over x-ratelimit-reset" do
+    fake_response = Object.new
+    fake_response.define_singleton_method(:headers) do
+      { "Retry-After" => "4", "x-ratelimit-reset" => "60" }
+    end
+
+    assert_equal 4.0, NewsFetchers::BaseFetcher.parse_retry_after_seconds(fake_response)
+  end
+
+  test "parse_retry_after_seconds uses relative x-ratelimit-reset" do
+    fake_response = Object.new
+    fake_response.define_singleton_method(:headers) do
+      { "x-ratelimit-reset" => "58" }
+    end
+
+    assert_equal 58.0, NewsFetchers::BaseFetcher.parse_retry_after_seconds(fake_response)
+  end
+
+  test "with_jitter returns base when factor is zero" do
+    assert_equal 10.0, NewsFetchers::BaseFetcher.with_jitter(10, factor: 0)
   end
 
   test "get retries transient network errors with backoff before succeeding" do
