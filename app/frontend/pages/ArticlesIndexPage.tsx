@@ -467,11 +467,27 @@ export default function ArticlesIndexPage() {
   }
 
   const hasInterestFilter = activeInterests.length > 0
+  const hasContentFilters = activeContentType !== 'all' || activeMaxDuration !== 'all'
+  const hasCategoryOrTag = activeFilter !== 'all' || activeTag !== 'all'
+  const hasScoreFilter = activeScoreFilter !== 'all'
+  const hasNarrowingFilter =
+    hasInterestFilter || hasContentFilters || hasCategoryOrTag || hasScoreFilter
   const noResults = articles.length === 0 && (data?.pagination.total_count ?? 0) === 0
+  // Only the true empty inbox — never hide filters when a narrowing filter is active
+  // (e.g. Videos with 0 matches used to trap users with no All button).
   const showEmptyFeed =
-    !data || (!searchQuery && !hasInterestFilter && allArticlesCount === 0 && articles.length === 0)
+    !data ||
+    (!searchQuery && !hasNarrowingFilter && allArticlesCount === 0 && articles.length === 0)
   const showNoSearchResults = Boolean(searchQuery) && noResults
   const showNoInterestResults = !searchQuery && hasInterestFilter && noResults
+  const showNoContentTypeResults =
+    !searchQuery && !hasInterestFilter && hasContentFilters && noResults
+  const showNoOtherFilterResults =
+    !searchQuery &&
+    !hasInterestFilter &&
+    !hasContentFilters &&
+    (hasCategoryOrTag || hasScoreFilter) &&
+    noResults
 
   let emptyResults: { title: string; description: string } | null = null
   if (showNoSearchResults) {
@@ -483,6 +499,30 @@ export default function ArticlesIndexPage() {
     emptyResults = {
       title: 'No articles match these interests',
       description: `Nothing in the feed mentions ${interestLabels}. Try picking fewer interests or clearing them.`,
+    }
+  } else if (showNoContentTypeResults) {
+    if (activeContentType === 'video') {
+      emptyResults = {
+        title: 'No videos found',
+        description:
+          'There are no videos in your feed yet. Add YouTube channels on Sources, click Fetch News, then tap All to return to the full feed.',
+      }
+    } else if (activeContentType === 'article') {
+      emptyResults = {
+        title: 'No text articles found',
+        description: 'Nothing matched the Articles filter. Tap All to see the full feed again.',
+      }
+    } else {
+      emptyResults = {
+        title: 'No videos match this length',
+        description:
+          'Try a longer max duration, or tap All / Any length to clear the video length filter.',
+      }
+    }
+  } else if (showNoOtherFilterResults) {
+    emptyResults = {
+      title: 'No articles match these filters',
+      description: 'Try clearing the category, topic, or score filter to see more of the feed.',
     }
   }
 

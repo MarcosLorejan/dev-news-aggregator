@@ -5,7 +5,9 @@ class SourcesController < ApplicationController
   before_action :set_source, only: [ :update, :destroy ]
 
   def index
-    NewsSource.bootstrap_defaults! if NewsSource.none?
+    # Idempotent: fills in defaults (incl. YouTube) even when older DBs already
+    # have HN/Reddit rows — otherwise Videos stays empty forever.
+    NewsSource.bootstrap_defaults!
 
     respond_to do |format|
       format.html

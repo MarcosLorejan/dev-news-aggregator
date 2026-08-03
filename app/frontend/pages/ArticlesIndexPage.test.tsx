@@ -305,6 +305,43 @@ describe('ArticlesIndexPage dismiss flow', () => {
     )
   })
 
+  it('keeps content filters visible when Videos has no matches', async () => {
+    vi.mocked(articlesApi.fetchArticles).mockResolvedValue(
+      buildArticlesIndexResponse({
+        articles: [],
+        articles_by_category: {},
+        category_counts: {},
+        pagination: {
+          current_page: 1,
+          per_page: 20,
+          total_count: 0,
+          total_pages: 0,
+        },
+      })
+    )
+
+    const user = userEvent.setup()
+    renderPage(['/articles?content_type=video'])
+
+    await screen.findByTestId('articles-page')
+    expect(await screen.findByText('No videos found')).toBeInTheDocument()
+    expect(screen.queryByText('Your feed is empty')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Videos' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'All' }))
+
+    await waitFor(() => {
+      const calls = vi.mocked(articlesApi.fetchArticles).mock.calls
+      const lastCall = calls[calls.length - 1]?.[0] as {
+        content_type?: string
+        page?: number
+      }
+      expect(lastCall?.page).toBe(1)
+      expect(lastCall?.content_type).toBeUndefined()
+    })
+  })
+
   it('updates content type params and resets pagination', async () => {
     const user = userEvent.setup()
     renderPage(['/articles?page=3'])

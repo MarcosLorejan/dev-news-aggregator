@@ -14,6 +14,17 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
     assert json["sources"].any? { |source| source["source_type"] == "hacker_news" }
   end
 
+  test "index backfills default youtube channels when older DBs lack them" do
+    NewsSource.where(source_type: "youtube").delete_all
+    assert_equal 0, NewsSource.where(source_type: "youtube").count
+
+    get sources_url, as: :json
+    assert_response :success
+
+    assert NewsSource.where(source_type: "youtube").exists?
+    assert JSON.parse(response.body)["sources"].any? { |source| source["source_type"] == "youtube" }
+  end
+
   test "index JSON includes last_fetch for sources with FetchRun" do
     FetchRun.record_outcome(
       source_key: "hacker_news",
