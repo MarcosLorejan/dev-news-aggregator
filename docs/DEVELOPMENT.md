@@ -4,6 +4,8 @@ Project-specific commands, architecture, and conventions for dev-news-aggregator
 
 For the directory map, see [REPO_STRUCTURE.md](REPO_STRUCTURE.md). **Update that file whenever you change project structure** (new folders, models, routes, migrations, etc.).
 
+For how we store durable project knowledge (guides vs decision/concept docs, OKF-inspired practices), see [KNOWLEDGE.md](KNOWLEDGE.md).
+
 ## Development commands
 
 ### Prerequisites
