@@ -10,6 +10,7 @@ vi.mock('../api/sources', () => ({
   fetchSources: vi.fn(),
   updateSource: vi.fn(),
   addRedditSource: vi.fn(),
+  addYoutubeSource: vi.fn(),
   removeSource: vi.fn(),
 }))
 
@@ -44,6 +45,16 @@ describe('SourcesIndexPage', () => {
         name: 'programming',
         source_type: 'reddit',
         subreddit: 'programming',
+        active: true,
+      })
+    )
+    vi.mocked(sourcesApi.addYoutubeSource).mockResolvedValue(
+      buildNewsSource({
+        id: 5,
+        name: 'Fireship',
+        source_type: 'youtube',
+        channel_id: 'UCsBjURrPoezykLs9EqgamOA',
+        channel_name: 'Fireship',
         active: true,
       })
     )
@@ -140,14 +151,29 @@ describe('SourcesIndexPage', () => {
     renderPage()
     await waitForSourcesPage()
 
-    await user.type(screen.getByTestId('subreddit-input'), 'programming')
-    await user.click(screen.getByTestId('add-subreddit-button'))
+    await user.type(screen.getByTestId('source-input'), 'programming')
+    await user.click(screen.getByTestId('add-source-button'))
 
     await waitFor(() => {
       expect(sourcesApi.addRedditSource).toHaveBeenCalledWith('programming')
     })
     expect(await screen.findByText('r/programming')).toBeInTheDocument()
-    expect(screen.getByTestId('subreddit-input')).toHaveValue('')
+    expect(screen.getByTestId('source-input')).toHaveValue('')
+  })
+
+  it('adds a YouTube channel after selecting the type', async () => {
+    const user = userEvent.setup()
+    renderPage()
+    await waitForSourcesPage()
+
+    await user.click(screen.getByTestId('add-type-youtube'))
+    await user.type(screen.getByTestId('source-input'), '@fireship')
+    await user.click(screen.getByTestId('add-source-button'))
+
+    await waitFor(() => {
+      expect(sourcesApi.addYoutubeSource).toHaveBeenCalledWith('@fireship')
+    })
+    expect(await screen.findByText('Fireship')).toBeInTheDocument()
   })
 
   it('shows validation error when adding a subreddit fails', async () => {
@@ -156,10 +182,10 @@ describe('SourcesIndexPage', () => {
     renderPage()
     await waitForSourcesPage()
 
-    await user.type(screen.getByTestId('subreddit-input'), 'notarealsub')
-    await user.click(screen.getByTestId('add-subreddit-button'))
+    await user.type(screen.getByTestId('source-input'), 'notarealsub')
+    await user.click(screen.getByTestId('add-source-button'))
 
-    expect(await screen.findByTestId('subreddit-validation-error')).toHaveTextContent(
+    expect(await screen.findByTestId('source-validation-error')).toHaveTextContent(
       'Subreddit not found'
     )
   })
@@ -169,7 +195,7 @@ describe('SourcesIndexPage', () => {
     renderPage()
     await waitForSourcesPage()
 
-    await user.click(screen.getByRole('button', { name: 'Remove' }))
+    await user.click(screen.getByTestId('remove-reddit-3'))
     expect(await screen.findByTestId('confirm-dialog')).toBeInTheDocument()
     await user.click(screen.getByTestId('confirm-dialog-confirm'))
 

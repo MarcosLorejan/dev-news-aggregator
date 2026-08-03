@@ -63,7 +63,7 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
     assert @reddit_source.reload.active
   end
 
-  test "should not remove non-reddit source" do
+  test "should not remove built-in source" do
     hn = news_sources(:hacker_news)
     delete source_url(hn), as: :json
     assert_response :unprocessable_entity
@@ -76,11 +76,24 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
     assert_not NewsSource.exists?(@reddit_source.id)
   end
 
+  test "should remove youtube source" do
+    youtube = NewsSource.create!(
+      name: "Confreaks",
+      source_type: "youtube",
+      config: { "channel_id" => "UCWnPjmqvljcafA0QXblOU1A", "channel_name" => "Confreaks" },
+      active: true
+    )
+
+    delete source_url(youtube), as: :json
+    assert_response :no_content
+    assert_not NewsSource.exists?(youtube.id)
+  end
+
   test "should reject invalid subreddit" do
     original = RedditSubredditValidator.method(:valid?)
     RedditSubredditValidator.define_singleton_method(:valid?) { |_subreddit| false }
     begin
-      post sources_url, params: { subreddit: "not-a-real-subreddit-xyz" }, as: :json
+      post sources_url, params: { source_type: "reddit", subreddit: "not-a-real-subreddit-xyz" }, as: :json
       assert_response :unprocessable_entity
       assert_equal "Subreddit not found or not accessible", JSON.parse(response.body)["error"]
     ensure
@@ -93,7 +106,7 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
     RedditSubredditValidator.define_singleton_method(:valid?) { |_subreddit| true }
     begin
       assert_difference("NewsSource.count", 1) do
-        post sources_url, params: { subreddit: "golang" }, as: :json
+        post sources_url, params: { source_type: "reddit", subreddit: "golang" }, as: :json
       end
 
       assert_response :created
@@ -102,6 +115,55 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
       assert_equal "golang", json["subreddit"]
     ensure
       RedditSubredditValidator.define_singleton_method(:valid?, original)
+    end
+  end
+
+  test "should add valid youtube channel" do
+    channel_id = "UCWnPjmqvljcafA0QXblOU1A"
+    original = YoutubeChannelValidator.method(:resolve)
+    YoutubeChannelValidator.define_singleton_method(:resolve) do |_input|
+      YoutubeChannelValidator::Result.new(
+        ok: true,
+        channel_id: channel_id,
+        channel_name: "Confreaks",
+        error: nil
+      )
+    end
+    begin
+      assert_difference("NewsSource.count", 1) do
+        post sources_url, params: { source_type: "youtube", channel: "@confreaks" }, as: :json
+      end
+
+      assert_response :created
+      json = JSON.parse(response.body)
+      assert_equal "youtube", json["source_type"]
+      assert_equal channel_id, json["channel_id"]
+      assert_equal "Confreaks", json["channel_name"]
+    ensure
+      YoutubeChannelValidator.define_singleton_method(:resolve) do |*args, **kwargs, &block|
+        original.call(*args, **kwargs, &block)
+      end
+    end
+  end
+
+  test "should reject invalid youtube channel" do
+    original = YoutubeChannelValidator.method(:resolve)
+    YoutubeChannelValidator.define_singleton_method(:resolve) do |_input|
+      YoutubeChannelValidator::Result.new(
+        ok: false,
+        channel_id: nil,
+        channel_name: nil,
+        error: "YouTube channel not found or feed unavailable"
+      )
+    end
+    begin
+      post sources_url, params: { source_type: "youtube", channel: "@nope" }, as: :json
+      assert_response :unprocessable_entity
+      assert_equal "YouTube channel not found or feed unavailable", JSON.parse(response.body)["error"]
+    ensure
+      YoutubeChannelValidator.define_singleton_method(:resolve) do |*args, **kwargs, &block|
+        original.call(*args, **kwargs, &block)
+      end
     end
   end
 end

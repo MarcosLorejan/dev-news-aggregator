@@ -23,6 +23,7 @@ export interface NewsSource {
   source_type: 'hacker_news' | 'dev_to' | 'reddit' | 'youtube'
   subreddit: string | null
   channel_id?: string | null
+  channel_name?: string | null
   active: boolean
   last_fetch: SourceLastFetch | null
 }
@@ -45,7 +46,14 @@ export function updateSource(id: number, active: boolean) {
 export function addRedditSource(subreddit: string) {
   return apiRequest<NewsSource>('/sources.json', {
     method: 'POST',
-    body: JSON.stringify({ subreddit }),
+    body: JSON.stringify({ source_type: 'reddit', subreddit }),
+  })
+}
+
+export function addYoutubeSource(channel: string) {
+  return apiRequest<NewsSource>('/sources.json', {
+    method: 'POST',
+    body: JSON.stringify({ source_type: 'youtube', channel }),
   })
 }
 
