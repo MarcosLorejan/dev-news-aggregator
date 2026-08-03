@@ -103,6 +103,7 @@ dev-news-aggregator/
 | `news_fetchers/reddit_fetcher.rb` | Reddit API (one instance per subreddit) |
 | `news_fetchers/youtube_fetcher.rb` | YouTube channel Atom feeds (no API key) |
 | `youtube_keyword_discovery.rb` | Opt-in keyword search.list discovery with daily quota budget |
+| `youtube_channel_validator.rb` | Resolve/validate YouTube channel IDs, URLs, and @handles |
 | `personal_feed_ranker.rb` | For you sort — source affinity from bookmarks/dismissals |
 | `article_topic_classifier.rb` | Schema-validated topic tagging (keyword heuristics) |
 | `feed_noise_classifier.rb` | Heuristics to flag low-signal / meme feed items |
