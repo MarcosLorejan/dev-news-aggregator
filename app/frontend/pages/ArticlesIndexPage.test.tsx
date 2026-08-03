@@ -41,6 +41,16 @@ async function waitForArticlesFeed() {
   })
 }
 
+async function openFiltersMenu(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByTestId('filters-menu'))
+  return screen.findByTestId('filters-menu-panel')
+}
+
+async function openSortMenu(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByTestId('sort-menu'))
+  return screen.findByTestId('sort-menu-panel')
+}
+
 describe('ArticlesIndexPage dismiss flow', () => {
   beforeEach(() => {
     vi.mocked(articlesApi.fetchArticles).mockResolvedValue(buildArticlesIndexResponse())
@@ -105,9 +115,11 @@ describe('ArticlesIndexPage dismiss flow', () => {
     )
     expect(screen.getByText('Rust 2024 Edition Highlights')).toBeInTheDocument()
     expect(screen.queryByText('Ruby 3.3 Performance Tips')).not.toBeInTheDocument()
+    expect(screen.getByTestId('active-filter-chips')).toHaveTextContent('Programming Languages')
 
     vi.mocked(articlesApi.fetchArticles).mockResolvedValue(buildArticlesIndexResponse())
-    await user.click(screen.getByRole('button', { name: /All Articles/ }))
+    const filters = await openFiltersMenu(user)
+    await user.click(within(filters).getByRole('button', { name: /All Articles/ }))
 
     await waitFor(() => {
       expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
@@ -143,13 +155,19 @@ describe('ArticlesIndexPage dismiss flow', () => {
   })
 
   it('requests sorted articles when sort is in the URL', async () => {
+    const user = userEvent.setup()
     renderPage(['/articles?sort=score'])
 
     await waitForArticlesFeed()
     expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
       expect.objectContaining({ sort: 'score' })
     )
-    expect(screen.getByRole('button', { name: 'Highest score' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByTestId('sort-menu')).toHaveTextContent('Highest score')
+    const sortPanel = await openSortMenu(user)
+    expect(within(sortPanel).getByRole('button', { name: 'Highest score' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
   })
 
   it('requests for_you sort when selected', async () => {
@@ -157,14 +175,15 @@ describe('ArticlesIndexPage dismiss flow', () => {
     renderPage()
 
     await waitForArticlesFeed()
-    await user.click(screen.getByRole('button', { name: 'For you' }))
+    const sortPanel = await openSortMenu(user)
+    await user.click(within(sortPanel).getByRole('button', { name: 'For you' }))
 
     await waitFor(() => {
       expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
         expect.objectContaining({ sort: 'for_you' })
       )
     })
-    expect(screen.getByRole('button', { name: 'For you' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByTestId('sort-menu')).toHaveTextContent('For you')
   })
 
   it('updates sort via the sort control', async () => {
@@ -172,7 +191,8 @@ describe('ArticlesIndexPage dismiss flow', () => {
     renderPage()
 
     await waitForArticlesFeed()
-    await user.click(screen.getByRole('button', { name: 'Most comments' }))
+    const sortPanel = await openSortMenu(user)
+    await user.click(within(sortPanel).getByRole('button', { name: 'Most comments' }))
 
     await waitFor(() => {
       expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
@@ -210,13 +230,22 @@ describe('ArticlesIndexPage dismiss flow', () => {
   })
 
   it('renders interest chips and reflects the interests URL param', async () => {
+    const user = userEvent.setup()
     renderPage(['/articles?interests=rust'])
 
     await waitForArticlesFeed()
+    expect(screen.getByTestId('active-filter-chips')).toHaveTextContent('Rust')
+    const filters = await openFiltersMenu(user)
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Rust (5)' })).toHaveAttribute('aria-pressed', 'true')
+      expect(within(filters).getByRole('button', { name: 'Rust (5)' })).toHaveAttribute(
+        'aria-pressed',
+        'true'
+      )
     })
-    expect(screen.getByRole('button', { name: 'Ruby (3)' })).toHaveAttribute('aria-pressed', 'false')
+    expect(within(filters).getByRole('button', { name: 'Ruby (3)' })).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    )
     expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
       expect.objectContaining({ interests: ['rust'] })
     )
@@ -227,7 +256,8 @@ describe('ArticlesIndexPage dismiss flow', () => {
     renderPage(['/articles?interests=rust'])
 
     await waitForArticlesFeed()
-    await user.click(await screen.findByRole('button', { name: 'Ruby (3)' }))
+    const filters = await openFiltersMenu(user)
+    await user.click(await within(filters).findByRole('button', { name: 'Ruby (3)' }))
 
     await waitFor(() => {
       expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
@@ -235,7 +265,7 @@ describe('ArticlesIndexPage dismiss flow', () => {
       )
     })
 
-    await user.click(screen.getByRole('button', { name: 'Rust (5)' }))
+    await user.click(screen.getByRole('button', { name: 'Clear filter Rust' }))
 
     await waitFor(() => {
       expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
@@ -249,7 +279,8 @@ describe('ArticlesIndexPage dismiss flow', () => {
     renderPage(['/articles?interests=ruby,rust&page=3'])
 
     await waitForArticlesFeed()
-    await user.click(await screen.findByTestId('clear-interests'))
+    const filters = await openFiltersMenu(user)
+    await user.click(await within(filters).findByTestId('clear-interests'))
 
     await waitFor(() => {
       expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
@@ -257,6 +288,7 @@ describe('ArticlesIndexPage dismiss flow', () => {
       )
     })
     expect(screen.queryByTestId('clear-interests')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('active-filter-chips')).not.toBeInTheDocument()
   })
 
   it('shows an interest-specific empty state when nothing matches', async () => {
@@ -274,32 +306,47 @@ describe('ArticlesIndexPage dismiss flow', () => {
       })
     )
 
+    const user = userEvent.setup()
     renderPage(['/articles?interests=rust'])
 
     await screen.findByTestId('articles-page')
     expect(await screen.findByText('No articles match these interests')).toBeInTheDocument()
     expect(screen.queryByText('Your feed is empty')).not.toBeInTheDocument()
+    expect(screen.getByTestId('active-filter-chips')).toHaveTextContent('Rust')
+    const filters = await openFiltersMenu(user)
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Rust (5)' })).toBeInTheDocument()
+      expect(within(filters).getByRole('button', { name: 'Rust (5)' })).toBeInTheDocument()
     })
   })
 
   it('keeps the feed usable when interests fail to load', async () => {
     vi.mocked(keywordFiltersApi.fetchKeywordFilters).mockRejectedValue(new Error('boom'))
 
+    const user = userEvent.setup()
     renderPage()
 
     await waitForArticlesFeed()
-    expect(screen.queryByText('Filter by interest')).not.toBeInTheDocument()
+    const filters = await openFiltersMenu(user)
+    expect(within(filters).queryByText('Filter by interest')).not.toBeInTheDocument()
     expect(screen.getByText('Rust 2024 Edition Highlights')).toBeInTheDocument()
   })
 
   it('applies content_type and max_duration from the URL', async () => {
+    const user = userEvent.setup()
     renderPage(['/articles?content_type=video&max_duration=20'])
 
     await waitForArticlesFeed()
-    expect(screen.getByRole('button', { name: 'Videos' })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: '≤ 20 min' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByTestId('active-filter-chips')).toHaveTextContent('Videos')
+    expect(screen.getByTestId('active-filter-chips')).toHaveTextContent('≤ 20 min')
+    const filters = await openFiltersMenu(user)
+    expect(within(filters).getByRole('button', { name: 'Videos' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
+    expect(within(filters).getByRole('button', { name: '≤ 20 min' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
     expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
       expect.objectContaining({ content_type: 'video', max_duration: 20 })
     )
@@ -310,13 +357,38 @@ describe('ArticlesIndexPage dismiss flow', () => {
     renderPage(['/articles?page=3'])
 
     await waitForArticlesFeed()
-    await user.click(screen.getByRole('button', { name: 'Videos' }))
+    const filters = await openFiltersMenu(user)
+    await user.click(within(filters).getByRole('button', { name: 'Videos' }))
 
     await waitFor(() => {
       expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
         expect.objectContaining({ content_type: 'video', page: 1 })
       )
     })
+  })
+
+  it('clears all active filters from the toolbar summary', async () => {
+    const user = userEvent.setup()
+    renderPage(['/articles?interests=rust&score=100&content_type=video&category=programming-languages'])
+
+    await waitForArticlesFeed()
+    expect(screen.getByTestId('active-filter-chips')).toBeInTheDocument()
+    await user.click(screen.getByTestId('clear-all-filters'))
+
+    await waitFor(() => {
+      expect(articlesApi.fetchArticles).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          interests: undefined,
+          category: undefined,
+          page: 1,
+        })
+      )
+    })
+    const calls = vi.mocked(articlesApi.fetchArticles).mock.calls
+    const lastCall = calls[calls.length - 1]?.[0]
+    expect(lastCall).not.toHaveProperty('content_type')
+    expect(lastCall).not.toHaveProperty('min_score')
+    expect(screen.queryByTestId('active-filter-chips')).not.toBeInTheDocument()
   })
 
   it('counts down dismiss toast and removes article after timeout', async () => {

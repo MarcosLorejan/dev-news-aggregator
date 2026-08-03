@@ -18,19 +18,17 @@ import type { KeywordFilter } from '../types/keywordFilter'
 import { parameterize, truncate } from '../utils/format'
 import ArticleList from '../components/ArticleList'
 import ArticleListSkeleton from '../components/ArticleListSkeleton'
-import ArticleSearch from '../components/ArticleSearch'
-import CategoryFilter from '../components/CategoryFilter'
 import DismissToast from '../components/DismissToast'
 import EmptyState from '../components/EmptyState'
-import InterestFilter, { parseInterests, toggleInterest } from '../components/InterestFilter'
+import FilterToolbar from '../components/FilterToolbar'
+import { parseInterests, toggleInterest } from '../components/InterestFilter'
 import PageHeader from '../components/PageHeader'
 import PageHeaderSkeleton from '../components/PageHeaderSkeleton'
 import PageContainer from '../components/ui/PageContainer'
 import Card from '../components/ui/Card'
 import PaginationControls from '../components/PaginationControls'
-import TopicFilter from '../components/TopicFilter'
-import ScoreFilter, { parseScoreFilter, scoreFilterParams, type ScoreFilterValue } from '../components/ScoreFilter'
-import ContentTypeFilter, {
+import { parseScoreFilter, scoreFilterParams, type ScoreFilterValue } from '../components/ScoreFilter'
+import {
   contentTypeFilterParams,
   maxDurationFilterParams,
   parseContentTypeFilter,
@@ -38,7 +36,7 @@ import ContentTypeFilter, {
   type ContentTypeFilterValue,
   type MaxDurationFilterValue,
 } from '../components/ContentTypeFilter'
-import SortControl, { parseSort, type SortValue } from '../components/SortControl'
+import { parseSort, type SortValue } from '../components/SortControl'
 import { usePatchSearchParams } from '../hooks/useSearchParamState'
 
 const SEARCH_DEBOUNCE_MS = 300
@@ -359,6 +357,18 @@ export default function ArticlesIndexPage() {
     })
   }
 
+  const handleClearAllFilters = () => {
+    patchSearchParams((params) => {
+      params.delete('interests')
+      params.delete('score')
+      params.delete('content_type')
+      params.delete('max_duration')
+      params.delete('category')
+      params.delete('tag')
+      params.delete('page')
+    })
+  }
+
   const handlePageChange = (page: number) => {
     patchSearchParams((params) => {
       if (page <= 1) params.delete('page')
@@ -442,7 +452,7 @@ export default function ArticlesIndexPage() {
     }
   }, [showRead, updateArticle])
 
-  if (loading) {
+  if (loading && !data) {
     return (
       <PageContainer testId="articles-page" role="status" aria-live="polite" aria-busy>
         <PageHeaderSkeleton />
@@ -538,44 +548,30 @@ export default function ArticlesIndexPage() {
         <div className="mb-4 text-sm text-red-400">{error}</div>
       )}
 
-      <ArticleSearch value={searchInput} onChange={setSearchInput} />
-
-      <InterestFilter
+      <FilterToolbar
+        searchValue={searchInput}
+        onSearchChange={setSearchInput}
         interests={interests}
-        selectedSlugs={activeInterests}
-        onToggle={handleInterestToggle}
-        onClear={handleInterestsClear}
-      />
-
-      <ScoreFilter
+        selectedInterestSlugs={activeInterests}
+        onInterestToggle={handleInterestToggle}
+        onInterestsClear={handleInterestsClear}
         activeScoreFilter={activeScoreFilter}
         onScoreFilterChange={handleScoreFilterChange}
-      />
-
-      <ContentTypeFilter
         activeContentType={activeContentType}
         activeMaxDuration={activeMaxDuration}
         onContentTypeChange={handleContentTypeChange}
         onMaxDurationChange={handleMaxDurationChange}
-      />
-
-      <SortControl
         activeSort={activeSort}
         onSortChange={handleSortChange}
-      />
-
-      <CategoryFilter
         categories={data.categories}
         categoryCounts={categoryCounts}
         totalCount={allArticlesCount}
-        activeFilter={activeFilter}
-        onFilterChange={handleFilterChange}
-      />
-
-      <TopicFilter
-        tags={data.topic_tags ?? []}
+        activeCategory={activeFilter}
+        onCategoryChange={handleFilterChange}
+        topicTags={data.topic_tags ?? []}
         activeTag={activeTag}
         onTagChange={handleTagChange}
+        onClearAllFilters={handleClearAllFilters}
       />
 
       {emptyResults ? (
