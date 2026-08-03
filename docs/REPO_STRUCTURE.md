@@ -222,6 +222,7 @@ dev-news-aggregator/
 | `SUMMARIZER.md` | Optional pluggable article summarizer (env, providers, caching) |
 | `KEYWORD_FILTERS.md` | Interest/keyword feed filters and articles index API params |
 | `YOUTUBE.md` | YouTube Atom vs Data API paths, quota strategy, config, Sources UI |
+| `decisions/` | Durable *why* decision records (Context / Decision / Consequences) |
 
 ## `.github/`
 
@@ -269,10 +270,11 @@ Agents should start here, then use this file as the navigation map:
 3. [CONTRIBUTING.md](../CONTRIBUTING.md) — PR workflow
 4. [KNOWLEDGE.md](KNOWLEDGE.md) — knowledge conventions (OKF-inspired; where *why* lives)
 5. [DEVELOPMENT.md](DEVELOPMENT.md) — setup, commands, conventions
-6. [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md) — interest/keyword feed filters
-7. [YOUTUBE.md](YOUTUBE.md) — YouTube ingestion and quota
-8. [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md) — Overcommit setup
-9. This file — directory and entry-point map
+6. [index.md](index.md) Decisions section — durable *why* under `docs/decisions/`
+7. [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md) — interest/keyword feed filters
+8. [YOUTUBE.md](YOUTUBE.md) — YouTube ingestion and quota
+9. [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md) — Overcommit setup
+10. This file — directory and entry-point map
 
 ## Routes (summary)
 

@@ -10,6 +10,8 @@ resource: app/services/news_fetchers/
 
 Short developer videos in the same feed as HN / Dev.to / Reddit. Two paths with very different quota profiles — prefer Atom for channels; treat Data API search as a scarce budget.
 
+*Why Atom first:* [decisions/youtube-atom-first.md](decisions/youtube-atom-first.md).
+
 ## Two ingestion paths
 
 | Path | How | API key? | Quota | What you get |

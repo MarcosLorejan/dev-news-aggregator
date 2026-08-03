@@ -17,7 +17,7 @@ We borrow practices from the [Open Knowledge Format (OKF)](https://cloud.google.
 |-------|----------|--------|
 | Standing instructions | `AGENTS.md`, Cursor rules/skills, `CONTRIBUTING.md` | Workflow, scope, verification, “always/never” guardrails |
 | How-to guides | `docs/*.md` (e.g. `DEVELOPMENT.md`, `YOUTUBE.md`) | Setup, APIs, operational steps |
-| Curated *why* | Concept / decision files under `docs/` (see roadmap) | Trade-offs and reasoning agents cannot recover from code alone |
+| Curated *why* | `docs/decisions/` (and future concept files) | Trade-offs and reasoning agents cannot recover from code alone |
 | Code map | `docs/REPO_STRUCTURE.md` | Directory layout and structural maintenance rules |
 
 Do **not** dump long domain reasoning into `AGENTS.md`. Keep that file short and point here (and to focused docs) instead.
@@ -88,7 +88,7 @@ Suggested shape for a concept/decision file:
 3. **Consequences** — what follows (including footguns)  
 4. Links to how-to guides + `resource:` path to code  
 
-Initial concept backlog: [#409](https://github.com/MarcosLorejan/dev-news-aggregator/issues/409).
+Initial decision set: [docs/decisions/](decisions/) ([#409](https://github.com/MarcosLorejan/dev-news-aggregator/issues/409)).
 
 ## Implementation roadmap
 

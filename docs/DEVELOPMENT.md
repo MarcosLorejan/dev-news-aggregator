@@ -57,7 +57,7 @@ SOLID_QUEUE_IN_PUMA=1 bin/rails server
 # Or double-click start-app.bat in Explorer (same thing)
 ```
 
-Note: on Windows, `SOLID_QUEUE_IN_PUMA` is **not** used — Solid Queue’s Puma plugin requires `fork()`, which Windows does not support. The web app still runs; background jobs (e.g. delayed dismissal cleanup) won’t process until you run workers on a Unix-like environment.
+Note: on Windows, `SOLID_QUEUE_IN_PUMA` is **not** used — Solid Queue’s Puma plugin requires `fork()`, which Windows does not support. The web app still runs; background jobs (e.g. delayed dismissal cleanup) won’t process until you run workers on a Unix-like environment. *Why:* [decisions/solid-queue-windows.md](decisions/solid-queue-windows.md).
 
 Development uses `skipProxy: true` in `config/vite.json` so the browser loads Vite assets directly from port 3036. That avoids blank pages caused by Vite’s many module requests queueing behind a few Puma threads.
 
@@ -191,7 +191,7 @@ whenever --clear-crontab
 
 ### Core components
 
-**NewsAggregatorService**: Central orchestrator that coordinates all news fetchers. Builds the fetcher list from enabled `NewsSource` records when present, otherwise from `config/news_aggregator.yml` (Hacker News, Dev.to, configured Reddit subreddits, and YouTube channels). Handles error logging and aggregates results.
+**NewsAggregatorService**: Central orchestrator that coordinates all news fetchers. Builds the fetcher list from enabled `NewsSource` records when present, otherwise from `config/news_aggregator.yml` (Hacker News, Dev.to, configured Reddit subreddits, and YouTube channels). Handles error logging and aggregates results. *Why this split:* [decisions/fetch-orchestration.md](decisions/fetch-orchestration.md).
 
 **NewsAggregatorConfig**: Loads `config/news_aggregator.yml` via `Rails.application.config_for`. Provides fetching limits (`max_articles_per_source`), retention settings, Reddit/YouTube source lists, and API endpoint metadata. Fetchers read article limits from config; `news:clean` uses configured retention days.
 

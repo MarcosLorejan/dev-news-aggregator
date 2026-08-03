@@ -11,6 +11,8 @@ resource: app/controllers/api/v1/
 Stable JSON contract for machine clients and coding agents. Prefer these
 routes over scraping the HTML UI.
 
+*Why a thinner `/api/v1`:* [decisions/agent-api-thin-contract.md](decisions/agent-api-thin-contract.md).
+
 Base path: `/api/v1`
 
 ## Auth and rate limits
