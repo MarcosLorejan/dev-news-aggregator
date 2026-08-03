@@ -5,6 +5,7 @@ Guidance for AI coding agents working in this repository. Keep this file concise
 ## Read First
 
 - `docs/index.md`: knowledge map (one line per doc — start here for orientation).
+- `docs/log.md`: knowledge changelog (append in the same PR when docs change materially).
 - `CONTRIBUTING.md`: contributor entry point and pull request workflow.
 - `docs/KNOWLEDGE.md`: OKF-inspired conventions for durable project knowledge (instructions vs *why*, concept files, roadmap).
 - `docs/DEVELOPMENT.md`: setup, architecture, coding standards, test expectations, and git conventions.

@@ -213,6 +213,7 @@ dev-news-aggregator/
 | File | Purpose |
 |------|---------|
 | `index.md` | Knowledge map — one-line purpose per maintained doc |
+| `log.md` | Knowledge changelog (dated, newest first) |
 | `KNOWLEDGE.md` | OKF-inspired knowledge conventions (instructions vs curated *why*, roadmap) |
 | `DEVELOPMENT.md` | Commands, architecture, coding and git conventions |
 | `AGENT_API.md` | Versioned `/api/v1` JSON contract for agents |

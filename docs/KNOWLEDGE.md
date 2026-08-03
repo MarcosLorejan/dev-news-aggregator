@@ -44,7 +44,7 @@ Cross-link related guides and concepts with relative Markdown links. A link to a
 
 ### Knowledge changelog
 
-When concept docs land, keep a dated `docs/log.md` (newest first, one bullet per create/update/deprecate), same PR as the knowledge change ([#407](https://github.com/MarcosLorejan/dev-news-aggregator/issues/407)).
+Keep a dated [log.md](log.md) (newest first, ISO day headings, one bullet per create/update/deprecate). Append in the **same PR** when you add or materially change knowledge under `docs/` (new guides, decisions, maps, or structural moves). Skip pure typos and formatting-only edits.
 
 ### Light frontmatter (optional)
 
