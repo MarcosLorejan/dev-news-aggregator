@@ -27,6 +27,8 @@ Interests filter by matching terms against **title + description**. They are ort
 | `category` | Source-category slug. |
 | `tag` | Topic tag slug. |
 | `min_score` / `top_percent` / `sort` / `show_read` / `page` | Unchanged score/sort/pagination params. |
+| `content_type` | `video` or `article` (absent = both). See [YOUTUBE.md](YOUTUBE.md). |
+| `max_duration` | Max video length in **minutes**; text articles untouched; unknown duration included. |
 
 ### Combining filters
 

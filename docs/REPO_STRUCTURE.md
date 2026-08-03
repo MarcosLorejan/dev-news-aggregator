@@ -209,6 +209,8 @@ dev-news-aggregator/
 | `PRE_COMMIT_HOOKS.md` | Overcommit setup and usage |
 | `REACT_SETUP.md` | React/Vite frontend setup |
 | `SUMMARIZER.md` | Optional pluggable article summarizer (env, providers, caching) |
+| `KEYWORD_FILTERS.md` | Interest/keyword feed filters and articles index API params |
+| `YOUTUBE.md` | YouTube Atom vs Data API paths, quota strategy, config, Sources UI |
 
 ## `.github/`
 
@@ -255,14 +257,16 @@ Agents should start here, then use this file as the navigation map:
 2. [CONTRIBUTING.md](../CONTRIBUTING.md) — PR workflow
 3. [DEVELOPMENT.md](DEVELOPMENT.md) — setup, commands, conventions
 4. [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md) — interest/keyword feed filters
-5. This file — directory and entry-point map
+5. [YOUTUBE.md](YOUTUBE.md) — YouTube ingestion and quota
+6. [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md) — Overcommit setup
+7. This file — directory and entry-point map
 
 ## Routes (summary)
 
 | Path | Controller#action |
 |------|-------------------|
 | `/` | `articles#index` |
-| `/articles.atom` | `articles#index` (Atom feed; honors `q`, `keywords`, `match`, `interest`/`interests`, `category`, `tag`, `sort`, score filters — see [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md)) |
+| `/articles.atom` | `articles#index` (Atom feed; honors `q`, `keywords`, `match`, `interest`/`interests`, `category`, `tag`, `content_type`, `max_duration`, `sort`, score filters — see [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md) and [YOUTUBE.md](YOUTUBE.md)) |
 | `/articles/:id` | `articles#show` |
 | `/articles/:id/summarize` | `articles#summarize` (POST; optional AI/heuristic summary) |
 | `/keyword_filters` | `keyword_filters#index` (CRUD JSON for interest presets) |

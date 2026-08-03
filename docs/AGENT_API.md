@@ -32,16 +32,18 @@ Query params:
 | `show_read` | `true` to include read articles |
 | `page`, `per_page` | Pagination (`per_page` max 100) |
 
-For the richer HTML/JSON feed (`GET /articles.json` / `.atom`) — including `keywords`, `match`, `interest` / `interests`, categories, and tags — see [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md). Those params are not yet mirrored on `/api/v1/articles`.
+For the richer HTML/JSON feed (`GET /articles.json` / `.atom`) — including `keywords`, `match`, `interest` / `interests`, `content_type`, `max_duration`, categories, and tags — see [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md) and [YOUTUBE.md](YOUTUBE.md). Those params are not yet mirrored on `/api/v1/articles`.
 
 Response:
 
 ```json
 {
-  "articles": [ { "id": 1, "title": "...", "url": "...", "source_type": "hacker_news", "score": 10, "bookmarked": false, "read": false, "dismissed": false, "pending_dismissal": false } ],
+  "articles": [ { "id": 1, "title": "...", "url": "...", "source_type": "hacker_news", "score": 10, "content_type": "article", "duration_seconds": null, "thumbnail_url": null, "author": null, "bookmarked": false, "read": false, "dismissed": false, "pending_dismissal": false } ],
   "pagination": { "current_page": 1, "per_page": 50, "total_count": 10, "total_pages": 1 }
 }
 ```
+
+Video items use `content_type: "video"` with optional `duration_seconds`, `thumbnail_url`, and `author` (same fields on `GET /articles.json`).
 
 ### Show article
 
