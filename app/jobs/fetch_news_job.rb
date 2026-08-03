@@ -3,6 +3,7 @@ class FetchNewsJob < ApplicationJob
 
   def perform
     result = NewsAggregatorService.fetch_all_news
+    YoutubeKeywordDiscovery.run!
     YoutubeVideoEnricher.enrich!
     result
   end
