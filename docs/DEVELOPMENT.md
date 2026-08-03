@@ -182,16 +182,16 @@ whenever --clear-crontab
 
 ### Core components
 
-**NewsAggregatorService**: Central orchestrator that coordinates all news fetchers. Builds the fetcher list from enabled `NewsSource` records when present, otherwise from `config/news_aggregator.yml` (Hacker News, Dev.to, and configured Reddit subreddits). Handles error logging and aggregates results.
+**NewsAggregatorService**: Central orchestrator that coordinates all news fetchers. Builds the fetcher list from enabled `NewsSource` records when present, otherwise from `config/news_aggregator.yml` (Hacker News, Dev.to, configured Reddit subreddits, and YouTube channels). Handles error logging and aggregates results.
 
-**NewsAggregatorConfig**: Loads `config/news_aggregator.yml` via `Rails.application.config_for`. Provides fetching limits (`max_articles_per_source`), retention settings, Reddit subreddit lists, and API endpoint metadata. Fetchers read article limits from config; `news:clean` uses configured retention days.
+**NewsAggregatorConfig**: Loads `config/news_aggregator.yml` via `Rails.application.config_for`. Provides fetching limits (`max_articles_per_source`), retention settings, Reddit/YouTube source lists, and API endpoint metadata. Fetchers read article limits from config; `news:clean` uses configured retention days.
 
-**Fetcher architecture**: Modular fetcher system with `NewsFetchers::BaseFetcher` as the abstract base class. Each fetcher (HackerNews, DevTo, Reddit) inherits and implements `fetch_articles`. Common pattern: fetch from API, transform data, call `create_or_update_article`.
+**Fetcher architecture**: Modular fetcher system with `NewsFetchers::BaseFetcher` as the abstract base class. Each fetcher (HackerNews, DevTo, Reddit, YouTube) inherits and implements `fetch_articles`. Common pattern: fetch from API, transform data, call `create_or_update_article`.
 
 **Data models**:
-- `Article`: Stores aggregated news with unified schema (title, url, published_at, description, external_id, source_type, score, comment_count)
+- `Article`: Stores aggregated news with unified schema (title, url, published_at, description, external_id, source_type, score, comment_count, plus optional video fields: `content_type`, `duration_seconds`, `thumbnail_url`, `author`)
 - `Bookmark`: Tracks bookmarked articles for personal reading list functionality
-- `NewsSource`: Database-backed source registry with admin UI at `/sources`. `bootstrap_defaults!` seeds Hacker News, Dev.to, and Reddit subreddits from `config/news_aggregator.yml`. When any enabled records exist, they override the YAML default fetcher list
+- `NewsSource`: Database-backed source registry with admin UI at `/sources`. `bootstrap_defaults!` seeds Hacker News, Dev.to, Reddit subreddits, and YouTube channels from `config/news_aggregator.yml`. When any enabled records exist, they override the YAML default fetcher list
 
 **Scheduled jobs**: Uses `whenever` gem to run `news:fetch` hourly during business hours (9 AM - 6 PM) and `news:clean` daily at 2 AM. `news:fetch` enqueues `FetchNewsJob` so cron exits immediately; workers process the fetch asynchronously. Logs to `log/cron.log`.
 
@@ -212,19 +212,23 @@ whenever --clear-crontab
 ```
 app/
   controllers/articles_controller.rb    # Main web interface
-  controllers/sources_controller.rb     # Enable/disable sources, add Reddit subreddits
+  controllers/sources_controller.rb     # Enable/disable sources; add Reddit / YouTube
   models/
     article.rb                          # Article data model
     news_aggregator_config.rb           # YAML config loader for news fetching
     news_source.rb                      # Database-backed source registry
   services/
     news_aggregator_service.rb          # Main orchestrator
+    youtube_video_enricher.rb           # Optional videos.list duration/stats
+    youtube_keyword_discovery.rb        # Opt-in search.list discovery (budgeted)
+    youtube_channel_validator.rb        # Resolve/validate YouTube channels for /sources
     news_fetchers/
       base_fetcher.rb                   # Abstract fetcher base class
       hacker_news_fetcher.rb            # HN API integration
       dev_to_fetcher.rb                 # Dev.to API integration
       reddit_fetcher.rb                 # Reddit API integration
-config/news_aggregator.yml              # Fetch limits, retention, subreddit list
+      youtube_fetcher.rb                # YouTube channel Atom feeds
+config/news_aggregator.yml              # Fetch limits, retention, Reddit/YouTube sources
 lib/tasks/news.rake                     # Rake tasks for news operations
 config/schedule.rb                      # Cron job definitions
 ```
@@ -237,13 +241,17 @@ config/schedule.rb                      # Cron job definitions
 
 **Reddit**: Multiple instances for different subreddits. Each subreddit is treated as a separate source type in the database. By default, fetchers read the public Atom feed (`/r/{subreddit}/.rss`) because unauthenticated `.json` listings return HTTP 403 (Atom has no score fields, so new articles seed `score`/`comment_count` to 0). Set `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` to switch to OAuth JSON listings on `oauth.reddit.com`, which persist real scores and comment counts. Requests share a configurable throttle (`apis.reddit.min_request_interval_seconds`, default 2.5s); HTTP 429 responses are retried with backoff (`apis.reddit.rate_limit_max_retries`) and failures are recorded on `FetchRun` instead of silent zero-article success.
 
+**YouTube**: Channel uploads via public Atom feeds (no API key). Optional `YOUTUBE_API_KEY` enables `videos.list` enrichment (duration/stats) and opt-in keyword `search.list` discovery with a hard daily budget. Manage channels at `/sources`. Full quota/config details: [YOUTUBE.md](YOUTUBE.md).
+
 ### Database schema
 
 Articles table uses generic fields to accommodate all news sources:
-- `source_type`: String identifier (hacker_news, dev_to, reddit_programming, etc.)
-- `external_id`: Source-specific unique identifier
-- `score`: Votes/reactions from source (HN score, Dev.to reactions, Reddit upvotes)
+- `source_type`: String identifier (hacker_news, dev_to, reddit_programming, youtube_UC…, youtube_search_<slug>, etc.)
+- `external_id`: Source-specific unique identifier (YouTube video ID for videos)
+- `score`: Votes/reactions from source (HN score, Dev.to reactions, Reddit upvotes, YouTube views when enriched)
 - `comment_count`: Source-specific comment counts
+- `content_type`: `article` (default) or `video`
+- `duration_seconds` / `thumbnail_url` / `author`: Video metadata (nullable)
 
 ### Environment configuration
 
@@ -262,13 +270,16 @@ Copy `.env.example` to `.env` before starting the stack. Docker Compose reads it
 
 **Keyword interests**: Saved topic presets (`KeywordFilter`) filter the feed by title/description terms (`keywords`, `interest` / `interests`). Manage them at `/interests`; see [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md).
 
-**Multi-source aggregation**: Default sources are defined in `config/news_aggregator.yml` — Hacker News, Dev.to, and 11 Reddit subreddits (programming, webdev, javascript, ruby, rust, netsec, cybersecurity, technology, MachineLearning, artificial, LocalLLaMA). Override via enabled `NewsSource` records.
+**YouTube videos**: Channel Atom ingestion plus optional API enrichment/discovery; content-type and duration filters on the feed. See [YOUTUBE.md](YOUTUBE.md).
+
+**Multi-source aggregation**: Default sources are defined in `config/news_aggregator.yml` — Hacker News, Dev.to, Reddit subreddits, and starter YouTube channels. Override via enabled `NewsSource` records.
 
 ### Adding new news sources
 
 **Via config (default path)**:
 1. For Reddit: add the subreddit to `config/news_aggregator.yml` under `apis.reddit.subreddits`
-2. Adjust `fetching.max_articles_per_source` if needed
+2. For YouTube: add `{ channel_id, name }` under `apis.youtube.channels`, or use `/sources` in the UI
+3. Adjust `fetching.max_articles_per_source` if needed
 
 **Via database (optional override)**:
 1. Create or enable a `NewsSource` record (`NewsSource.bootstrap_defaults!` seeds defaults)
