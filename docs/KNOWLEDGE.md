@@ -1,3 +1,10 @@
+---
+type: Guide
+title: Knowledge conventions (OKF-inspired)
+description: What we borrow from OKF for durable project knowledge without requiring the okf gem.
+tags: [knowledge, agents, conventions]
+---
+
 # Knowledge conventions (OKF-inspired)
 
 How this repo stores durable project knowledge for humans and coding agents.
@@ -15,7 +22,7 @@ We borrow practices from the [Open Knowledge Format (OKF)](https://cloud.google.
 
 Do **not** dump long domain reasoning into `AGENTS.md`. Keep that file short and point here (and to focused docs) instead.
 
-`REPO_STRUCTURE.md` remains the **code** map. The knowledge map (`docs/index.md`, when added) is complementary: one-line summaries of knowledge docs, not a second file-tree.
+`REPO_STRUCTURE.md` remains the **code** map. The knowledge map ([index.md](index.md)) is complementary: one-line summaries of knowledge docs, not a second file-tree.
 
 ## Practices we adopt
 
@@ -27,8 +34,9 @@ Prefer focused docs (like `AGENT_API.md`, `KEYWORD_FILTERS.md`, `YOUTUBE.md`) ov
 
 Agents should orient from a short map first, then open only the files they need.
 
-- Today: `AGENTS.md` → this file → existing guides listed in `REPO_STRUCTURE.md`
-- Next: `docs/index.md` with one line per maintained knowledge doc ([#408](https://github.com/MarcosLorejan/dev-news-aggregator/issues/408))
+- Start: [index.md](index.md) (one line per doc)
+- Then: [AGENTS.md](../AGENTS.md) → this file → focused guides as needed
+- Code layout stays in [REPO_STRUCTURE.md](REPO_STRUCTURE.md)
 
 ### Links are edges
 

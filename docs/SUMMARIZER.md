@@ -1,3 +1,11 @@
+---
+type: Guide
+title: Optional article summarizer
+description: Pluggable providers (none, heuristic, openai, ollama) for article show summaries.
+tags: [summarizer, optional]
+resource: app/services/
+---
+
 # Optional article summarizer
 
 Pluggable short summaries for article show pages. Disabled by default so the core app never depends on an LLM.
