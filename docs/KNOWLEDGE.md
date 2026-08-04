@@ -64,7 +64,15 @@ resource: app/services/news_fetchers/   # code or path this knowledge describes
 
 ### Drift checks
 
-Prefer cheap, dependency-free checks (broken relative links, orphans missing from the knowledge map) before considering `okf validate` in CI ([#411](https://github.com/MarcosLorejan/dev-news-aggregator/issues/411), optional gem spike [#410](https://github.com/MarcosLorejan/dev-news-aggregator/issues/410)).
+Run the dependency-free checker locally (also wired into `bin/validate` / `bin/validate --fast` and CI `docs_check`):
+
+```bash
+bin/check-docs
+```
+
+It fails on broken relative Markdown links under `docs/` (plus `AGENTS.md` / `CONTRIBUTING.md`) and on `docs/**/*.md` files missing from [index.md](index.md).
+
+Graduate to `okf validate` in CI only after the tree is intentionally OKF-shaped ([#410](https://github.com/MarcosLorejan/dev-news-aggregator/issues/410)). Until then, keep this lightweight gate.
 
 Continue updating `REPO_STRUCTURE.md` in the same change when project structure changes (existing rule).
 

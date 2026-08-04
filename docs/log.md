@@ -11,6 +11,10 @@ Dated history of **project knowledge** changes (guides, decisions, maps). Newest
 
 Update this file in the **same PR** when you add or materially change knowledge under `docs/` (see [KNOWLEDGE.md](KNOWLEDGE.md)). Do not log every typo; do log new decisions, new guides, and structural doc moves.
 
+## 2026-08-04
+
+- Added `bin/check-docs` (broken relative links + knowledge-map orphans), wired into `bin/validate` and CI `docs_check` ([#411](https://github.com/MarcosLorejan/dev-news-aggregator/issues/411)).
+
 ## 2026-08-03
 
 - Created [decisions/](decisions/) with six durable *why* records (React/Vite, keyword interests, Agent API thin contract, YouTube Atom-first, Solid Queue on Windows, fetch orchestration) ([#409](https://github.com/MarcosLorejan/dev-news-aggregator/issues/409)).

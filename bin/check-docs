@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Lightweight docs link + orphan checks (no Rails boot).
+# Usage: bin/check-docs
+#        bin/check-docs /path/to/repo
+
+require_relative "../lib/docs_knowledge_check"
+
+root = ARGV[0] || File.expand_path("..", __dir__)
+result = DocsKnowledgeCheck.run(root: root)
+
+if result.ok?
+  puts "Docs knowledge check passed."
+  exit 0
+end
+
+warn "Docs knowledge check failed:"
+result.errors.each { |error| warn "  - #{error}" }
+exit 1
