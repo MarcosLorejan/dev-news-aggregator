@@ -30,6 +30,20 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_no_selector "[data-testid='article-list-skeleton']", wait: 12
   end
 
+  # Category/source filters live inside the compact Filters dropdown.
+  def open_filters_menu
+    assert_selector "[data-testid='filter-toolbar']", wait: 12
+    return if page.has_selector?("[data-testid='filters-menu-panel']", wait: 0)
+
+    trigger = find("[data-testid='filters-menu']")
+    trigger.click
+    return if page.has_selector?("[data-testid='filters-menu-panel']", wait: 2)
+
+    # Click may have closed an already-open menu; open again.
+    trigger.click
+    assert_selector "[data-testid='filters-menu-panel']", wait: 5
+  end
+
   def visit_bookmarks_index
     visit bookmarks_path
     unless page.has_selector?("[data-testid='bookmarks-page']", wait: 12)

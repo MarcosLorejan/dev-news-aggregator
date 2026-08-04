@@ -6,9 +6,10 @@ export type ScoreFilterValue = 'all' | '50' | '100' | '500' | 'top10'
 interface ScoreFilterProps {
   activeScoreFilter: ScoreFilterValue
   onScoreFilterChange: (value: ScoreFilterValue) => void
+  embedded?: boolean
 }
 
-const OPTIONS: { value: ScoreFilterValue; label: string }[] = [
+export const SCORE_FILTER_OPTIONS: { value: ScoreFilterValue; label: string }[] = [
   { value: 'all', label: 'All scores' },
   { value: 'top10', label: 'Top 10%' },
   { value: '50', label: 'Score > 50' },
@@ -16,16 +17,23 @@ const OPTIONS: { value: ScoreFilterValue; label: string }[] = [
   { value: '500', label: 'Score > 500' },
 ]
 
-export default function ScoreFilter({ activeScoreFilter, onScoreFilterChange }: ScoreFilterProps) {
-  return (
-    <Card tone="subtle" className="mb-8">
-      <h2 className="text-h3 text-gray-100 mb-4">Filter by score</h2>
-      <div className="flex flex-wrap gap-3">
-        {OPTIONS.map((option) => (
+export default function ScoreFilter({
+  activeScoreFilter,
+  onScoreFilterChange,
+  embedded = false,
+}: ScoreFilterProps) {
+  const body = (
+    <>
+      <h2 className={embedded ? 'mb-3 text-sm font-medium text-gray-200' : 'mb-4 text-h3 text-gray-100'}>
+        Filter by score
+      </h2>
+      <div className="flex flex-wrap gap-2">
+        {SCORE_FILTER_OPTIONS.map((option) => (
           <Button
             key={option.value}
             variant="filter"
             active={activeScoreFilter === option.value}
+            className={embedded ? '!px-3 !py-1.5 text-sm' : undefined}
             data-score-filter={option.value}
             aria-pressed={activeScoreFilter === option.value}
             onClick={() => onScoreFilterChange(option.value)}
@@ -34,6 +42,14 @@ export default function ScoreFilter({ activeScoreFilter, onScoreFilterChange }: 
           </Button>
         ))}
       </div>
+    </>
+  )
+
+  if (embedded) return <div>{body}</div>
+
+  return (
+    <Card tone="subtle" className="mb-8">
+      {body}
     </Card>
   )
 }

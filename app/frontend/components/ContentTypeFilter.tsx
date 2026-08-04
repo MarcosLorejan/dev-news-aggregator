@@ -9,6 +9,7 @@ interface ContentTypeFilterProps {
   activeMaxDuration: MaxDurationFilterValue
   onContentTypeChange: (value: ContentTypeFilterValue) => void
   onMaxDurationChange: (value: MaxDurationFilterValue) => void
+  embedded?: boolean
 }
 
 const TYPE_OPTIONS: { value: ContentTypeFilterValue; label: string }[] = [
@@ -29,16 +30,20 @@ export default function ContentTypeFilter({
   activeMaxDuration,
   onContentTypeChange,
   onMaxDurationChange,
+  embedded = false,
 }: ContentTypeFilterProps) {
-  return (
-    <Card tone="subtle" className="mb-8">
-      <h2 className="text-h3 text-gray-100 mb-4">Filter by content</h2>
-      <div className="flex flex-wrap gap-3 mb-4">
+  const body = (
+    <>
+      <h2 className={embedded ? 'mb-3 text-sm font-medium text-gray-200' : 'mb-4 text-h3 text-gray-100'}>
+        Filter by content
+      </h2>
+      <div className={`flex flex-wrap gap-2 ${embedded ? 'mb-3' : 'mb-4'}`}>
         {TYPE_OPTIONS.map((option) => (
           <Button
             key={option.value}
             variant="filter"
             active={activeContentType === option.value}
+            className={embedded ? '!px-3 !py-1.5 text-sm' : undefined}
             data-content-type-filter={option.value}
             aria-pressed={activeContentType === option.value}
             onClick={() => onContentTypeChange(option.value)}
@@ -47,13 +52,14 @@ export default function ContentTypeFilter({
           </Button>
         ))}
       </div>
-      <h3 className="text-sm font-medium text-gray-300 mb-3">Max video length</h3>
-      <div className="flex flex-wrap gap-3">
+      <h3 className="mb-2 text-sm font-medium text-gray-300">Max video length</h3>
+      <div className="flex flex-wrap gap-2">
         {DURATION_OPTIONS.map((option) => (
           <Button
             key={option.value}
             variant="filter"
             active={activeMaxDuration === option.value}
+            className={embedded ? '!px-3 !py-1.5 text-sm' : undefined}
             data-max-duration-filter={option.value}
             aria-pressed={activeMaxDuration === option.value}
             onClick={() => onMaxDurationChange(option.value)}
@@ -62,6 +68,14 @@ export default function ContentTypeFilter({
           </Button>
         ))}
       </div>
+    </>
+  )
+
+  if (embedded) return <div>{body}</div>
+
+  return (
+    <Card tone="subtle" className="mb-8">
+      {body}
     </Card>
   )
 }
