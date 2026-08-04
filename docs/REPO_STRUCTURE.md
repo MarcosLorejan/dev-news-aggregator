@@ -2,7 +2,7 @@
 
 Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
 
-Last updated: 2026-08-02
+Last updated: 2026-08-03
 
 ## Maintenance
 
@@ -131,6 +131,8 @@ dev-news-aggregator/
 | `app/frontend/api/keywordFilters.ts` | Keyword filter CRUD client |
 | `app/frontend/types/keywordFilter.ts` | Keyword filter TypeScript types |
 | `app/frontend/components/InterestFilter.tsx` | Interest chip filters on the articles index |
+| `app/frontend/components/FilterToolbar.tsx` | Compact search + sort/filters dropdown chrome on the articles index |
+| `app/frontend/components/FilterMenu.tsx` | Accessible dropdown shell used by the articles filter toolbar |
 | `app/frontend/components/ContentTypeFilter.tsx` | Content type and max video duration filters on the articles index |
 | `app/frontend/components/TermChipInput.tsx` | Chip input for interest keyword terms |
 | `app/frontend/components/articleCard/VideoThumbnail.tsx` | Thumbnail, duration badge, and play affordance for video cards |
@@ -203,6 +205,7 @@ dev-news-aggregator/
 
 | File | Purpose |
 |------|---------|
+| `KNOWLEDGE.md` | OKF-inspired knowledge conventions (instructions vs curated *why*, roadmap) |
 | `DEVELOPMENT.md` | Commands, architecture, coding and git conventions |
 | `AGENT_API.md` | Versioned `/api/v1` JSON contract for agents |
 | `REPO_STRUCTURE.md` | This file — directory map and maintenance rules |
@@ -255,11 +258,12 @@ Agents should start here, then use this file as the navigation map:
 
 1. [AGENTS.md](../AGENTS.md) — work rules and verification (`bin/validate`)
 2. [CONTRIBUTING.md](../CONTRIBUTING.md) — PR workflow
-3. [DEVELOPMENT.md](DEVELOPMENT.md) — setup, commands, conventions
-4. [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md) — interest/keyword feed filters
-5. [YOUTUBE.md](YOUTUBE.md) — YouTube ingestion and quota
-6. [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md) — Overcommit setup
-7. This file — directory and entry-point map
+3. [KNOWLEDGE.md](KNOWLEDGE.md) — knowledge conventions (OKF-inspired; where *why* lives)
+4. [DEVELOPMENT.md](DEVELOPMENT.md) — setup, commands, conventions
+5. [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md) — interest/keyword feed filters
+6. [YOUTUBE.md](YOUTUBE.md) — YouTube ingestion and quota
+7. [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md) — Overcommit setup
+8. This file — directory and entry-point map
 
 ## Routes (summary)
 

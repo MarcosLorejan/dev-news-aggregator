@@ -5,6 +5,7 @@ Guidance for AI coding agents working in this repository. Keep this file concise
 ## Read First
 
 - `CONTRIBUTING.md`: contributor entry point and pull request workflow.
+- `docs/KNOWLEDGE.md`: OKF-inspired conventions for durable project knowledge (instructions vs *why*, concept files, roadmap).
 - `docs/DEVELOPMENT.md`: setup, architecture, coding standards, test expectations, and git conventions.
 - `docs/REPO_STRUCTURE.md`: repository map. Update it in the same change when structure changes.
 - `docs/PRE_COMMIT_HOOKS.md`: Overcommit setup and local hook checks.
