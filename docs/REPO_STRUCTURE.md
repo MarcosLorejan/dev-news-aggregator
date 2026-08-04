@@ -194,7 +194,8 @@ dev-news-aggregator/
 | Path | Purpose |
 |------|---------|
 | `lib/docs_knowledge_check.rb` | Dependency-free docs link + knowledge-map orphan checks |
-| `lib/tasks/news.rake` | `news:fetch`, `news:fetch_status`, `news:latest`, `news:clean` rake tasks |
+| `lib/local_env.rb` | Allowlisted `.env` → ENV loader (no dotenv gem; used by `bin/dev` + dev initializer) |
+| `lib/tasks/news.rake` | `news:fetch`, `news:fetch_status`, `news:reddit_oauth_status`, `news:latest`, `news:clean` rake tasks |
 
 ## `test/`
 
@@ -249,12 +250,12 @@ dev-news-aggregator/
 | `.env.example` | Template for local env vars (Postgres, `SECRET_KEY_BASE`, optional API keys) |
 | `Gemfile` / `Gemfile.lock` | Ruby gems |
 | `package.json` / `package-lock.json` | Node packages |
-| `bin/dev` | Rails-only server wrapper (`bin/rails server`); does **not** start Vite |
+| `bin/dev` | Rails-only server wrapper; loads allowlisted `.env` keys then `bin/rails server`; does **not** start Vite |
 | `bin/validate` | Local CI-equivalent checks (includes `bin/check-docs`) |
 | `bin/check-docs` | Docs relative-link + knowledge-map orphan checker |
-| `dev.ps1` | Windows helper that starts Postgres (if needed), Vite + Rails, and opens the browser |
+| `dev.ps1` | Windows helper: loads `.env`, starts Postgres (if needed), Vite + Rails, opens the browser |
 | `start-app.bat` | Double-click launcher for `dev.ps1` (full stack) |
-| `setup-local-env.ps1` | Windows one-time/repeat setup (bundle, npm, Postgres, `db:prepare`) |
+| `setup-local-env.ps1` | Windows one-time/repeat setup (creates `.env` from example if missing, bundle, npm, Postgres, `db:prepare`) |
 | `docker-compose.yml` | Local PostgreSQL container |
 | `Dockerfile` | Production/container image |
 | `.trivyignore` | Baselined Trivy CVEs for CI `docker_scan` |
