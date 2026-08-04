@@ -142,7 +142,7 @@ class ReadArticlesFunctionalityTest < ApplicationSystemTestCase
     end
     find("[data-testid='confirm-dialog-confirm']").click
 
-    sleep 0.5
+    assert_no_selector "article.article-card[data-source='#{@read_article.source_type}']", wait: 10
     assert_not @read_article.reload.read?
   end
 

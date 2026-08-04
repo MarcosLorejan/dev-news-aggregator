@@ -125,7 +125,7 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
         find("button[title='Remove from reading list']").click
       end
       find("[data-testid='confirm-dialog-confirm']").click
-      sleep 0.5
+      assert_no_selector "article.article-card[data-source='reddit_rust']", wait: 10
       assert_not @bookmarked_article.reload.bookmarked?
     else
       skip "No bookmarked Reddit Rust articles found"
