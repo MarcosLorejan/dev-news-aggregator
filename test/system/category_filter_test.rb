@@ -9,6 +9,7 @@ class CategoryFilterTest < ApplicationSystemTestCase
 
   test "should maintain category filter after client-side navigation" do
     visit_articles_index
+    open_filters_menu
 
     first_category_btn = first("button.filter-btn[data-filter-type='category']")
     skip "No category filter buttons found" unless first_category_btn
@@ -26,6 +27,7 @@ class CategoryFilterTest < ApplicationSystemTestCase
     assert_selector "[data-testid='articles-page']", wait: 12
     assert_no_selector "[data-testid='article-list-skeleton']", wait: 12
 
+    open_filters_menu
     fresh_category_btn = first("button.filter-btn[data-filter-type='category']")
     skip "No category filter buttons found after navigation" unless fresh_category_btn
 
@@ -38,6 +40,7 @@ class CategoryFilterTest < ApplicationSystemTestCase
     visit_articles_index
 
     3.times do |i|
+      open_filters_menu
       all_articles_btn = first("button.filter-btn[data-filter-value='all']")
       skip "No articles or filter buttons found on iteration #{i}" unless all_articles_btn
 
@@ -50,6 +53,7 @@ class CategoryFilterTest < ApplicationSystemTestCase
       visit_articles_index
       assert_current_path articles_path
 
+      open_filters_menu
       first_category_btn = first("button.filter-btn[data-filter-type='category']")
       next unless first_category_btn
 

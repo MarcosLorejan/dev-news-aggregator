@@ -54,36 +54,34 @@ class BookmarkFunctionalityTest < ApplicationSystemTestCase
 
   test "should filter articles by category" do
     visit_articles_index
+    open_filters_menu
 
-    # Look for a category button (they contain emojis and text)
-    if page.has_button?("🔨 Programming Languages", wait: 1)
-      click_button "🔨 Programming Languages"
+    category_btn = first("button.filter-btn[data-filter-type='category'][data-filter-value='programming-languages']")
+    if category_btn
+      category_btn.click
       assert_selector "article.article-card[data-category='programming-languages']", visible: true
     else
-      # Skip test if no Programming Languages category exists
       skip "No Programming Languages category found"
     end
   end
 
   test "should show all articles when clicking All Articles filter" do
     visit_articles_index
+    open_filters_menu
 
-    # First click a category filter if it exists
-    if page.has_button?("🔨 Programming Languages", wait: 1)
-      click_button "🔨 Programming Languages"
-    end
+    category_btn = first("button.filter-btn[data-filter-type='category'][data-filter-value='programming-languages']")
+    category_btn&.click
 
-    # Then click All Articles - the button text includes count
-    all_articles_btn = find("button[data-filter-value='all']")
-    all_articles_btn.click
+    open_filters_menu unless page.has_selector?("button[data-filter-value='all']", wait: 1)
+    find("button[data-filter-value='all']").click
 
     assert_selector "article.article-card", minimum: 1
   end
 
   test "should filter by specific category" do
     visit_articles_index
+    open_filters_menu
 
-    # Click the first available category filter (which filters by category, not source)
     first_category_btn = first("button.filter-btn[data-filter-type='category']")
     if first_category_btn
       category_value = first_category_btn["data-filter-value"]
