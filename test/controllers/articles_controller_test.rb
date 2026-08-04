@@ -359,14 +359,14 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index JSON max_duration keeps text articles and short or unknown videos" do
-    short = Article.create!(
-      title: "Short tip",
+    under_cap = Article.create!(
+      title: "Five minute tip",
       url: "https://www.youtube.com/watch?v=short1",
       external_id: "short1",
       source_type: "youtube_UCtest",
       published_at: Time.current,
       content_type: "video",
-      duration_seconds: 60
+      duration_seconds: 300
     )
     long = Article.create!(
       title: "Long talk",
@@ -392,7 +392,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
     ids = JSON.parse(response.body)["articles"].map { |item| item["id"] }
     assert_includes ids, @article.id
-    assert_includes ids, short.id
+    assert_includes ids, under_cap.id
     assert_includes ids, unknown.id
     assert_not_includes ids, long.id
   end

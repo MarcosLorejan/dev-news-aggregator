@@ -63,7 +63,7 @@ class YoutubeKeywordDiscoveryTest < ActiveSupport::TestCase
     assert_equal "video", ruby_video.content_type
     assert_equal "youtube_search_ruby", ruby_video.source_type
     assert_equal "Confreaks", ruby_video.author
-    assert_equal "https://i.ytimg.com/vi/rubyVid001/hqdefault.jpg", ruby_video.thumbnail_url
+    assert_equal "https://i.ytimg.com/vi/rubyVid001/maxresdefault.jpg", ruby_video.thumbnail_url
 
     assert FetchRun.exists?(source_key: "youtube_search_ruby", status: "success")
     assert FetchRun.exists?(source_key: "youtube_search_rust", status: "success")
