@@ -21,9 +21,9 @@ export default function InterestFilter({
 
   const body = (
     <>
-      <div className={`flex items-center justify-between gap-4 ${embedded ? 'mb-3' : 'mb-4'}`}>
+      <div className={`flex items-center justify-between gap-4 ${embedded ? 'mb-1' : 'mb-4'}`}>
         <h2 className={embedded ? 'text-sm font-medium text-gray-200' : 'text-h3 text-gray-100'}>
-          Filter by interest
+          My interests
         </h2>
         {selectedSlugs.length > 0 && (
           <button
@@ -36,6 +36,9 @@ export default function InterestFilter({
           </button>
         )}
       </div>
+      {embedded && (
+        <p className="mb-3 text-xs text-gray-400">Saved keyword presets from Interests</p>
+      )}
       <div className="flex flex-wrap gap-2">
         {interests.map((interest) => {
           const selected = selectedSlugs.includes(interest.slug)

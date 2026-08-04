@@ -23,9 +23,12 @@ export default function TopicFilter({
 
   const body = (
     <>
-      <h2 className={embedded ? 'mb-3 text-sm font-medium text-gray-200' : 'mb-4 text-h3 text-gray-100'}>
-        Filter by topic
+      <h2 className={embedded ? 'mb-1 text-sm font-medium text-gray-200' : 'mb-4 text-h3 text-gray-100'}>
+        Filter by tag
       </h2>
+      {embedded && (
+        <p className="mb-3 text-xs text-gray-400">Topics detected on the article</p>
+      )}
       <div className="flex flex-wrap gap-2">
         <Button
           variant="filter"
@@ -36,7 +39,7 @@ export default function TopicFilter({
           aria-pressed={activeTag === 'all'}
           onClick={() => onTagChange('all')}
         >
-          All topics
+          All tags
         </Button>
         {tags.map((tag) => (
           <Button

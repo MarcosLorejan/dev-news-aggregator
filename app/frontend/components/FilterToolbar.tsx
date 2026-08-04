@@ -9,7 +9,7 @@ import ContentTypeFilter, {
 import FilterMenu from './FilterMenu'
 import InterestFilter from './InterestFilter'
 import ScoreFilter, { SCORE_FILTER_OPTIONS, type ScoreFilterValue } from './ScoreFilter'
-import SortControl, { SORT_OPTIONS, type SortValue } from './SortControl'
+import { SORT_OPTIONS, type SortValue } from './SortControl'
 import TopicFilter, { type TopicTagOption } from './TopicFilter'
 import { FOCUS_RING } from './ui/buttonStyles'
 import Card from './ui/Card'
@@ -95,7 +95,6 @@ export default function FilterToolbar({
   onTagChange,
   onClearAllFilters,
 }: FilterToolbarProps) {
-  const sortLabel = SORT_OPTIONS.find((option) => option.value === activeSort)?.label ?? 'Newest'
   const scoreLabel =
     SCORE_FILTER_OPTIONS.find((option) => option.value === activeScoreFilter)?.label ?? 'All scores'
 
@@ -127,9 +126,27 @@ export default function FilterToolbar({
     filterCount === 0 ? undefined : filterCount === 1 ? '1 active' : `${filterCount} active`
 
   const activeChips: ActiveChip[] = [
+    ...(activeCategoryName
+      ? [
+          {
+            key: 'category',
+            label: `Source: ${activeCategoryName}`,
+            onClear: () => onCategoryChange('all'),
+          },
+        ]
+      : []),
+    ...(activeTagName
+      ? [
+          {
+            key: 'tag',
+            label: `Tag: ${activeTagName}`,
+            onClear: () => onTagChange('all'),
+          },
+        ]
+      : []),
     ...interestNames.map((name, index) => ({
       key: `interest-${selectedInterestSlugs[index]}`,
-      label: name,
+      label: `Interest: ${name}`,
       onClear: () => onInterestToggle(selectedInterestSlugs[index]),
     })),
     ...(activeScoreFilter !== 'all'
@@ -156,24 +173,6 @@ export default function FilterToolbar({
             key: 'max-duration',
             label: durationLabel(activeMaxDuration),
             onClear: () => onMaxDurationChange('all'),
-          },
-        ]
-      : []),
-    ...(activeCategoryName
-      ? [
-          {
-            key: 'category',
-            label: activeCategoryName,
-            onClear: () => onCategoryChange('all'),
-          },
-        ]
-      : []),
-    ...(activeTagName
-      ? [
-          {
-            key: 'tag',
-            label: activeTagName,
-            onClear: () => onTagChange('all'),
           },
         ]
       : []),
@@ -214,14 +213,26 @@ export default function FilterToolbar({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <FilterMenu
-              label="Sort"
-              summary={sortLabel}
-              active={activeSort !== 'published_at'}
-              testId="sort-menu"
+            <label htmlFor="article-sort" className="sr-only">
+              Sort articles
+            </label>
+            <select
+              id="article-sort"
+              value={activeSort}
+              onChange={(event) => onSortChange(event.target.value as SortValue)}
+              className={`rounded-lg border px-3 py-2 text-sm font-medium ${FOCUS_RING} ${
+                activeSort !== 'published_at'
+                  ? 'border-primary-500 bg-primary-600/20 text-primary-200'
+                  : 'border-dark-500 bg-dark-800 text-gray-200 hover:border-dark-400'
+              }`}
+              data-testid="sort-select"
             >
-              <SortControl embedded activeSort={activeSort} onSortChange={onSortChange} />
-            </FilterMenu>
+              {SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  Sort: {option.label}
+                </option>
+              ))}
+            </select>
 
             <FilterMenu
               label="Filters"

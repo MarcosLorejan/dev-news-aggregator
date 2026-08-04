@@ -46,11 +46,6 @@ async function openFiltersMenu(user: ReturnType<typeof userEvent.setup>) {
   return screen.findByTestId('filters-menu-panel')
 }
 
-async function openSortMenu(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByTestId('sort-menu'))
-  return screen.findByTestId('sort-menu-panel')
-}
-
 describe('ArticlesIndexPage dismiss flow', () => {
   beforeEach(() => {
     vi.mocked(articlesApi.fetchArticles).mockResolvedValue(buildArticlesIndexResponse())
@@ -115,7 +110,7 @@ describe('ArticlesIndexPage dismiss flow', () => {
     )
     expect(screen.getByText('Rust 2024 Edition Highlights')).toBeInTheDocument()
     expect(screen.queryByText('Ruby 3.3 Performance Tips')).not.toBeInTheDocument()
-    expect(screen.getByTestId('active-filter-chips')).toHaveTextContent('Programming Languages')
+    expect(screen.getByTestId('active-filter-chips')).toHaveTextContent('Source: Programming Languages')
 
     vi.mocked(articlesApi.fetchArticles).mockResolvedValue(buildArticlesIndexResponse())
     const filters = await openFiltersMenu(user)
@@ -155,19 +150,13 @@ describe('ArticlesIndexPage dismiss flow', () => {
   })
 
   it('requests sorted articles when sort is in the URL', async () => {
-    const user = userEvent.setup()
     renderPage(['/articles?sort=score'])
 
     await waitForArticlesFeed()
     expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
       expect.objectContaining({ sort: 'score' })
     )
-    expect(screen.getByTestId('sort-menu')).toHaveTextContent('Highest score')
-    const sortPanel = await openSortMenu(user)
-    expect(within(sortPanel).getByRole('button', { name: 'Highest score' })).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    )
+    expect(screen.getByTestId('sort-select')).toHaveValue('score')
   })
 
   it('requests for_you sort when selected', async () => {
@@ -175,15 +164,14 @@ describe('ArticlesIndexPage dismiss flow', () => {
     renderPage()
 
     await waitForArticlesFeed()
-    const sortPanel = await openSortMenu(user)
-    await user.click(within(sortPanel).getByRole('button', { name: 'For you' }))
+    await user.selectOptions(screen.getByTestId('sort-select'), 'for_you')
 
     await waitFor(() => {
       expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
         expect.objectContaining({ sort: 'for_you' })
       )
     })
-    expect(screen.getByTestId('sort-menu')).toHaveTextContent('For you')
+    expect(screen.getByTestId('sort-select')).toHaveValue('for_you')
   })
 
   it('updates sort via the sort control', async () => {
@@ -191,8 +179,7 @@ describe('ArticlesIndexPage dismiss flow', () => {
     renderPage()
 
     await waitForArticlesFeed()
-    const sortPanel = await openSortMenu(user)
-    await user.click(within(sortPanel).getByRole('button', { name: 'Most comments' }))
+    await user.selectOptions(screen.getByTestId('sort-select'), 'comment_count')
 
     await waitFor(() => {
       expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
@@ -234,7 +221,7 @@ describe('ArticlesIndexPage dismiss flow', () => {
     renderPage(['/articles?interests=rust'])
 
     await waitForArticlesFeed()
-    expect(screen.getByTestId('active-filter-chips')).toHaveTextContent('Rust')
+    expect(screen.getByTestId('active-filter-chips')).toHaveTextContent('Interest: Rust')
     const filters = await openFiltersMenu(user)
     await waitFor(() => {
       expect(within(filters).getByRole('button', { name: 'Rust (5)' })).toHaveAttribute(
@@ -265,7 +252,7 @@ describe('ArticlesIndexPage dismiss flow', () => {
       )
     })
 
-    await user.click(screen.getByRole('button', { name: 'Clear filter Rust' }))
+    await user.click(screen.getByRole('button', { name: 'Clear filter Interest: Rust' }))
 
     await waitFor(() => {
       expect(articlesApi.fetchArticles).toHaveBeenCalledWith(
@@ -312,7 +299,7 @@ describe('ArticlesIndexPage dismiss flow', () => {
     await screen.findByTestId('articles-page')
     expect(await screen.findByText('No articles match these interests')).toBeInTheDocument()
     expect(screen.queryByText('Your feed is empty')).not.toBeInTheDocument()
-    expect(screen.getByTestId('active-filter-chips')).toHaveTextContent('Rust')
+    expect(screen.getByTestId('active-filter-chips')).toHaveTextContent('Interest: Rust')
     const filters = await openFiltersMenu(user)
     await waitFor(() => {
       expect(within(filters).getByRole('button', { name: 'Rust (5)' })).toBeInTheDocument()
@@ -327,7 +314,7 @@ describe('ArticlesIndexPage dismiss flow', () => {
 
     await waitForArticlesFeed()
     const filters = await openFiltersMenu(user)
-    expect(within(filters).queryByText('Filter by interest')).not.toBeInTheDocument()
+    expect(within(filters).queryByText('My interests')).not.toBeInTheDocument()
     expect(screen.getByText('Rust 2024 Edition Highlights')).toBeInTheDocument()
   })
 

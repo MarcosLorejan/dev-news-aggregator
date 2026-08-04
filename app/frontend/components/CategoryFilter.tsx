@@ -43,8 +43,11 @@ export default function CategoryFilter({
             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.707A1 1 0 013 7V4z"
           />
         </svg>
-        Filter by Category
+        Filter by source
       </h2>
+      {embedded && (
+        <p className="mb-3 text-xs text-gray-400">Where it came from (HN, Reddit, Dev.to, …)</p>
+      )}
       <div className="flex flex-wrap gap-2">
         <Button
           variant="filter"
