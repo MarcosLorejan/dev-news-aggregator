@@ -1,8 +1,17 @@
+---
+type: Guide
+title: Development guide
+description: Setup, architecture, coding standards, tests, and git conventions.
+tags: [development, setup]
+---
+
 # Development Guide
 
 Project-specific commands, architecture, and conventions for dev-news-aggregator.
 
 For the directory map, see [REPO_STRUCTURE.md](REPO_STRUCTURE.md). **Update that file whenever you change project structure** (new folders, models, routes, migrations, etc.).
+
+For orientation across docs, start at [index.md](index.md). For how we store durable project knowledge (guides vs decision/concept docs, OKF-inspired practices), see [KNOWLEDGE.md](KNOWLEDGE.md).
 
 ## Development commands
 
@@ -48,7 +57,7 @@ SOLID_QUEUE_IN_PUMA=1 bin/rails server
 # Or double-click start-app.bat in Explorer (same thing)
 ```
 
-Note: on Windows, `SOLID_QUEUE_IN_PUMA` is **not** used — Solid Queue’s Puma plugin requires `fork()`, which Windows does not support. The web app still runs; background jobs (e.g. delayed dismissal cleanup) won’t process until you run workers on a Unix-like environment.
+Note: on Windows, `SOLID_QUEUE_IN_PUMA` is **not** used — Solid Queue’s Puma plugin requires `fork()`, which Windows does not support. The web app still runs; background jobs (e.g. delayed dismissal cleanup) won’t process until you run workers on a Unix-like environment. *Why:* [decisions/solid-queue-windows.md](decisions/solid-queue-windows.md).
 
 Development uses `skipProxy: true` in `config/vite.json` so the browser loads Vite assets directly from port 3036. That avoids blank pages caused by Vite’s many module requests queueing behind a few Puma threads.
 
@@ -146,13 +155,14 @@ Prettier is configured (`.prettierrc.json`) but not enforced: most of the existi
 Prefer the CI-oriented wrapper before opening a PR (documented in [AGENTS.md](../AGENTS.md#verification)):
 
 ```bash
-bin/validate          # RuboCop, Brakeman, typecheck, npm test, rails test
-bin/validate --fast   # skips Brakeman and Rails tests
+bin/validate          # RuboCop, docs check, Brakeman, typecheck, npm test, rails test
+bin/validate --fast   # skips Brakeman and Rails tests (still runs docs check)
 ```
 
 | Check | `bin/validate` | CI job(s) |
 |-------|----------------|-----------|
 | RuboCop | yes | `lint` |
+| `bin/check-docs` | yes (also with `--fast`) | `docs_check` |
 | Brakeman | yes (skipped with `--fast`) | `scan_ruby` |
 | `npm run typecheck` | yes | `typecheck` |
 | `npm run lint` | yes | `frontend_lint` |
@@ -182,7 +192,7 @@ whenever --clear-crontab
 
 ### Core components
 
-**NewsAggregatorService**: Central orchestrator that coordinates all news fetchers. Builds the fetcher list from enabled `NewsSource` records when present, otherwise from `config/news_aggregator.yml` (Hacker News, Dev.to, configured Reddit subreddits, and YouTube channels). Handles error logging and aggregates results.
+**NewsAggregatorService**: Central orchestrator that coordinates all news fetchers. Builds the fetcher list from enabled `NewsSource` records when present, otherwise from `config/news_aggregator.yml` (Hacker News, Dev.to, configured Reddit subreddits, and YouTube channels). Handles error logging and aggregates results. *Why this split:* [decisions/fetch-orchestration.md](decisions/fetch-orchestration.md).
 
 **NewsAggregatorConfig**: Loads `config/news_aggregator.yml` via `Rails.application.config_for`. Provides fetching limits (`max_articles_per_source`), retention settings, Reddit/YouTube source lists, and API endpoint metadata. Fetchers read article limits from config; `news:clean` uses configured retention days.
 

@@ -55,6 +55,7 @@ skip_check() {
 }
 
 run_check "RuboCop" bundle exec rubocop -f github
+run_check "Docs knowledge check" bin/check-docs
 
 if "$fast"; then
   skip_check "Brakeman"

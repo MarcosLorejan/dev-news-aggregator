@@ -4,7 +4,10 @@ Thanks for improving Dev News Aggregator. This file is the short entry point; ke
 
 ## Start Here
 
+- [docs/index.md](docs/index.md) for the knowledge map (one-line purpose per doc).
+- [docs/log.md](docs/log.md) for the knowledge changelog (append when docs change materially).
 - [AGENTS.md](AGENTS.md) for AI-agent workflow, scope, and verification guardrails.
+- [docs/KNOWLEDGE.md](docs/KNOWLEDGE.md) for OKF-inspired knowledge conventions (what belongs in guides vs decision/concept docs).
 - [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for setup, architecture, coding standards, tests, and git conventions.
 - [docs/REPO_STRUCTURE.md](docs/REPO_STRUCTURE.md) for the repository map. Update it when you change project structure.
 - [docs/PRE_COMMIT_HOOKS.md](docs/PRE_COMMIT_HOOKS.md) for Overcommit setup and local hook usage.

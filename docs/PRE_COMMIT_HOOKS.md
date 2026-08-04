@@ -1,3 +1,11 @@
+---
+type: Guide
+title: Pre-commit hooks setup
+description: Overcommit install and Conventional Commits enforcement for local hooks.
+tags: [tooling, git, overcommit]
+resource: .overcommit.yml
+---
+
 # Pre-commit Hooks Setup
 
 This project uses [Overcommit](https://github.com/sds/overcommit) to manage Git hooks that run automatically before commits and when writing commit messages.

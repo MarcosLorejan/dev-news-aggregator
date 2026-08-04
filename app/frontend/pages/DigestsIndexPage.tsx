@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { createDigest, fetchDigests } from '../api/digests'
+import type { DigestSummary } from '../api/digests'
+import { isAbortError, isTransientNetworkError } from '../api/client'
 import EmptyState from '../components/EmptyState'
 import PageShell from '../components/PageShell'
 import PageHeading from '../components/ui/PageHeading'
@@ -8,9 +10,18 @@ import Card from '../components/ui/Card'
 import { useAsyncResource } from '../hooks/useAsyncResource'
 import { useState } from 'react'
 
+async function fetchDigestsWithRetry(signal: AbortSignal): Promise<{ digests: DigestSummary[] }> {
+  try {
+    return await fetchDigests(signal)
+  } catch (err) {
+    if (isAbortError(err) || signal.aborted || !isTransientNetworkError(err)) throw err
+    return await fetchDigests(signal)
+  }
+}
+
 export default function DigestsIndexPage() {
   const { data, loading, error, reload, setData, setError } = useAsyncResource(
-    (signal) => fetchDigests(signal),
+    (signal) => fetchDigestsWithRetry(signal),
     { errorMessage: 'Failed to load digests. Please try again.' }
   )
   const [generating, setGenerating] = useState(false)

@@ -1,6 +1,16 @@
+---
+type: Guide
+title: Keyword interests and filtering
+description: Interest presets, keyword query params, and how they combine with category and tag filters.
+tags: [filtering, interests, api]
+resource: app/models/keyword_filter.rb
+---
+
 # Keyword interests & filtering
 
 Drive the feed from personal topics (ruby, rails, rust, software architecture, AI performance) in addition to source categories and free-text search.
+
+*Why presets + query params:* [decisions/keyword-interests.md](decisions/keyword-interests.md).
 
 ## Concepts
 

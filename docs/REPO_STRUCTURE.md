@@ -1,8 +1,15 @@
+---
+type: Map
+title: Repository structure
+description: Living directory map and structural maintenance rules for this codebase.
+tags: [structure, map]
+---
+
 # Repository Structure
 
 Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
 
-Last updated: 2026-08-02
+Last updated: 2026-08-04
 
 ## Maintenance
 
@@ -186,6 +193,7 @@ dev-news-aggregator/
 
 | Path | Purpose |
 |------|---------|
+| `lib/docs_knowledge_check.rb` | Dependency-free docs link + knowledge-map orphan checks |
 | `lib/tasks/news.rake` | `news:fetch`, `news:fetch_status`, `news:latest`, `news:clean` rake tasks |
 
 ## `test/`
@@ -199,12 +207,16 @@ dev-news-aggregator/
 | `test/helpers/` | Helper tests |
 | `test/integration/` | Multi-step workflow tests |
 | `test/system/` | Browser/system tests (Capybara) |
+| `test/lib/` | Library unit tests (e.g. docs knowledge check) |
 | `test/fixtures/` | YAML test data |
 
 ## `docs/`
 
 | File | Purpose |
 |------|---------|
+| `index.md` | Knowledge map — one-line purpose per maintained doc |
+| `log.md` | Knowledge changelog (dated, newest first) |
+| `KNOWLEDGE.md` | OKF-inspired knowledge conventions (instructions vs curated *why*, roadmap) |
 | `DEVELOPMENT.md` | Commands, architecture, coding and git conventions |
 | `AGENT_API.md` | Versioned `/api/v1` JSON contract for agents |
 | `REPO_STRUCTURE.md` | This file — directory map and maintenance rules |
@@ -213,6 +225,7 @@ dev-news-aggregator/
 | `SUMMARIZER.md` | Optional pluggable article summarizer (env, providers, caching) |
 | `KEYWORD_FILTERS.md` | Interest/keyword feed filters and articles index API params |
 | `YOUTUBE.md` | YouTube Atom vs Data API paths, quota strategy, config, Sources UI |
+| `decisions/` | Durable *why* decision records (Context / Decision / Consequences) |
 
 ## `.github/`
 
@@ -237,6 +250,8 @@ dev-news-aggregator/
 | `Gemfile` / `Gemfile.lock` | Ruby gems |
 | `package.json` / `package-lock.json` | Node packages |
 | `bin/dev` | Rails-only server wrapper (`bin/rails server`); does **not** start Vite |
+| `bin/validate` | Local CI-equivalent checks (includes `bin/check-docs`) |
+| `bin/check-docs` | Docs relative-link + knowledge-map orphan checker |
 | `dev.ps1` | Windows helper that starts Postgres (if needed), Vite + Rails, and opens the browser |
 | `start-app.bat` | Double-click launcher for `dev.ps1` (full stack) |
 | `setup-local-env.ps1` | Windows one-time/repeat setup (bundle, npm, Postgres, `db:prepare`) |
@@ -255,13 +270,16 @@ dev-news-aggregator/
 
 Agents should start here, then use this file as the navigation map:
 
-1. [AGENTS.md](../AGENTS.md) — work rules and verification (`bin/validate`)
-2. [CONTRIBUTING.md](../CONTRIBUTING.md) — PR workflow
-3. [DEVELOPMENT.md](DEVELOPMENT.md) — setup, commands, conventions
-4. [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md) — interest/keyword feed filters
-5. [YOUTUBE.md](YOUTUBE.md) — YouTube ingestion and quota
-6. [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md) — Overcommit setup
-7. This file — directory and entry-point map
+1. [index.md](index.md) — knowledge map (one line per doc)
+2. [AGENTS.md](../AGENTS.md) — work rules and verification (`bin/validate`)
+3. [CONTRIBUTING.md](../CONTRIBUTING.md) — PR workflow
+4. [KNOWLEDGE.md](KNOWLEDGE.md) — knowledge conventions (OKF-inspired; where *why* lives)
+5. [DEVELOPMENT.md](DEVELOPMENT.md) — setup, commands, conventions
+6. [index.md](index.md) Decisions section — durable *why* under `docs/decisions/`
+7. [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md) — interest/keyword feed filters
+8. [YOUTUBE.md](YOUTUBE.md) — YouTube ingestion and quota
+9. [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md) — Overcommit setup
+10. This file — directory and entry-point map
 
 ## Routes (summary)
 

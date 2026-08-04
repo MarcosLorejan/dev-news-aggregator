@@ -1,6 +1,16 @@
+---
+type: Guide
+title: React with Vite setup
+description: Frontend install, Vite HMR, and two-process local development.
+tags: [frontend, vite, react]
+resource: app/frontend/
+---
+
 # React with Vite Setup
 
 This project now uses React with Vite for the frontend.
+
+*Why this shape:* [decisions/react-vite-two-process.md](decisions/react-vite-two-process.md).
 
 ## Prerequisites
 

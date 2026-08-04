@@ -14,6 +14,11 @@ interface AsyncResourceState<T> {
   setError: Dispatch<SetStateAction<string | null>>
 }
 
+function resolveLoadError(err: unknown, fallback: string): string {
+  if (err instanceof Error && err.message.trim()) return err.message.trim()
+  return fallback
+}
+
 export function useAsyncResource<T>(
   loader: (signal: AbortSignal) => Promise<T>,
   options: UseAsyncResourceOptions = {}
@@ -43,7 +48,7 @@ export function useAsyncResource<T>(
       setData(result)
     } catch (err) {
       if (isAbortError(err) || signal.aborted) return
-      setError(errorMessage)
+      setError(resolveLoadError(err, errorMessage))
     } finally {
       if (!signal.aborted) setLoading(false)
     }

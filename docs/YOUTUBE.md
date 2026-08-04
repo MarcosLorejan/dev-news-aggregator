@@ -1,6 +1,16 @@
+---
+type: Guide
+title: YouTube ingestion
+description: Channel Atom vs Data API paths, quota strategy, and Sources UI.
+tags: [ingestion, youtube]
+resource: app/services/news_fetchers/
+---
+
 # YouTube ingestion
 
 Short developer videos in the same feed as HN / Dev.to / Reddit. Two paths with very different quota profiles — prefer Atom for channels; treat Data API search as a scarce budget.
+
+*Why Atom first:* [decisions/youtube-atom-first.md](decisions/youtube-atom-first.md).
 
 ## Two ingestion paths
 
