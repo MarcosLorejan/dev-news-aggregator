@@ -373,10 +373,16 @@ describe('ArticlesIndexPage dismiss flow', () => {
     await screen.findByTestId('articles-page')
     expect(await screen.findByText('No videos found')).toBeInTheDocument()
     expect(screen.queryByText('Your feed is empty')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Videos' })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
+    expect(screen.getByTestId('active-filter-chips')).toHaveTextContent('Videos')
 
-    await user.click(screen.getByRole('button', { name: 'All' }))
+    const filters = await openFiltersMenu(user)
+    expect(within(filters).getByRole('button', { name: 'Videos' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
+    expect(within(filters).getByRole('button', { name: 'All' })).toBeInTheDocument()
+
+    await user.click(within(filters).getByRole('button', { name: 'All' }))
 
     await waitFor(() => {
       const calls = vi.mocked(articlesApi.fetchArticles).mock.calls
