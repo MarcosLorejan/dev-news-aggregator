@@ -61,11 +61,26 @@ class YoutubeVideoEnricher
 
       article.update!(attributes)
       updated += 1
-      discard_if_too_long!(article)
+      discard_if_short!(article)
+      discard_if_too_long!(article) unless article.destroyed?
     rescue StandardError => e
       Rails.logger.error "Failed to enrich YouTube video #{article.external_id}: #{e.message}"
     end
     updated
+  end
+
+  def discard_if_short!(article)
+    return unless NewsAggregatorConfig.youtube_exclude_shorts?
+
+    max_short = NewsAggregatorConfig.youtube_shorts_max_seconds
+    return if max_short <= 0
+    return if article.duration_seconds.blank? || article.duration_seconds > max_short
+    return if article.bookmarked? || article.read?
+
+    Rails.logger.info(
+      "Discarding YouTube Short #{article.external_id} (#{article.duration_seconds}s ≤ #{max_short}s)"
+    )
+    article.destroy!
   end
 
   def discard_if_too_long!(article)
@@ -84,7 +99,7 @@ class YoutubeVideoEnricher
     response = HTTParty.get(
       API_URL,
       query: {
-        part: "contentDetails,statistics",
+        part: "contentDetails,statistics,snippet",
         id: ids.join(","),
         key: self.class.api_key
       },
@@ -112,6 +127,11 @@ class YoutubeVideoEnricher
       attributes[:score] = stats["viewCount"].to_i if stats.key?("viewCount")
       attributes[:comment_count] = stats["commentCount"].to_i if stats.key?("commentCount")
     end
+
+    thumb = item.dig("snippet", "thumbnails", "maxres", "url").presence ||
+            item.dig("snippet", "thumbnails", "standard", "url").presence ||
+            item.dig("snippet", "thumbnails", "high", "url").presence
+    attributes[:thumbnail_url] = thumb if thumb.present?
 
     attributes
   end

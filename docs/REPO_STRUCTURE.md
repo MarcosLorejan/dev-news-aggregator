@@ -120,6 +120,7 @@ dev-news-aggregator/
 | `article_summarizer.rb` | Pluggable article summarizer facade (`none` / `heuristic` / `openai` / `ollama`) |
 | `summarizers/` | Provider implementations for `ArticleSummarizer` |
 | `youtube_video_enricher.rb` | Optional YouTube `videos.list` duration/stats enrichment |
+| `youtube_thumbnail.rb` | Prefer `maxresdefault` still URLs from Atom/API thumbnails |
 
 ### Jobs
 

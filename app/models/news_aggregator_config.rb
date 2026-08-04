@@ -106,6 +106,16 @@ module NewsAggregatorConfig
       config.dig(:apis, :youtube, :max_duration_seconds) || 1200
     end
 
+    def youtube_exclude_shorts?
+      flag = config.dig(:apis, :youtube, :exclude_shorts)
+      flag.nil? ? true : ActiveModel::Type::Boolean.new.cast(flag)
+    end
+
+    def youtube_shorts_max_seconds
+      seconds = config.dig(:apis, :youtube, :shorts_max_seconds)
+      seconds.nil? ? 60 : [ seconds.to_i, 0 ].max
+    end
+
     def youtube_search
       config.dig(:apis, :youtube, :search) || {}
     end

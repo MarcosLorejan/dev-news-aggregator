@@ -177,7 +177,7 @@ describe('ArticleCard', () => {
     expect(thumb).toHaveAttribute('aria-label', 'Watch Hexagonal Architecture in Rails')
     expect(thumb.querySelector('img')).toHaveAttribute(
       'src',
-      'https://i.ytimg.com/vi/abc123/hqdefault.jpg'
+      'https://i.ytimg.com/vi/abc123/maxresdefault.jpg'
     )
     expect(screen.getByTestId('video-duration')).toHaveTextContent('6:12')
     expect(screen.getByTestId('video-channel')).toHaveTextContent('Thoughtbot')
