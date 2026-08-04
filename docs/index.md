@@ -25,10 +25,20 @@ Conventions: [KNOWLEDGE.md](KNOWLEDGE.md). Code layout: [REPO_STRUCTURE.md](REPO
 | [SUMMARIZER.md](SUMMARIZER.md) | Optional pluggable article summarizer providers |
 | [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md) | Overcommit setup, Conventional Commits hooks |
 
+## Decisions (*why*)
+
+| Doc | Purpose |
+|-----|---------|
+| [decisions/react-vite-two-process.md](decisions/react-vite-two-process.md) | Why Vite SPA + two-process local dev |
+| [decisions/keyword-interests.md](decisions/keyword-interests.md) | Why interests are presets + query params |
+| [decisions/agent-api-thin-contract.md](decisions/agent-api-thin-contract.md) | Why `/api/v1` stays thinner than the rich feed |
+| [decisions/youtube-atom-first.md](decisions/youtube-atom-first.md) | Why channel Atom precedes Data API search |
+| [decisions/solid-queue-windows.md](decisions/solid-queue-windows.md) | Why Solid Queue in Puma is skipped on Windows |
+| [decisions/fetch-orchestration.md](decisions/fetch-orchestration.md) | Why orchestrator vs per-source fetchers |
+
 ## Planned (milestone)
 
 | Area | Issue |
 |------|--------|
-| Decision / *why* concept files | [#409](https://github.com/MarcosLorejan/dev-news-aggregator/issues/409) |
 | Knowledge changelog (`log.md`) | [#407](https://github.com/MarcosLorejan/dev-news-aggregator/issues/407) |
 | Link / orphan drift checks | [#411](https://github.com/MarcosLorejan/dev-news-aggregator/issues/411) |

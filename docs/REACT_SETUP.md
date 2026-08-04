@@ -10,6 +10,8 @@ resource: app/frontend/
 
 This project now uses React with Vite for the frontend.
 
+*Why this shape:* [decisions/react-vite-two-process.md](decisions/react-vite-two-process.md).
+
 ## Prerequisites
 
 - Ruby 3.3.x (see `.ruby-version`) and Bundler
