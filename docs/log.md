@@ -13,6 +13,7 @@ Update this file in the **same PR** when you add or materially change knowledge 
 
 ## 2026-08-04
 
+- Evaluated `okf` 1.12.0 against `docs/`; **deferred** requiring it in CI — keep `bin/check-docs` ([#410](https://github.com/MarcosLorejan/dev-news-aggregator/issues/410)).
 - Added `bin/check-docs` (broken relative links + knowledge-map orphans), wired into `bin/validate` and CI `docs_check` ([#411](https://github.com/MarcosLorejan/dev-news-aggregator/issues/411)).
 
 ## 2026-08-03
