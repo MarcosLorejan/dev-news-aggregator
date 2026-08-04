@@ -1,3 +1,11 @@
+---
+type: Guide
+title: Agent API (v1)
+description: Stable /api/v1 JSON contract for machine clients and coding agents.
+tags: [api, agents]
+resource: app/controllers/api/v1/
+---
+
 # Agent API (v1)
 
 Stable JSON contract for machine clients and coding agents. Prefer these

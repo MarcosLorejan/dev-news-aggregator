@@ -4,6 +4,7 @@ Thanks for improving Dev News Aggregator. This file is the short entry point; ke
 
 ## Start Here
 
+- [docs/index.md](docs/index.md) for the knowledge map (one-line purpose per doc).
 - [AGENTS.md](AGENTS.md) for AI-agent workflow, scope, and verification guardrails.
 - [docs/KNOWLEDGE.md](docs/KNOWLEDGE.md) for OKF-inspired knowledge conventions (what belongs in guides vs decision/concept docs).
 - [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for setup, architecture, coding standards, tests, and git conventions.

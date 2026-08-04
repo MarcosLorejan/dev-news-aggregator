@@ -1,10 +1,17 @@
+---
+type: Guide
+title: Development guide
+description: Setup, architecture, coding standards, tests, and git conventions.
+tags: [development, setup]
+---
+
 # Development Guide
 
 Project-specific commands, architecture, and conventions for dev-news-aggregator.
 
 For the directory map, see [REPO_STRUCTURE.md](REPO_STRUCTURE.md). **Update that file whenever you change project structure** (new folders, models, routes, migrations, etc.).
 
-For how we store durable project knowledge (guides vs decision/concept docs, OKF-inspired practices), see [KNOWLEDGE.md](KNOWLEDGE.md).
+For orientation across docs, start at [index.md](index.md). For how we store durable project knowledge (guides vs decision/concept docs, OKF-inspired practices), see [KNOWLEDGE.md](KNOWLEDGE.md).
 
 ## Development commands
 

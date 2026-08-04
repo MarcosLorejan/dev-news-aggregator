@@ -1,3 +1,10 @@
+---
+type: Map
+title: Repository structure
+description: Living directory map and structural maintenance rules for this codebase.
+tags: [structure, map]
+---
+
 # Repository Structure
 
 Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
@@ -205,6 +212,7 @@ dev-news-aggregator/
 
 | File | Purpose |
 |------|---------|
+| `index.md` | Knowledge map — one-line purpose per maintained doc |
 | `KNOWLEDGE.md` | OKF-inspired knowledge conventions (instructions vs curated *why*, roadmap) |
 | `DEVELOPMENT.md` | Commands, architecture, coding and git conventions |
 | `AGENT_API.md` | Versioned `/api/v1` JSON contract for agents |
@@ -256,14 +264,15 @@ dev-news-aggregator/
 
 Agents should start here, then use this file as the navigation map:
 
-1. [AGENTS.md](../AGENTS.md) — work rules and verification (`bin/validate`)
-2. [CONTRIBUTING.md](../CONTRIBUTING.md) — PR workflow
-3. [KNOWLEDGE.md](KNOWLEDGE.md) — knowledge conventions (OKF-inspired; where *why* lives)
-4. [DEVELOPMENT.md](DEVELOPMENT.md) — setup, commands, conventions
-5. [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md) — interest/keyword feed filters
-6. [YOUTUBE.md](YOUTUBE.md) — YouTube ingestion and quota
-7. [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md) — Overcommit setup
-8. This file — directory and entry-point map
+1. [index.md](index.md) — knowledge map (one line per doc)
+2. [AGENTS.md](../AGENTS.md) — work rules and verification (`bin/validate`)
+3. [CONTRIBUTING.md](../CONTRIBUTING.md) — PR workflow
+4. [KNOWLEDGE.md](KNOWLEDGE.md) — knowledge conventions (OKF-inspired; where *why* lives)
+5. [DEVELOPMENT.md](DEVELOPMENT.md) — setup, commands, conventions
+6. [KEYWORD_FILTERS.md](KEYWORD_FILTERS.md) — interest/keyword feed filters
+7. [YOUTUBE.md](YOUTUBE.md) — YouTube ingestion and quota
+8. [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md) — Overcommit setup
+9. This file — directory and entry-point map
 
 ## Routes (summary)
 
