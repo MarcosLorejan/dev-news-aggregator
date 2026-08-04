@@ -9,6 +9,7 @@ Conventions: [KNOWLEDGE.md](KNOWLEDGE.md). Code layout: [REPO_STRUCTURE.md](REPO
 | Doc | Purpose |
 |-----|---------|
 | [KNOWLEDGE.md](KNOWLEDGE.md) | OKF-inspired conventions: instructions vs curated *why*, roadmap |
+| [log.md](log.md) | Knowledge changelog (newest first) |
 | [DEVELOPMENT.md](DEVELOPMENT.md) | Setup, architecture, coding standards, tests, git workflow |
 | [REPO_STRUCTURE.md](REPO_STRUCTURE.md) | Living directory map; update when structure changes |
 | [../AGENTS.md](../AGENTS.md) | Standing instructions for coding agents (`bin/validate`, scope) |
@@ -40,5 +41,4 @@ Conventions: [KNOWLEDGE.md](KNOWLEDGE.md). Code layout: [REPO_STRUCTURE.md](REPO
 
 | Area | Issue |
 |------|--------|
-| Knowledge changelog (`log.md`) | [#407](https://github.com/MarcosLorejan/dev-news-aggregator/issues/407) |
 | Link / orphan drift checks | [#411](https://github.com/MarcosLorejan/dev-news-aggregator/issues/411) |
