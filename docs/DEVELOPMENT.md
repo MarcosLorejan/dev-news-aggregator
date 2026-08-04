@@ -155,13 +155,14 @@ Prettier is configured (`.prettierrc.json`) but not enforced: most of the existi
 Prefer the CI-oriented wrapper before opening a PR (documented in [AGENTS.md](../AGENTS.md#verification)):
 
 ```bash
-bin/validate          # RuboCop, Brakeman, typecheck, npm test, rails test
-bin/validate --fast   # skips Brakeman and Rails tests
+bin/validate          # RuboCop, docs check, Brakeman, typecheck, npm test, rails test
+bin/validate --fast   # skips Brakeman and Rails tests (still runs docs check)
 ```
 
 | Check | `bin/validate` | CI job(s) |
 |-------|----------------|-----------|
 | RuboCop | yes | `lint` |
+| `bin/check-docs` | yes (also with `--fast`) | `docs_check` |
 | Brakeman | yes (skipped with `--fast`) | `scan_ruby` |
 | `npm run typecheck` | yes | `typecheck` |
 | `npm run lint` | yes | `frontend_lint` |

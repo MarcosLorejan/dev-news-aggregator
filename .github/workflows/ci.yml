@@ -79,6 +79,20 @@ jobs:
       - name: Lint code for consistent style
         run: bundle exec rubocop -f github
 
+  docs_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+
+      - name: Check docs links and knowledge-map orphans
+        run: ruby bin/check-docs
+
   frontend_lint:
     runs-on: ubuntu-latest
     steps:
@@ -278,12 +292,12 @@ jobs:
   quality_gate:
     runs-on: ubuntu-latest
     permissions: {}
-    needs: [scan_ruby, scan_dependencies, scan_js, lint, frontend_lint, typecheck, frontend_test, test, docker_build, docker_scan]
+    needs: [scan_ruby, scan_dependencies, scan_js, lint, docs_check, frontend_lint, typecheck, frontend_test, test, docker_build, docker_scan]
     if: always()
     steps:
       - name: Check all jobs status
         run: |
-          if [[ "${{ needs.scan_ruby.result }}" == "failure" || "${{ needs.scan_dependencies.result }}" == "failure" || "${{ needs.scan_js.result }}" == "failure" || "${{ needs.lint.result }}" == "failure" || "${{ needs.frontend_lint.result }}" == "failure" || "${{ needs.typecheck.result }}" == "failure" || "${{ needs.frontend_test.result }}" == "failure" || "${{ needs.test.result }}" == "failure" || "${{ needs.docker_build.result }}" == "failure" || "${{ needs.docker_scan.result }}" == "failure" ]]; then
+          if [[ "${{ needs.scan_ruby.result }}" == "failure" || "${{ needs.scan_dependencies.result }}" == "failure" || "${{ needs.scan_js.result }}" == "failure" || "${{ needs.lint.result }}" == "failure" || "${{ needs.docs_check.result }}" == "failure" || "${{ needs.frontend_lint.result }}" == "failure" || "${{ needs.typecheck.result }}" == "failure" || "${{ needs.frontend_test.result }}" == "failure" || "${{ needs.test.result }}" == "failure" || "${{ needs.docker_build.result }}" == "failure" || "${{ needs.docker_scan.result }}" == "failure" ]]; then
             echo "One or more jobs failed"
             exit 1
           fi

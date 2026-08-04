@@ -41,4 +41,4 @@ Conventions: [KNOWLEDGE.md](KNOWLEDGE.md). Code layout: [REPO_STRUCTURE.md](REPO
 
 | Area | Issue |
 |------|--------|
-| Link / orphan drift checks | [#411](https://github.com/MarcosLorejan/dev-news-aggregator/issues/411) |
+| Optional: evaluate `okf` gem for CI | [#410](https://github.com/MarcosLorejan/dev-news-aggregator/issues/410) |

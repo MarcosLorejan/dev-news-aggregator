@@ -9,7 +9,7 @@ tags: [structure, map]
 
 Living map of this codebase. **Keep this file in sync with the repo** — see [Maintenance](#maintenance) below.
 
-Last updated: 2026-08-03
+Last updated: 2026-08-04
 
 ## Maintenance
 
@@ -193,6 +193,7 @@ dev-news-aggregator/
 
 | Path | Purpose |
 |------|---------|
+| `lib/docs_knowledge_check.rb` | Dependency-free docs link + knowledge-map orphan checks |
 | `lib/tasks/news.rake` | `news:fetch`, `news:fetch_status`, `news:latest`, `news:clean` rake tasks |
 
 ## `test/`
@@ -206,6 +207,7 @@ dev-news-aggregator/
 | `test/helpers/` | Helper tests |
 | `test/integration/` | Multi-step workflow tests |
 | `test/system/` | Browser/system tests (Capybara) |
+| `test/lib/` | Library unit tests (e.g. docs knowledge check) |
 | `test/fixtures/` | YAML test data |
 
 ## `docs/`
@@ -248,6 +250,8 @@ dev-news-aggregator/
 | `Gemfile` / `Gemfile.lock` | Ruby gems |
 | `package.json` / `package-lock.json` | Node packages |
 | `bin/dev` | Rails-only server wrapper (`bin/rails server`); does **not** start Vite |
+| `bin/validate` | Local CI-equivalent checks (includes `bin/check-docs`) |
+| `bin/check-docs` | Docs relative-link + knowledge-map orphan checker |
 | `dev.ps1` | Windows helper that starts Postgres (if needed), Vite + Rails, and opens the browser |
 | `start-app.bat` | Double-click launcher for `dev.ps1` (full stack) |
 | `setup-local-env.ps1` | Windows one-time/repeat setup (bundle, npm, Postgres, `db:prepare`) |
