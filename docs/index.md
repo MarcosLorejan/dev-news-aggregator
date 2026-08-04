@@ -37,8 +37,4 @@ Conventions: [KNOWLEDGE.md](KNOWLEDGE.md). Code layout: [REPO_STRUCTURE.md](REPO
 | [decisions/solid-queue-windows.md](decisions/solid-queue-windows.md) | Why Solid Queue in Puma is skipped on Windows |
 | [decisions/fetch-orchestration.md](decisions/fetch-orchestration.md) | Why orchestrator vs per-source fetchers |
 
-## Planned (milestone)
-
-| Area | Issue |
-|------|--------|
-| Optional: evaluate `okf` gem for CI | [#410](https://github.com/MarcosLorejan/dev-news-aggregator/issues/410) |
+Milestone [Knowledge as code (OKF-inspired)](https://github.com/MarcosLorejan/dev-news-aggregator/milestone/20) practices are landed; requiring the `okf` gem in CI is [deferred](KNOWLEDGE.md#okf-gem-evaluation-deferred).

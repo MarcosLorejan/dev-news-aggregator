@@ -72,18 +72,35 @@ bin/check-docs
 
 It fails on broken relative Markdown links under `docs/` (plus `AGENTS.md` / `CONTRIBUTING.md`) and on `docs/**/*.md` files missing from [index.md](index.md).
 
-Graduate to `okf validate` in CI only after the tree is intentionally OKF-shaped ([#410](https://github.com/MarcosLorejan/dev-news-aggregator/issues/410)). Until then, keep this lightweight gate.
-
 Continue updating `REPO_STRUCTURE.md` in the same change when project structure changes (existing rule).
+
+## okf gem evaluation (deferred)
+
+Spike against this tree with `okf` **1.12.0** ([#410](https://github.com/MarcosLorejan/dev-news-aggregator/issues/410)):
+
+| Check | Result |
+|-------|--------|
+| `okf validate docs/` | **Fail** — `log.md` requires ISO `YYYY-MM-DD` headings only (our `## Earlier (seed)` is intentional seed text) |
+| `okf lint docs/` | Exit 0 with noise — parent links like `../AGENTS.md` look “missing” because the bundle root is `docs/`, not the repo root |
+| Frontmatter / types | Mostly fine (guides + decisions recognized) |
+
+**Decision: do not add `okf` as a required CI dependency.** Keep `bin/check-docs` as the gate.
+
+Reasons:
+
+1. `docs/` is a **mixed** corpus (how-to + decisions + pointers to repo-root `AGENTS.md` / `CONTRIBUTING.md`), not a self-contained OKF bundle.
+2. Making validate green would mean restructuring (dedicated sub-bundle, rewriting the log seed, treating root entry files as in-bundle concepts) for little gain over link/orphan checks we already run.
+3. Lint’s parent-path “missing concept” warnings are false positives for our layout.
+4. Revisit only if we extract something like `docs/knowledge/` (or `.okf/`) as a true OKF bundle and want graph/search/skill tooling.
+
+Optional local experiment (not CI): `gem install okf` then `okf validate docs/` / `okf lint docs/`.
 
 ## What we skip for now
 
-- Installing `okf` as a required dependency
+- Installing `okf` as a required dependency or CI job
 - Rewriting guides into a full `.okf/` or OKF-conformant tree
 - Graph server, registry, or Claude plugin from okf-gem
 - Replacing `REPO_STRUCTURE.md` with an OKF index
-
-Revisit only after the roadmap below is in decent shape ([#410](https://github.com/MarcosLorejan/dev-news-aggregator/issues/410)).
 
 ## Writing durable *why*
 
@@ -107,7 +124,7 @@ Initial decision set: [docs/decisions/](decisions/) ([#409](https://github.com/M
 | Durable why / decision concept files | [#409](https://github.com/MarcosLorejan/dev-news-aggregator/issues/409) |
 | `docs/log.md` knowledge changelog | [#407](https://github.com/MarcosLorejan/dev-news-aggregator/issues/407) |
 | Lightweight link / orphan checks | [#411](https://github.com/MarcosLorejan/dev-news-aggregator/issues/411) |
-| Optional: evaluate `okf` gem for CI | [#410](https://github.com/MarcosLorejan/dev-news-aggregator/issues/410) |
+| Evaluate `okf` gem for CI | [#410](https://github.com/MarcosLorejan/dev-news-aggregator/issues/410) — **deferred** (see [okf gem evaluation](#okf-gem-evaluation-deferred)) |
 
 ## References
 
