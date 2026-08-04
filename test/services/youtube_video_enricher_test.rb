@@ -119,11 +119,33 @@ class YoutubeVideoEnricherTest < ActiveSupport::TestCase
     assert_nil Article.find_by(id: @video.id)
   end
 
+  test "enrich! discards Shorts by duration when exclude_shorts is enabled" do
+    stub_videos_list(
+      items: [
+        {
+          "id" => "abc123XYZ",
+          "contentDetails" => { "duration" => "PT45S" },
+          "statistics" => { "viewCount" => "9", "commentCount" => "0" },
+          "snippet" => {
+            "thumbnails" => {
+              "maxres" => { "url" => "https://i.ytimg.com/vi/abc123XYZ/maxresdefault.jpg" }
+            }
+          }
+        }
+      ]
+    )
+
+    result = YoutubeVideoEnricher.enrich!
+
+    assert_equal 1, result[:enriched]
+    assert_nil Article.find_by(id: @video.id)
+  end
+
   private
 
   def stub_videos_list(items:)
     stub_request(:get, %r{https://www\.googleapis\.com/youtube/v3/videos})
-      .with(query: hash_including("part" => "contentDetails,statistics", "key" => "test-key"))
+      .with(query: hash_including("part" => "contentDetails,statistics,snippet", "key" => "test-key"))
       .to_return(
         status: 200,
         body: { items: items }.to_json,

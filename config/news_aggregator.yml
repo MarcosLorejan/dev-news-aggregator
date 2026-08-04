@@ -80,6 +80,9 @@ development: &default
       enrich_max_per_run: 100
       # After enrichment, drop videos longer than this (seconds). 0 disables.
       max_duration_seconds: 1200
+      # Drop Shorts (URL/title heuristics + duration ≤ shorts_max_seconds after enrich).
+      exclude_shorts: true
+      shorts_max_seconds: 60
       # Keyword search discovery (search.list). Disabled by default — burns ~100 units/call.
       search:
         enabled: false
@@ -91,15 +94,22 @@ development: &default
         relevance_language: en
         region_code: US
         published_after_days: 7 # used when a filter has never been searched
+      # Tools / languages first — skip corporate AI promo defaults.
       channels:
-        - channel_id: "UCWnPjmqvljcafA0QXblOU1A"
-          name: "Confreaks"
         - channel_id: "UCsBjURrPoezykLs9EqgamOA"
           name: "Fireship"
-        - channel_id: "UC_x5XG1OV2P6uZZ5FSM9Ttw"
-          name: "Google for Developers"
-        - channel_id: "UCUyeluBRhGPCW4rPe7MhPUA"
-          name: "ThePrimeagen"
+        - channel_id: "UC29ju8bIPH5as8OGnQzwJyA"
+          name: "Traversy Media"
+        - channel_id: "UCFbNIlppjAuEX4znoulh0Cw"
+          name: "Web Dev Simplified"
+        - channel_id: "UC8butISFwT-Wl7EV0hUK0BQ"
+          name: "freeCodeCamp.org"
+        - channel_id: "UCmEzz-dPBVrsy4ZluSsYHDg"
+          name: "Hyperplexed"
+        - channel_id: "UCbRP3c757lWg9M-U7TyEkXA"
+          name: "Theo - t3.gg"
+        - channel_id: "UCCezIgC97PvUuR4_gbFUs5g"
+          name: "Corey Schafer"
 
 test:
   <<: *default

@@ -134,7 +134,7 @@ class YoutubeKeywordDiscovery
       source_type: self.class.source_key_for(filter),
       published_at: published_at,
       content_type: "video",
-      thumbnail_url: thumbnail,
+      thumbnail_url: YoutubeThumbnail.preferred_url(thumbnail, video_id: video_id),
       author: snippet["channelTitle"].presence,
       score: 0,
       comment_count: 0

@@ -52,10 +52,55 @@ class NewsFetchers::YoutubeFetcherTest < ActiveSupport::TestCase
     assert_equal "https://www.youtube.com/watch?v=abc123XYZ", article.url
     assert_equal "video", article.content_type
     assert_equal "Confreaks", article.author
-    assert_equal "https://i.ytimg.com/vi/abc123XYZ/hqdefault.jpg", article.thumbnail_url
+    assert_equal "https://i.ytimg.com/vi/abc123XYZ/maxresdefault.jpg", article.thumbnail_url
     assert_equal 1234, article.score
     assert_equal 0, article.comment_count
     assert_equal "A talk about Rails performance.", article.description
+  end
+
+  test "fetch_articles skips Shorts by URL or #shorts title" do
+    stub_youtube_feed(<<~ATOM)
+      <feed xmlns:yt="http://www.youtube.com/xml/schemas/2015"
+            xmlns:media="http://search.yahoo.com/mrss/"
+            xmlns="http://www.w3.org/2005/Atom">
+        <entry>
+          <yt:videoId>shortAAA</yt:videoId>
+          <title>Quick tip</title>
+          <link rel="alternate" href="https://www.youtube.com/shorts/shortAAA"/>
+          <published>2024-06-01T12:00:00+00:00</published>
+          <media:group>
+            <media:thumbnail url="https://i.ytimg.com/vi/shortAAA/hqdefault.jpg"/>
+          </media:group>
+        </entry>
+        <entry>
+          <yt:videoId>shortBBB</yt:videoId>
+          <title>Another tip #shorts</title>
+          <link rel="alternate" href="https://www.youtube.com/watch?v=shortBBB"/>
+          <published>2024-06-01T13:00:00+00:00</published>
+          <media:group>
+            <media:thumbnail url="https://i.ytimg.com/vi/shortBBB/hqdefault.jpg"/>
+          </media:group>
+        </entry>
+        <entry>
+          <yt:videoId>longCCC</yt:videoId>
+          <title>Full tutorial</title>
+          <link rel="alternate" href="https://www.youtube.com/watch?v=longCCC"/>
+          <published>2024-06-01T14:00:00+00:00</published>
+          <media:group>
+            <media:thumbnail url="https://i.ytimg.com/vi/longCCC/hqdefault.jpg"/>
+          </media:group>
+        </entry>
+      </feed>
+    ATOM
+
+    assert_difference "Article.count", 1 do
+      articles = @fetcher.fetch_articles
+      assert_equal 1, articles.length
+    end
+
+    assert Article.exists?(external_id: "longCCC", source_type: "youtube_#{@channel_id}")
+    assert_not Article.exists?(external_id: "shortAAA")
+    assert_not Article.exists?(external_id: "shortBBB")
   end
 
   test "fetch_articles updates existing videos without wiping a higher score when views are missing" do

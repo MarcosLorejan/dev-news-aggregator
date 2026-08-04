@@ -70,6 +70,8 @@ Do not commit real keys.
 | `enrich_batch_size` | `50` | IDs per `videos.list` call (clamped 1–50) |
 | `enrich_max_per_run` | `100` | Max videos enriched per job run |
 | `max_duration_seconds` | `1200` | After enrichment, destroy non-bookmarked/non-read videos longer than this (`0` disables) |
+| `exclude_shorts` | `true` | Skip `/shorts/` URLs and `#shorts` titles on ingest; hide them in the feed |
+| `shorts_max_seconds` | `60` | After enrichment, destroy non-bookmarked/non-read videos at or below this length |
 | `search.enabled` | `false` | Keyword `search.list` discovery |
 | `search.daily_call_budget` | `20` | Hard cap on search calls per UTC day |
 | `search.min_interval_hours` | `12` | Per-interest minimum gap between searches |

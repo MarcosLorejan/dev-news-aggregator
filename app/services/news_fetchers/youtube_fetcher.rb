@@ -137,6 +137,11 @@ class NewsFetchers::YoutubeFetcher < NewsFetchers::BaseFetcher
   end
 
   def create_article_from_atom_entry(entry)
+    if NewsAggregatorConfig.youtube_exclude_shorts? && short_entry?(entry)
+      Rails.logger.info "Skipping YouTube Short #{entry[:video_id]} from #{@channel_id}"
+      return
+    end
+
     published_at = Time.iso8601(entry[:published_at])
     source_type = source_key
 
@@ -148,7 +153,7 @@ class NewsFetchers::YoutubeFetcher < NewsFetchers::BaseFetcher
       external_id: entry[:video_id],
       source_type: source_type,
       content_type: "video",
-      thumbnail_url: entry[:thumbnail_url],
+      thumbnail_url: YoutubeThumbnail.preferred_url(entry[:thumbnail_url], video_id: entry[:video_id]),
       author: entry[:author],
       comment_count: 0
     }
@@ -163,5 +168,11 @@ class NewsFetchers::YoutubeFetcher < NewsFetchers::BaseFetcher
     @articles << article if article.persisted?
   rescue StandardError => e
     Rails.logger.error "Error creating YouTube video #{entry[:video_id]}: #{e.message}"
+  end
+
+  def short_entry?(entry)
+    url = entry[:url].to_s
+    title = entry[:title].to_s
+    url.match?(%r{/shorts/}i) || title.match?(/#\s*shorts\b/i)
   end
 end

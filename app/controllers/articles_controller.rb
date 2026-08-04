@@ -155,6 +155,7 @@ class ArticlesController < ApplicationController
     scope = apply_keyword_filter(scope)
     scope = apply_content_type_filter(scope)
     scope = apply_max_duration_filter(scope)
+    scope = apply_shorts_exclusion(scope)
     scope = scope.with_topic_tag(params[:tag])
     scope = helpers.apply_category_filter(scope, params[:category]) if apply_category
     scope = ArticleClusterer.primaries(scope)
@@ -167,6 +168,22 @@ class ArticlesController < ApplicationController
     when "article" then scope.articles_only
     else scope
     end
+  end
+
+  # Hide Shorts even before enrichment: URL/title markers, and known ultra-short durations.
+  def apply_shorts_exclusion(scope)
+    return scope unless NewsAggregatorConfig.youtube_exclude_shorts?
+
+    max_short = NewsAggregatorConfig.youtube_shorts_max_seconds
+    scope = scope.where.not("articles.url ILIKE ?", "%/shorts/%")
+    scope = scope.where.not("articles.title ILIKE ?", "%#shorts%")
+    return scope if max_short <= 0
+
+    scope.where(
+      "articles.content_type != ? OR articles.duration_seconds IS NULL OR articles.duration_seconds > ?",
+      "video",
+      max_short
+    )
   end
 
   # max_duration is in minutes. Text articles are untouched; videos with unknown duration
