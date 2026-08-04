@@ -3,6 +3,7 @@ import {
   apiRequest,
   clearMutatingAuthCredentials,
   isAbortError,
+  isTransientNetworkError,
   setMutatingAuthCredentials,
 } from './client'
 
@@ -94,5 +95,14 @@ describe('apiRequest', () => {
     expect(isAbortError(new DOMException('Aborted', 'AbortError'))).toBe(true)
     expect(isAbortError(Object.assign(new Error('Aborted'), { name: 'AbortError' }))).toBe(true)
     expect(isAbortError(new Error('other'))).toBe(false)
+  })
+
+  it('isTransientNetworkError detects common fetch failures', () => {
+    expect(isTransientNetworkError(new TypeError('Failed to fetch'))).toBe(true)
+    expect(isTransientNetworkError(new Error('NetworkError when attempting to fetch resource.'))).toBe(
+      true
+    )
+    expect(isTransientNetworkError(new Error('Request failed: 500'))).toBe(false)
+    expect(isTransientNetworkError(new DOMException('Aborted', 'AbortError'))).toBe(false)
   })
 })

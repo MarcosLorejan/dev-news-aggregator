@@ -36,6 +36,19 @@ describe('useAsyncResource', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.data).toBeNull()
+    expect(result.current.error).toBe('boom')
+  })
+
+  it('falls back to errorMessage when the loader throws a non-Error', async () => {
+    const loader = vi.fn(async (_signal: AbortSignal) => {
+      throw 'nope'
+    })
+
+    const { result } = renderHook(() =>
+      useAsyncResource(loader, { errorMessage: 'Could not load.' })
+    )
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.error).toBe('Could not load.')
   })
 

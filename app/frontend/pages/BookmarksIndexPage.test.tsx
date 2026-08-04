@@ -84,7 +84,7 @@ describe('BookmarksIndexPage', () => {
 
     renderPage()
 
-    expect(await screen.findByText('Failed to load reading list. Please try again.')).toBeInTheDocument()
+    expect(await screen.findByText('network')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Retry' }))
 

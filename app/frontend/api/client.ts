@@ -11,6 +11,19 @@ export function isAbortError(error: unknown): boolean {
   )
 }
 
+/** True for common transient browser network failures (offline, connection reset, CORS-ish TypeErrors). */
+export function isTransientNetworkError(error: unknown): boolean {
+  if (!(error instanceof Error) || isAbortError(error)) return false
+  const message = error.message.toLowerCase()
+  return (
+    error.name === 'TypeError' ||
+    message.includes('failed to fetch') ||
+    message.includes('networkerror') ||
+    message.includes('network request failed') ||
+    message.includes('load failed')
+  )
+}
+
 export function setMutatingAuthCredentials(username: string, password: string): void {
   sessionStorage.setItem(MUTATING_AUTH_STORAGE_KEY, btoa(`${username}:${password}`))
 }
