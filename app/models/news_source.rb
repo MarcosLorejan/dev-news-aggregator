@@ -29,13 +29,13 @@ class NewsSource < ApplicationRecord
     end
 
     NewsAggregatorConfig.youtube_channels.each do |channel|
-      source = find_or_initialize_by(source_type: "youtube", name: channel[:name])
-      source.active = true if source.new_record?
-      source.config = {
-        "channel_id" => channel[:channel_id],
-        "channel_name" => channel[:name]
-      }
-      source.save!
+      find_or_create_by!(source_type: "youtube", name: channel[:name]) do |source|
+        source.active = true
+        source.config = {
+          "channel_id" => channel[:channel_id],
+          "channel_name" => channel[:name]
+        }
+      end
     end
 
     retire_removed_youtube_defaults!
