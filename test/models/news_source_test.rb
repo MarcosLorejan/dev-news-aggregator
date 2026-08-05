@@ -63,4 +63,34 @@ class NewsSourceTest < ActiveSupport::TestCase
     assert_equal NewsAggregatorConfig.youtube_channels.length,
                  NewsSource.where(source_type: "youtube").count
   end
+
+  test "bootstrap_defaults preserves local YouTube channel_id edits" do
+    default = NewsAggregatorConfig.youtube_channels.first
+    source = NewsSource.create!(
+      name: default[:name],
+      source_type: "youtube",
+      active: true,
+      config: { "channel_id" => "UClocalOverride12345678901", "channel_name" => default[:name] }
+    )
+
+    NewsSource.bootstrap_defaults!
+
+    assert_equal "UClocalOverride12345678901", source.reload.channel_id
+  end
+
+  test "bootstrap_defaults retires removed YouTube defaults without deleting them" do
+    retired = NewsSource.create!(
+      name: "Google for Developers",
+      source_type: "youtube",
+      active: true,
+      config: {
+        "channel_id" => "UC_x5XG1OV2P6uZZ5FSM9Ttw",
+        "channel_name" => "Google for Developers"
+      }
+    )
+
+    NewsSource.bootstrap_defaults!
+
+    assert_not retired.reload.active?
+  end
 end
