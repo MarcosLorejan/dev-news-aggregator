@@ -100,6 +100,33 @@ If a hook fails, you'll see output explaining what went wrong:
 - **YAML syntax errors**: Fix syntax in the affected YAML file
 - **Message Format failures**: Rewrite the subject to Conventional Commits (examples below)
 
+### `invalid byte sequence in UTF-8` on Windows
+
+If every commit aborts before any hook runs, with a stack trace through `win32_symlink?` and a "Report this bug" banner:
+
+```
+invalid byte sequence in UTF-8
+.../overcommit/utils/file_utils.rb:67:in `win32_symlink?'
+.../overcommit/utils.rb:268:in `broken_symlink?'
+.git/hooks/pre-commit:80:in `<main>'
+```
+
+your console is using a legacy code page. On Windows, Overcommit detects symlinks by shelling out to `dir` and regex-matching the output, but `dir` emits text in the console code page (CP 850 on a pt-BR console) while Ruby tags it as UTF-8. Overcommit checks every modified file this way, so this fires on any commit, not just ones touching symlinks.
+
+Switch the console to UTF-8:
+
+```powershell
+chcp.com 65001
+```
+
+`.\setup-local-env.ps1` does this for you, but only for the console you run it in. To make it permanent, add it to your PowerShell profile:
+
+```powershell
+Add-Content $PROFILE "`nchcp.com 65001 > `$null"
+```
+
+Tracked in [#446](https://github.com/MarcosLorejan/dev-news-aggregator/issues/446); the underlying encoding bug is in Overcommit itself, not this repo.
+
 ### Signature Verification Errors
 If Overcommit reports that the configuration signature changed:
 ```bash

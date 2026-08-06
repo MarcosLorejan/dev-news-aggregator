@@ -5,6 +5,17 @@ $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 Set-Location $root
 
+# Overcommit detects symlinks by matching `dir` output as UTF-8, so on a console
+# using a legacy code page (CP 850 on pt-BR) every commit aborts with
+# "invalid byte sequence in UTF-8" before any hook runs.
+if ([Console]::OutputEncoding.CodePage -ne 65001) {
+    Write-Host "==> Switching console to the UTF-8 code page (65001)..." -ForegroundColor Cyan
+    chcp.com 65001 | Out-Null
+    Write-Host "    This applies to the current console only. To make it permanent, add" -ForegroundColor DarkGray
+    Write-Host "    'chcp.com 65001 > `$null' to your PowerShell `$PROFILE." -ForegroundColor DarkGray
+    Write-Host "    See docs/PRE_COMMIT_HOOKS.md" -ForegroundColor DarkGray
+}
+
 $envExample = Join-Path $root ".env.example"
 $envFile = Join-Path $root ".env"
 if (-not (Test-Path $envFile)) {
@@ -13,7 +24,7 @@ if (-not (Test-Path $envFile)) {
         Copy-Item $envExample $envFile
         Write-Host "    Fill optional REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET for OAuth scores." -ForegroundColor DarkGray
     } else {
-        Write-Host "Missing .env.example — skip creating .env." -ForegroundColor Yellow
+        Write-Host "Missing .env.example - skip creating .env." -ForegroundColor Yellow
     }
 } else {
     Write-Host "==> .env already present (left unchanged)." -ForegroundColor DarkGray
