@@ -8,10 +8,15 @@ class NewsFetchers::RedditFetcher < NewsFetchers::BaseFetcher
   headers "User-Agent" => USER_AGENT
 
   class << self
-    attr_writer :min_request_interval_seconds, :access_token, :access_token_expires_at, :rate_limit_backoff_seconds
+    attr_writer :min_request_interval_seconds, :access_token, :access_token_expires_at,
+                :rate_limit_backoff_seconds, :rate_limit_jitter_factor
 
     def min_request_interval_seconds
       @min_request_interval_seconds || NewsAggregatorConfig.reddit_min_request_interval_seconds
+    end
+
+    def rate_limit_jitter_factor
+      @rate_limit_jitter_factor.nil? ? 0.25 : @rate_limit_jitter_factor
     end
 
     def rate_limit_backoff_seconds(attempt)
@@ -38,7 +43,7 @@ class NewsFetchers::RedditFetcher < NewsFetchers::BaseFetcher
         now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         if @last_request_at
           wait = min_request_interval_seconds - (now - @last_request_at)
-          sleep(wait) if wait.positive?
+          Kernel.sleep(wait) if wait.positive?
         end
         @last_request_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       end
@@ -174,8 +179,18 @@ class NewsFetchers::RedditFetcher < NewsFetchers::BaseFetcher
 
     unless response.success?
       body_preview = response.body.to_s.gsub(/\s+/, " ").strip[0, 200]
-      raise FetchError,
-            "HTTP #{response.code} for #{response.request&.uri}: #{body_preview.presence || '(empty body)'}"
+      message = "HTTP #{response.code} for #{response.request&.uri}: #{body_preview.presence || '(empty body)'}"
+      code = response.code.to_i
+
+      if code == 429
+        raise RateLimitedError.new(
+          message,
+          http_status: code,
+          retry_after_seconds: self.class.parse_retry_after_seconds(response)
+        )
+      end
+
+      raise FetchError, message
     end
 
     payload = response.parsed_response
@@ -197,17 +212,31 @@ class NewsFetchers::RedditFetcher < NewsFetchers::BaseFetcher
       attempt += 1
       raise if attempt >= max_attempts
 
-      wait = rate_limit_backoff_seconds(attempt)
+      wait = compute_rate_limit_wait(e, attempt)
       Rails.logger.warn(
-        "Reddit r/#{@subreddit} rate limited (attempt #{attempt}/#{max_attempts - 1}); sleeping #{wait}s"
+        "Reddit r/#{@subreddit} rate limited (attempt #{attempt}/#{max_attempts - 1}); sleeping #{wait.round(2)}s"
       )
-      sleep(wait)
+      Kernel.sleep(wait)
       retry
     end
   end
 
   def rate_limited_error?(error)
-    error.message.match?(/HTTP 429\b/)
+    return true if error.is_a?(RateLimitedError)
+    return true if error.message.match?(/HTTP 429\b/)
+
+    # Unauthenticated Atom path: Reddit often returns transient 403 under back-pressure.
+    !self.class.oauth_configured? && error.message.match?(/HTTP 403\b/)
+  end
+
+  def compute_rate_limit_wait(error, attempt)
+    header_wait = error.is_a?(RateLimitedError) ? error.retry_after_seconds : nil
+    wait = header_wait.nil? ? rate_limit_backoff_seconds(attempt).to_f : header_wait.to_f
+    max_wait = NewsAggregatorConfig.reddit_rate_limit_max_wait_seconds
+    wait = [ wait, max_wait ].min
+    return 0.0 if wait <= 0
+
+    self.class.with_jitter(wait, factor: self.class.rate_limit_jitter_factor)
   end
 
   def rate_limit_backoff_seconds(attempt)

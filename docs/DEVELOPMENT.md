@@ -214,7 +214,7 @@ whenever --clear-crontab
 
 **Service-oriented architecture**: Business logic separated into service classes rather than fat models. Each news source has its own fetcher service.
 
-**Fail-safe aggregation**: If one news source fails, others continue processing. Errors are logged but don't stop the entire aggregation process. Sources run in parallel threads; each fetcher uses configured HTTP timeouts and retries with exponential backoff.
+**Fail-safe aggregation**: If one news source fails, others continue processing. Errors are logged but don't stop the entire aggregation process. Sources run in parallel threads; each fetcher uses configured HTTP timeouts and retries with jittered exponential backoff. Rate-limited responses honor `Retry-After` / `x-ratelimit-reset` when present.
 
 **Idempotent updates**: Articles use `find_or_initialize_by(external_id, source_type)` to prevent duplicates while allowing updates to existing articles.
 
@@ -252,7 +252,9 @@ config/schedule.rb                      # Cron job definitions
 
 **Dev.to**: Uses REST API (`dev.to/api/articles`) with query params for pagination and filtering by top posts from last 7 days.
 
-**Reddit**: Multiple instances for different subreddits. Each subreddit is treated as a separate source type in the database. By default, fetchers read the public Atom feed (`/r/{subreddit}/.rss`) because unauthenticated `.json` listings return HTTP 403 (Atom has no score fields, so new articles seed `score`/`comment_count` to 0). Set `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` in `.env` (loaded into the Rails process by `LocalEnv` / `dev.ps1` / `bin/dev` — see Environment configuration) to switch to OAuth JSON listings on `oauth.reddit.com`, which persist real scores and comment counts. Check with `bin/rails news:reddit_oauth_status` (prints present/length only, never secret values). Requests share a configurable throttle (`apis.reddit.min_request_interval_seconds`); HTTP 429 responses are retried with backoff (`apis.reddit.rate_limit_max_retries`) and failures are recorded on `FetchRun` instead of silent zero-article success.
+**Reddit**: Multiple instances for different subreddits. Each subreddit is treated as a separate source type in the database. By default, fetchers read the public Atom feed (`/r/{subreddit}/.rss`) because unauthenticated `.json` listings return HTTP 403 (Atom has no score fields, so new articles seed `score`/`comment_count` to 0). Set `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` in `.env` (loaded into the Rails process by `LocalEnv` / `dev.ps1` / `bin/dev` — see Environment configuration) to switch to OAuth JSON listings on `oauth.reddit.com`, which persist real scores and comment counts. Check with `bin/rails news:reddit_oauth_status` (prints present/length only, never secret values).
+
+Unauthenticated Atom is aggressively rate-limited (~1 request/minute as of mid-2026). Requests share a configurable throttle (`apis.reddit.min_request_interval_seconds`, default **60s**) so a full multi-subreddit run does not burst into HTTP 429. HTTP 429 (and transient Atom 403) responses are retried with bounded backoff that prefers `Retry-After` / `x-ratelimit-reset`, capped by `apis.reddit.rate_limit_max_wait_seconds`. Prefer OAuth when you need denser polling or scores. Failures are recorded on `FetchRun` instead of silent zero-article success.
 
 **YouTube**: Channel uploads via public Atom feeds (no API key). Optional `YOUTUBE_API_KEY` enables `videos.list` enrichment (duration/stats) and opt-in keyword `search.list` discovery with a hard daily budget. Manage channels at `/sources`. Full quota/config details: [YOUTUBE.md](YOUTUBE.md).
 
