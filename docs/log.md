@@ -13,6 +13,7 @@ Update this file in the **same PR** when you add or materially change knowledge 
 
 ## 2026-08-06
 
+- Documented the Windows UTF-8 code page requirement for Overcommit in [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md); a legacy code page aborts every commit ([#446](https://github.com/MarcosLorejan/dev-news-aggregator/issues/446)).
 - Raised the Node.js floor from 20 to 24 in [DEVELOPMENT.md](DEVELOPMENT.md) and [REACT_SETUP.md](REACT_SETUP.md); jsdom 30 dropped Node 20 ([#418](https://github.com/MarcosLorejan/dev-news-aggregator/pull/418)).
 
 ## 2026-08-04
