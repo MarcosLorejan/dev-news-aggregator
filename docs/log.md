@@ -11,6 +11,10 @@ Dated history of **project knowledge** changes (guides, decisions, maps). Newest
 
 Update this file in the **same PR** when you add or materially change knowledge under `docs/` (see [KNOWLEDGE.md](KNOWLEDGE.md)). Do not log every typo; do log new decisions, new guides, and structural doc moves.
 
+## 2026-08-06
+
+- Raised the Node.js floor from 20 to 24 in [DEVELOPMENT.md](DEVELOPMENT.md) and [REACT_SETUP.md](REACT_SETUP.md); jsdom 30 dropped Node 20 ([#418](https://github.com/MarcosLorejan/dev-news-aggregator/pull/418)).
+
 ## 2026-08-04
 
 - Evaluated `okf` 1.12.0 against `docs/`; **deferred** requiring it in CI — keep `bin/check-docs` ([#410](https://github.com/MarcosLorejan/dev-news-aggregator/issues/410)).

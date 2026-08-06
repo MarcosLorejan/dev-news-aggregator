@@ -18,7 +18,7 @@ For orientation across docs, start at [index.md](index.md). For how we store dur
 ### Prerequisites
 
 - Ruby matching `.ruby-version` (currently 3.3.12) and Bundler
-- Node.js 20+ and npm
+- Node.js 24+ and npm (jsdom 30 requires `^22.22.2 || ^24.15.0 || >=26`)
 - Docker Compose (PostgreSQL) or a local Postgres 15 instance
 
 ### Setup & database

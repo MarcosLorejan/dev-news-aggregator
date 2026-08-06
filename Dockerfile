@@ -34,7 +34,7 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install Node.js for Vite (vite_rails hooks into assets:precompile)
-ARG NODE_VERSION=20.19.0
+ARG NODE_VERSION=24.19.0
 ENV PATH=/usr/local/node/bin:$PATH
 RUN curl -fsSL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
     /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
