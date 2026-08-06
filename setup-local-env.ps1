@@ -5,6 +5,20 @@ $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 Set-Location $root
 
+$envExample = Join-Path $root ".env.example"
+$envFile = Join-Path $root ".env"
+if (-not (Test-Path $envFile)) {
+    if (Test-Path $envExample) {
+        Write-Host "==> Creating .env from .env.example..." -ForegroundColor Cyan
+        Copy-Item $envExample $envFile
+        Write-Host "    Fill optional REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET for OAuth scores." -ForegroundColor DarkGray
+    } else {
+        Write-Host "Missing .env.example — skip creating .env." -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "==> .env already present (left unchanged)." -ForegroundColor DarkGray
+}
+
 Write-Host "==> Installing Ruby gems..." -ForegroundColor Cyan
 bundle install
 

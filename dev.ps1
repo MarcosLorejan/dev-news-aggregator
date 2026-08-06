@@ -106,6 +106,50 @@ function Get-NpmCmdPath {
     return $npmCmd
 }
 
+# Allowlisted keys mirrored from lib/local_env.rb / .env.example.
+$script:LocalEnvAllowlist = @(
+    "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DB",
+    "DB_HOST", "DB_PORT", "DB_USERNAME", "DB_PASSWORD",
+    "SECRET_KEY_BASE", "APP_HOSTS",
+    "MUTATING_AUTH_USERNAME", "MUTATING_AUTH_PASSWORD",
+    "ERROR_WEBHOOK_URL",
+    "REDDIT_CLIENT_ID", "REDDIT_CLIENT_SECRET",
+    "YOUTUBE_API_KEY",
+    "ARTICLE_SUMMARIZER_PROVIDER",
+    "OPENAI_API_KEY", "OPENAI_API_URL", "OPENAI_MODEL",
+    "OLLAMA_BASE_URL", "OLLAMA_MODEL"
+)
+
+function Import-LocalDotEnv {
+    param([string]$Path = (Join-Path $root ".env"))
+
+    if (-not (Test-Path $Path)) { return 0 }
+
+    $script:DotEnvLoadedCount = 0
+    Get-Content -Path $Path -Encoding UTF8 | ForEach-Object {
+        $line = $_.Trim()
+        if ([string]::IsNullOrWhiteSpace($line) -or $line.StartsWith("#")) { return }
+        $eq = $line.IndexOf("=")
+        if ($eq -lt 1) { return }
+
+        $key = $line.Substring(0, $eq).Trim()
+        if ($script:LocalEnvAllowlist -notcontains $key) { return }
+
+        $existing = [Environment]::GetEnvironmentVariable($key, "Process")
+        if (-not [string]::IsNullOrWhiteSpace($existing)) { return }
+
+        $value = $line.Substring($eq + 1).Trim()
+        if (($value.StartsWith('"') -and $value.EndsWith('"')) -or
+            ($value.StartsWith("'") -and $value.EndsWith("'"))) {
+            $value = $value.Substring(1, $value.Length - 2)
+        }
+
+        Set-Item -Path "Env:$key" -Value $value
+        $script:DotEnvLoadedCount++
+    }
+    return $script:DotEnvLoadedCount
+}
+
 function Start-NpmRunDev {
     param([string]$WorkingDirectory)
 
@@ -160,6 +204,13 @@ function Start-BrowserWhenReady {
 }
 
 Disable-ConsoleQuickEdit
+
+$dotenvLoaded = Import-LocalDotEnv
+if ($dotenvLoaded -gt 0) {
+    Write-Host "Loaded $dotenvLoaded allowlisted key(s) from .env into the process." -ForegroundColor DarkGray
+} elseif (-not (Test-Path (Join-Path $root ".env"))) {
+    Write-Host "No .env found. Copy .env.example to .env for optional secrets (Reddit OAuth, YouTube, etc.)." -ForegroundColor DarkGray
+}
 
 Start-PostgresIfNeeded
 

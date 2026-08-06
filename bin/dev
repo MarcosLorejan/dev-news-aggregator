@@ -2,4 +2,10 @@
 # Rails-only: runs `bin/rails server`. Does not start Vite.
 # Full stack: `npm run dev` + Rails, or `.\dev.ps1` on Windows.
 # See docs/DEVELOPMENT.md and AGENTS.md.
+#
+# Loads allowlisted keys from `.env` into ENV (when unset) so optional
+# secrets like REDDIT_CLIENT_* reach the Rails process without dotenv-rails.
+require_relative "../lib/local_env"
+LocalEnv.load!
+
 exec "./bin/rails", "server", *ARGV

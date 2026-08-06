@@ -82,6 +82,9 @@ bin/rails news:fetch
 # Show last fetch outcome per source
 bin/rails news:fetch_status
 
+# Reddit OAuth: present?/length only (never prints secrets)
+bin/rails news:reddit_oauth_status
+
 # Show latest 10 articles
 bin/rails news:latest
 
@@ -249,7 +252,7 @@ config/schedule.rb                      # Cron job definitions
 
 **Dev.to**: Uses REST API (`dev.to/api/articles`) with query params for pagination and filtering by top posts from last 7 days.
 
-**Reddit**: Multiple instances for different subreddits. Each subreddit is treated as a separate source type in the database. By default, fetchers read the public Atom feed (`/r/{subreddit}/.rss`) because unauthenticated `.json` listings return HTTP 403 (Atom has no score fields, so new articles seed `score`/`comment_count` to 0). Set `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` to switch to OAuth JSON listings on `oauth.reddit.com`, which persist real scores and comment counts. Requests share a configurable throttle (`apis.reddit.min_request_interval_seconds`, default 2.5s); HTTP 429 responses are retried with backoff (`apis.reddit.rate_limit_max_retries`) and failures are recorded on `FetchRun` instead of silent zero-article success.
+**Reddit**: Multiple instances for different subreddits. Each subreddit is treated as a separate source type in the database. By default, fetchers read the public Atom feed (`/r/{subreddit}/.rss`) because unauthenticated `.json` listings return HTTP 403 (Atom has no score fields, so new articles seed `score`/`comment_count` to 0). Set `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` in `.env` (loaded into the Rails process by `LocalEnv` / `dev.ps1` / `bin/dev` — see Environment configuration) to switch to OAuth JSON listings on `oauth.reddit.com`, which persist real scores and comment counts. Check with `bin/rails news:reddit_oauth_status` (prints present/length only, never secret values). Requests share a configurable throttle (`apis.reddit.min_request_interval_seconds`); HTTP 429 responses are retried with backoff (`apis.reddit.rate_limit_max_retries`) and failures are recorded on `FetchRun` instead of silent zero-article success.
 
 **YouTube**: Channel uploads via public Atom feeds (no API key). Optional `YOUTUBE_API_KEY` enables `videos.list` enrichment (duration/stats) and opt-in keyword `search.list` discovery with a hard daily budget. Manage channels at `/sources`. Full quota/config details: [YOUTUBE.md](YOUTUBE.md).
 
@@ -265,12 +268,24 @@ Articles table uses generic fields to accommodate all news sources:
 
 ### Environment configuration
 
-Copy `.env.example` to `.env` before starting the stack. Docker Compose reads it to create the PostgreSQL container:
+Copy `.env.example` to `.env` before starting the stack (`.\setup-local-env.ps1` creates `.env` from the example when missing). Docker Compose reads `.env` to create the PostgreSQL container:
 - `POSTGRES_USER`: dev_news_user
 - `POSTGRES_PASSWORD`: dev_password
 - `POSTGRES_DB`: dev_news_aggregator_development
 
-`config/database.yml` falls back to those same credentials (`DB_USERNAME`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`), so Rails connects to the container with no extra setup. Rails does not load `.env` itself — export `DB_*` in your shell only when pointing Rails at a different database. Windows setup (`setup-local-env.ps1`) uses the same credentials.
+`config/database.yml` falls back to those same credentials (`DB_USERNAME`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`), so Rails connects to the container with no extra setup.
+
+**Important:** there is no `dotenv-rails` gem. Putting secrets only in the `.env` file is not enough unless something loads them into the process:
+
+| Loader | When |
+|--------|------|
+| `LocalEnv` (`lib/local_env.rb`) via `config/initializers/local_env.rb` | Development Rails boot (`bin/rails`, console, runners) |
+| `bin/dev` | Before `bin/rails server` |
+| `.\dev.ps1` | Before starting Vite + Rails on Windows |
+
+Only allowlisted keys from `.env.example` are imported, and existing ENV values are never overwritten. Export `DB_*` in your shell only when pointing Rails at a different database.
+
+For Reddit OAuth scores: set both `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` in `.env`, restart the app, then run `bin/rails news:reddit_oauth_status` and confirm `oauth_configured: true` / `fetch_path: oauth_json`. New Reddit apps may require Reddit’s API approval (Responsible Builder Policy); that is outside this repo.
 
 ### Key features
 
@@ -362,7 +377,8 @@ CD is implemented as `.github/workflows/deploy.yml` (manual `workflow_dispatch`)
 | Variable | `KAMAL_SERVER_HOST` | Host/IP for `ssh-keyscan` (same as `servers.web`) |
 | Secret | `SSH_PRIVATE_KEY` | Private key for the deploy user |
 | Secret | `RAILS_MASTER_KEY` | Production credentials key |
-| Secret | `MUTATING_AUTH_USERNAME` / `MUTATING_AUTH_PASSWORD` | Optional; enable mutating Basic auth |
+| Secret | `MUTATING_AUTH_USERNAME` / `MUTATING_AUTH_PASSWORD` | Optional; enable mutating Basic auth (uncomment in `config/deploy.yml` + `.kamal/secrets`) |
+| Secret | `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` | Optional; Reddit OAuth JSON listings with scores (uncomment in `config/deploy.yml` + `.kamal/secrets`) |
 
 Images push to `ghcr.io/marcoslorejan/dev-news-aggregator` using `GITHUB_TOKEN`. Use a GitHub Environment named `production` for optional approval gates.
 

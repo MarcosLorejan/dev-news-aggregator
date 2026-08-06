@@ -83,4 +83,61 @@ class NewsRakeTest < ActiveSupport::TestCase
   ensure
     Rake::Task["news:clean"].reenable
   end
+
+  test "news:reddit_oauth_status reports masked configuration without secrets" do
+    previous_id = ENV["REDDIT_CLIENT_ID"]
+    previous_secret = ENV["REDDIT_CLIENT_SECRET"]
+    ENV.delete("REDDIT_CLIENT_ID")
+    ENV.delete("REDDIT_CLIENT_SECRET")
+    NewsFetchers::RedditFetcher.reset_oauth_token!
+
+    output = capture_io do
+      Rake::Task["news:reddit_oauth_status"].invoke
+    end.join
+
+    assert_match(/oauth_configured:\s+false/, output)
+    assert_match(/fetch_path:\s+atom_rss/, output)
+    assert_match(/present=false/, output)
+    refute_match(/REDDIT_CLIENT_SECRET=\S+/, output)
+  ensure
+    if previous_id
+      ENV["REDDIT_CLIENT_ID"] = previous_id
+    else
+      ENV.delete("REDDIT_CLIENT_ID")
+    end
+    if previous_secret
+      ENV["REDDIT_CLIENT_SECRET"] = previous_secret
+    else
+      ENV.delete("REDDIT_CLIENT_SECRET")
+    end
+    Rake::Task["news:reddit_oauth_status"].reenable
+  end
+
+  test "news:reddit_oauth_status reports oauth path when both credentials present" do
+    previous_id = ENV["REDDIT_CLIENT_ID"]
+    previous_secret = ENV["REDDIT_CLIENT_SECRET"]
+    ENV["REDDIT_CLIENT_ID"] = "test-client-id"
+    ENV["REDDIT_CLIENT_SECRET"] = "test-client-secret-value"
+
+    output = capture_io do
+      Rake::Task["news:reddit_oauth_status"].invoke
+    end.join
+
+    assert_match(/oauth_configured:\s+true/, output)
+    assert_match(/fetch_path:\s+oauth_json/, output)
+    assert_match(/present=true length=#{ENV['REDDIT_CLIENT_SECRET'].length}/, output)
+    refute_includes output, "test-client-secret-value"
+  ensure
+    if previous_id
+      ENV["REDDIT_CLIENT_ID"] = previous_id
+    else
+      ENV.delete("REDDIT_CLIENT_ID")
+    end
+    if previous_secret
+      ENV["REDDIT_CLIENT_SECRET"] = previous_secret
+    else
+      ENV.delete("REDDIT_CLIENT_SECRET")
+    end
+    Rake::Task["news:reddit_oauth_status"].reenable
+  end
 end

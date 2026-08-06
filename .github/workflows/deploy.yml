@@ -48,4 +48,6 @@ jobs:
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           MUTATING_AUTH_USERNAME: ${{ secrets.MUTATING_AUTH_USERNAME }}
           MUTATING_AUTH_PASSWORD: ${{ secrets.MUTATING_AUTH_PASSWORD }}
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
         run: bundle exec kamal deploy
